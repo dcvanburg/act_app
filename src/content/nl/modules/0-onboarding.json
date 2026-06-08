@@ -1,0 +1,42 @@
+{
+  "id": "onboarding",
+  "moduleNumber": 0,
+  "title": "Welkom & Intake",
+  "phase": "Onboarding",
+  "actProcess": "Introductie filosofie",
+  "bodyWork": "Lichaamsbewustzijn intake",
+  "goal": "Je voelt je begrepen en weet wat je te wachten staat.",
+  "sections": [
+    {
+      "id": "intro",
+      "title": "Welkom",
+      "body": "[PLACEHOLDER — warme introductie op de filosofie van de app]"
+    },
+    {
+      "id": "how-it-works",
+      "title": "Hoe het programma werkt",
+      "body": "[PLACEHOLDER — uitleg programma en ACT]"
+    },
+    {
+      "id": "philosophy",
+      "title": "Onze filosofie",
+      "points": [
+        "Klachten zijn niet de vijand — vermijding wel.",
+        "Het lichaam is geen bijzaak — het is de poort.",
+        "Waarden zijn het kompas, niet symptoomvrij zijn.",
+        "Terugval is informatie, geen mislukking."
+      ]
+    }
+  ],
+  "bodyExercise": {
+    "title": "Eerste kennismaking",
+    "description": "Korte bodyscan om te voelen waar je nu bent.",
+    "audioUrl": null,
+    "transcript": "[PLACEHOLDER — transcript lichaamsgerichte oefening]"
+  },
+  "practicalTask": {
+    "title": "Praktische opdracht",
+    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+  },
+  "backReferences": []
+}

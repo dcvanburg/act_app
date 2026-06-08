@@ -1,0 +1,42 @@
+{
+  "id": "acceptance",
+  "moduleNumber": 2,
+  "title": "Acceptatie",
+  "phase": "Fundament",
+  "actProcess": "Acceptatie — ruimte maken voor wat is",
+  "bodyWork": "Ademruimte",
+  "goal": "Je ervaart het verschil tussen acceptatie en berusting.",
+  "sections": [
+    {
+      "id": "not-giving-up",
+      "title": "Acceptatie is niet opgeven",
+      "body": "[PLACEHOLDER — stoppen met oorlog voeren]"
+    },
+    {
+      "id": "paradox",
+      "title": "De paradox van controle",
+      "body": "[PLACEHOLDER — hoe meer je vecht, hoe sterker het wordt]"
+    },
+    {
+      "id": "making-space",
+      "title": "Ruimte maken",
+      "body": "[PLACEHOLDER — ruimte maken als vaardigheid]"
+    }
+  ],
+  "bodyExercise": {
+    "title": "Ademruimte",
+    "description": "Iets toelaten zonder weg te gaan. Ademen naar het ongemak toe.",
+    "audioUrl": null,
+    "transcript": "[PLACEHOLDER]"
+  },
+  "practicalTask": {
+    "title": "Praktische opdracht",
+    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+  },
+  "backReferences": [
+    {
+      "moduleId": "recognition",
+      "label": "Terug naar: De vermijdingscirkel"
+    }
+  ]
+}

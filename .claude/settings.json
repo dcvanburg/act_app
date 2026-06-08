@@ -1,0 +1,47 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Bash(cat .env*)",
+      "Bash(git push --force*)",
+      "Bash(git push origin main*)",
+      "Bash(git push origin master*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read fp; blocked=false; for pattern in package-lock.json pnpm-lock.yaml yarn.lock .git/ node_modules/ dist/ .next/ build/; do case \"$fp\" in *\"$pattern\"*) blocked=true;; esac; done; case \"$fp\" in *.env|*.env.local|*.env.production|*.env.development) blocked=true;; esac; if $blocked; then echo \"BLOCKED: Writing to $fp is not allowed.\" >&2; exit 2; fi; } || true"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.command // empty' | { read cmd; branch=$(cd \"${CLAUDE_PROJECT_DIR:-.}\" && git rev-parse --abbrev-ref HEAD 2>/dev/null); if echo \"$cmd\" | grep -qE '^git push' && echo \"$branch\" | grep -qE '^(main|master)$'; then echo \"BLOCKED: Never push directly to $branch. Use a feature branch and PR.\" >&2; exit 2; fi; } || true"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"${CLAUDE_PROJECT_DIR:-.}\" && git diff --name-only 2>/dev/null | xargs grep -l 'console\\.log\\|console\\.debug' 2>/dev/null | head -10 | { files=$(cat); if [ -n \"$files\" ]; then echo \"WARNING: Debug statements in modified files:\" >&2; echo \"$files\" >&2; fi; } || true"
+          }
+        ]
+      }
+    ]
+  }
+}

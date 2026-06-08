@@ -1,0 +1,42 @@
+{
+  "id": "self-as-context",
+  "moduleNumber": 5,
+  "title": "Zelf-als-context",
+  "phase": "Kern",
+  "actProcess": "Het observerende zelf",
+  "bodyWork": "Centreren",
+  "goal": "Je ervaart dat je meer bent dan de klacht.",
+  "sections": [
+    {
+      "id": "not-the-complaint",
+      "title": "Jij bent niet je klacht",
+      "body": "[PLACEHOLDER — niet je pijn, angst of drang]"
+    },
+    {
+      "id": "content-container",
+      "title": "Inhoud en container",
+      "body": "[PLACEHOLDER — gedachten/gevoelens vs jij]"
+    },
+    {
+      "id": "observing-core",
+      "title": "De observerende kern",
+      "body": "[PLACEHOLDER — stabiel punt]"
+    }
+  ],
+  "bodyExercise": {
+    "title": "Centreren",
+    "description": "Voelen wie er kijkt. Aarden in het lichaam vanuit de kern.",
+    "audioUrl": null,
+    "transcript": "[PLACEHOLDER]"
+  },
+  "practicalTask": {
+    "title": "Praktische opdracht",
+    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+  },
+  "backReferences": [
+    {
+      "moduleId": "presence",
+      "label": "Terug naar: Aanwezig zijn als observator"
+    }
+  ]
+}

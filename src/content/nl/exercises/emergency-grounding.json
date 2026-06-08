@@ -1,0 +1,25 @@
+{
+  "id": "emergency-grounding",
+  "title": "Grondingsoefening",
+  "description": "Een korte adem- en grondingoefening om je te helpen terug te komen in het hier en nu.",
+  "steps": [
+    {
+      "id": "pause",
+      "instruction": "[PLACEHOLDER — neem een moment]"
+    },
+    {
+      "id": "breath",
+      "instruction": "[PLACEHOLDER — ademhaling]"
+    },
+    {
+      "id": "ground",
+      "instruction": "[PLACEHOLDER — voel contact met de grond]"
+    }
+  ],
+  "audioUrl": null,
+  "transcript": "[PLACEHOLDER — noodknop oefening]",
+  "crisisLink": {
+    "label": "Meer hulp nodig?",
+    "path": "/noodhulp"
+  }
+}

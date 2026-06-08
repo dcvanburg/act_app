@@ -1,0 +1,35 @@
+{
+  "app": {
+    "name": "Van Overleven naar Leven",
+    "tagline": "Een zelfgeleid therapeutisch programma"
+  },
+  "nav": {
+    "home": "Home",
+    "program": "Programma",
+    "exercises": "Oefeningen",
+    "journal": "Dagboek",
+    "checkIn": "Check-in",
+    "settings": "Instellingen"
+  },
+  "actions": {
+    "continue": "Verder",
+    "back": "Terug",
+    "save": "Opslaan",
+    "complete": "Afronden",
+    "pause": "Pauzeren",
+    "start": "Beginnen",
+    "skip": "Overslaan"
+  },
+  "emergency": {
+    "buttonLabel": "Noodknop",
+    "title": "Grondingsoefening",
+    "crisisLine": "Crisislijn: 0800-0113",
+    "crisisLineDescription": "24 uur per dag, 7 dagen per week bereikbaar"
+  },
+  "progress": {
+    "moduleLocked": "Deze module wordt beschikbaar na het afronden van de vorige stap.",
+    "moduleCompleted": "Afgerond",
+    "moduleInProgress": "Bezig",
+    "dailyPracticeLocked": "Dagelijkse praktijk wordt beschikbaar na het voltooien van het programma."
+  }
+}

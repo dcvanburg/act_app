@@ -1,0 +1,12 @@
+---
+description: Security and therapeutic safety
+globs: "**/*"
+alwaysApply: false
+---
+
+# Safety
+
+- Safety check in onboarding must block on crisis signals
+- Crisislijn: 0800-0113 on `/noodhulp`
+- Journal/progress = GDPR-sensitive; minimal collection
+- No copyrighted ACT workbook text in content files

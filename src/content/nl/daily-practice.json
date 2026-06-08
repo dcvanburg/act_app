@@ -1,0 +1,21 @@
+{
+  "title": "Dagelijkse praktijk",
+  "description": "Je hebt het programma doorlopen. Hier kun je oefeningen, reflecties en check-ins blijven gebruiken.",
+  "features": {
+    "exercises": {
+      "title": "Losse oefeningen",
+      "description": "Oefeningen per thema — te gebruiken wanneer je ze nodig hebt.",
+      "placeholder": "[PLACEHOLDER — oefeningenbibliotheek]"
+    },
+    "journal": {
+      "title": "Dagboek",
+      "description": "Reflecties bijhouden.",
+      "promptPlaceholder": "[PLACEHOLDER — optionele schrijfprompts]"
+    },
+    "checkIn": {
+      "title": "Wekelijkse check-in",
+      "description": "Hoe staat het met je waarden?",
+      "questionsPlaceholder": "[PLACEHOLDER — check-in vragen]"
+    }
+  }
+}

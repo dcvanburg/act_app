@@ -1,0 +1,42 @@
+{
+  "id": "values",
+  "moduleNumber": 6,
+  "title": "Waarden",
+  "phase": "Kern",
+  "actProcess": "Verduidelijken van waarden",
+  "bodyWork": "Hartgebied-oefening",
+  "goal": "Je weet wat je werkelijk beweegt en gebruikt dat als richting.",
+  "sections": [
+    {
+      "id": "directions-not-goals",
+      "title": "Waarden zijn richtingen",
+      "body": "[PLACEHOLDER — geen doelen]"
+    },
+    {
+      "id": "worth-living",
+      "title": "Wat maakt het de moeite waard",
+      "body": "[PLACEHOLDER — ook als de pijn blijft]"
+    },
+    {
+      "id": "compass",
+      "title": "Waarden als kompas",
+      "body": "[PLACEHOLDER — bij moeilijke keuzes]"
+    }
+  ],
+  "bodyExercise": {
+    "title": "Hartgebied-oefening",
+    "description": "Wat beweegt je werkelijk? Voelen vanuit het lichaam.",
+    "audioUrl": null,
+    "transcript": "[PLACEHOLDER]"
+  },
+  "practicalTask": {
+    "title": "Praktische opdracht",
+    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+  },
+  "backReferences": [
+    {
+      "moduleId": "self-as-context",
+      "label": "Terug naar: Vanuit het observerende zelf"
+    }
+  ]
+}

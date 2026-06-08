@@ -1,0 +1,28 @@
+{
+  "disclaimer": {
+    "title": "Belangrijk",
+    "body": "Deze app is geen vervanging voor professionele hulp bij acute suïcidaliteit, zelfbeschadiging, ernstige psychiatrische problematiek of ernstige verslavingsproblematiek zonder begeleiding."
+  },
+  "resources": {
+    "title": "Hulp nodig?",
+    "crisisLine": {
+      "name": "Crisislijn",
+      "phone": "0800-0113",
+      "phoneUri": "tel:08000113",
+      "description": "24/7 bereikbaar voor directe hulp"
+    },
+    "huisarts": {
+      "name": "Huisarts",
+      "description": "Neem contact op met je huisarts voor verwijzing"
+    },
+    "ggz": {
+      "name": "GGZ",
+      "description": "Geestelijke gezondheidszorg via verwijzing van je huisarts"
+    }
+  },
+  "safetyBlock": {
+    "title": "We maken ons zorgen om je",
+    "body": "Op basis van je antwoorden raden we aan om eerst contact op te nemen met professionele hulp voordat je verder gaat met het programma.",
+    "action": "Bekijk hulpmiddelen"
+  }
+}

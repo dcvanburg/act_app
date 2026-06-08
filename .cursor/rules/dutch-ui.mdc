@@ -1,0 +1,12 @@
+---
+description: Dutch content layer rules
+globs: src/**/*.{ts,tsx},src/content/**
+alwaysApply: false
+---
+
+# Dutch UI
+
+- User-facing strings: Dutch from `src/content/nl/**/*.json`
+- Never hardcode Dutch or English in components
+- `[PLACEHOLDER]` = therapist content pending
+- Crisis copy: `src/content/nl/crisis.json`

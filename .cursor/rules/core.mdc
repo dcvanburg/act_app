@@ -1,0 +1,13 @@
+---
+description: Core project standards for act_app
+alwaysApply: true
+---
+
+# act_app — Van Overleven naar Leven
+
+- Dutch UI via `src/content/nl/` only; English code
+- Read `AGENTS.md` and relevant `docs/` before implementing
+- Emergency button on every screen; never weaken crisis flows
+- Module unlock: linear; completed modules revisitable
+- Minimal diff scope; run verify before PR
+- Never commit `.env` or secrets

@@ -1,0 +1,42 @@
+{
+  "id": "committed-action",
+  "moduleNumber": 7,
+  "title": "Toegewijd handelen",
+  "phase": "Leven",
+  "actProcess": "Committed action — leven in de richting van waarden",
+  "bodyWork": "Bewegingsoefening",
+  "goal": "Je zet concrete, kleine stappen ondanks klachten.",
+  "sections": [
+    {
+      "id": "small-steps",
+      "title": "Kleine stappen",
+      "body": "[PLACEHOLDER — kleine stappen zijn echte stappen]"
+    },
+    {
+      "id": "relapse-info",
+      "title": "Terugval als informatie",
+      "body": "[PLACEHOLDER — wat zegt dit over wat ik echt wil]"
+    },
+    {
+      "id": "flexible-persistence",
+      "title": "Flexibel persisteren",
+      "body": "[PLACEHOLDER — aanpassen zonder opgeven]"
+    }
+  ],
+  "bodyExercise": {
+    "title": "Bewegingsoefening",
+    "description": "Het lichaam meenemen in een nieuwe richting.",
+    "audioUrl": null,
+    "transcript": "[PLACEHOLDER]"
+  },
+  "practicalTask": {
+    "title": "Praktische opdracht",
+    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+  },
+  "backReferences": [
+    {
+      "moduleId": "values",
+      "label": "Terug naar: Waarden als richting"
+    }
+  ]
+}

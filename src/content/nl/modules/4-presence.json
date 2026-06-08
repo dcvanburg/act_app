@@ -1,0 +1,42 @@
+{
+  "id": "presence",
+  "moduleNumber": 4,
+  "title": "Aanwezig zijn",
+  "phase": "Kern",
+  "actProcess": "Contact met het huidige moment",
+  "bodyWork": "Zintuigenoefening",
+  "goal": "Je verankert je in het nu — zonder zweverigheid.",
+  "sections": [
+    {
+      "id": "mindfulness-skill",
+      "title": "Mindfulness als vaardigheid",
+      "body": "[PLACEHOLDER — niet als levensfilosofie]"
+    },
+    {
+      "id": "present-moment",
+      "title": "Het heden",
+      "body": "[PLACEHOLDER — enige plek waar verandering mogelijk is]"
+    },
+    {
+      "id": "daily-anchors",
+      "title": "Ankers voor het dagelijks leven",
+      "body": "[PLACEHOLDER — praktische ankers]"
+    }
+  ],
+  "bodyExercise": {
+    "title": "Zintuigenoefening",
+    "description": "Het lichaam als anker in het nu.",
+    "audioUrl": null,
+    "transcript": "[PLACEHOLDER]"
+  },
+  "practicalTask": {
+    "title": "Praktische opdracht",
+    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+  },
+  "backReferences": [
+    {
+      "moduleId": "defusion",
+      "label": "Terug naar: Gedachten over verleden en toekomst"
+    }
+  ]
+}

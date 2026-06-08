@@ -1,0 +1,27 @@
+{
+  "title": "Wat speelt er bij jou?",
+  "subtitle": "Dit helpt ons het programma op jou af te stemmen. Er is geen goed of fout antwoord.",
+  "complaintTypes": {
+    "pain": {
+      "label": "Chronische pijn",
+      "description": "Fysieke en/of psychosomatische pijn"
+    },
+    "mental": {
+      "label": "Mentale klachten",
+      "description": "Angst, burn-out, depressie, stress"
+    },
+    "alcohol": {
+      "label": "Alcohol of verslaving",
+      "description": "Alcoholproblematiek of andere verslavingsklachten"
+    },
+    "combination": {
+      "label": "Combinatie",
+      "description": "Meerdere van bovenstaande"
+    }
+  },
+  "safetyCheck": {
+    "title": "Veiligheidscheck",
+    "description": "[PLACEHOLDER — screeningvragen in te vullen door therapeut]",
+    "questions": []
+  }
+}

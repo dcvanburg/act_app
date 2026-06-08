@@ -1,0 +1,37 @@
+{
+  "id": "recognition",
+  "moduleNumber": 1,
+  "title": "Herkennen",
+  "phase": "Fundament",
+  "actProcess": "Psycho-educatie & de vermijdingscirkel",
+  "bodyWork": "Bodyscan",
+  "goal": "Je herkent je eigen patroon van reageren op klachten.",
+  "sections": [
+    {
+      "id": "how-it-works",
+      "title": "Hoe klachten werken",
+      "body": "[PLACEHOLDER — hoe pijn/stress/drang werkt in het systeem]"
+    },
+    {
+      "id": "avoidance-cycle",
+      "title": "De vermijdingscirkel",
+      "body": "[PLACEHOLDER — korte termijn opluchting, lange termijn versterking]"
+    },
+    {
+      "id": "brain",
+      "title": "Het brein als overlevingsmachine",
+      "body": "[PLACEHOLDER — psycho-educatie]"
+    }
+  ],
+  "bodyExercise": {
+    "title": "Bodyscan",
+    "description": "Waar leef jij in je lichaam? Welke gebieden zijn er, welke zijn er niet?",
+    "audioUrl": null,
+    "transcript": "[PLACEHOLDER]"
+  },
+  "practicalTask": {
+    "title": "Praktische opdracht",
+    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+  },
+  "backReferences": []
+}

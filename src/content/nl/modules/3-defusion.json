@@ -1,0 +1,42 @@
+{
+  "id": "defusion",
+  "moduleNumber": 3,
+  "title": "Defusie",
+  "phase": "Kern",
+  "actProcess": "Cognitieve defusie — afstand nemen van gedachten",
+  "bodyWork": "Spanning & loslaten",
+  "goal": "Je ervaart dat gedachten gedachten zijn, geen feiten.",
+  "sections": [
+    {
+      "id": "fused-vs-observer",
+      "title": "Gefuseerd of observerend",
+      "body": "[PLACEHOLDER — verschil tussen gefuseerd zijn en observeren]"
+    },
+    {
+      "id": "inner-critic",
+      "title": "De innerlijke criticus",
+      "body": "[PLACEHOLDER — luidspreker, niet waarheid]"
+    },
+    {
+      "id": "techniques",
+      "title": "Defusietechnieken",
+      "body": "[PLACEHOLDER — eigen versie therapeut]"
+    }
+  ],
+  "bodyExercise": {
+    "title": "Spanning en loslaten",
+    "description": "Wat houdt je lichaam vast als je gelooft in een gedachte?",
+    "audioUrl": null,
+    "transcript": "[PLACEHOLDER]"
+  },
+  "practicalTask": {
+    "title": "Praktische opdracht",
+    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+  },
+  "backReferences": [
+    {
+      "moduleId": "acceptance",
+      "label": "Terug naar: Acceptatie van gedachten"
+    }
+  ]
+}
