@@ -15,9 +15,11 @@ export default function NoodhulpPage() {
   return (
     <main className="min-h-screen bg-background pb-28">
       <div className="mx-auto max-w-lg px-4 py-8">
-
         {/* Back link — only if user might be in the app */}
-        <Link href="/" className="mb-6 inline-flex items-center gap-1 text-sm text-text-muted hover:text-primary">
+        <Link
+          href="/"
+          className="mb-6 inline-flex items-center gap-1 text-sm text-text-muted hover:text-primary"
+        >
           ← Terug
         </Link>
 

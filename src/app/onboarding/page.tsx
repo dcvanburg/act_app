@@ -32,7 +32,7 @@ export default async function OnboardingPage() {
   // Onboarding is always accessible — status check is a safeguard
   if (status === 'locked') notFound();
 
-  const lastStepId = progress.modules.find(m => m.moduleId === 'onboarding')?.lastStepId ?? null;
+  const lastStepId = progress.modules.find((m) => m.moduleId === 'onboarding')?.lastStepId ?? null;
 
   if (status === 'completed') {
     return <ModuleReadOnlyView content={content} complaintTypes={progress.intake.complaintTypes} />;

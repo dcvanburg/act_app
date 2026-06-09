@@ -14,7 +14,7 @@ export const MODULE_ORDER: ModuleId[] = [
 export const FINAL_SCREEN_ID = 'practical-task';
 
 export function getModuleStatus(moduleId: ModuleId, progress: UserProgress): ModuleStatus {
-  const stored = progress.modules.find(m => m.moduleId === moduleId);
+  const stored = progress.modules.find((m) => m.moduleId === moduleId);
   if (stored) return stored.status;
 
   const index = MODULE_ORDER.indexOf(moduleId);
@@ -24,7 +24,7 @@ export function getModuleStatus(moduleId: ModuleId, progress: UserProgress): Mod
   const prevId = MODULE_ORDER[index - 1];
   if (!prevId) return 'locked';
 
-  const prev = progress.modules.find(m => m.moduleId === prevId);
+  const prev = progress.modules.find((m) => m.moduleId === prevId);
   return prev?.status === 'completed' ? 'available' : 'locked';
 }
 
@@ -34,7 +34,7 @@ export function isAccessible(moduleId: ModuleId, progress: UserProgress): boolea
 }
 
 export function getResumeScreenId(moduleId: ModuleId, progress: UserProgress): string | null {
-  return progress.modules.find(m => m.moduleId === moduleId)?.lastStepId ?? null;
+  return progress.modules.find((m) => m.moduleId === moduleId)?.lastStepId ?? null;
 }
 
 export function getDefaultProgress(): UserProgress {
@@ -53,7 +53,7 @@ export function withModuleUpdate(
   completed: boolean,
 ): UserProgress {
   const now = new Date().toISOString();
-  const existingIndex = progress.modules.findIndex(m => m.moduleId === moduleId);
+  const existingIndex = progress.modules.findIndex((m) => m.moduleId === moduleId);
   const modules = [...progress.modules];
 
   if (existingIndex >= 0) {
@@ -62,7 +62,11 @@ export function withModuleUpdate(
     modules[existingIndex] = {
       ...existing,
       lastStepId,
-      status: completed ? 'completed' : existing.status === 'completed' ? 'completed' : 'in_progress',
+      status: completed
+        ? 'completed'
+        : existing.status === 'completed'
+          ? 'completed'
+          : 'in_progress',
       ...(completed && existing.status !== 'completed' ? { completedAt: now } : {}),
     };
   } else {
@@ -75,8 +79,8 @@ export function withModuleUpdate(
     });
   }
 
-  const allCompleted = MODULE_ORDER.every(id =>
-    modules.find(m => m.moduleId === id)?.status === 'completed',
+  const allCompleted = MODULE_ORDER.every(
+    (id) => modules.find((m) => m.moduleId === id)?.status === 'completed',
   );
 
   return { ...progress, modules, dailyPracticeUnlocked: allCompleted };

@@ -47,22 +47,31 @@ export function ProgramOverview({ progress }: Props) {
   );
 }
 
-function ModuleIndicator({ index, status }: { index: number; status: ReturnType<typeof getModuleStatus> }) {
-  const base = 'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold';
+function ModuleIndicator({
+  index,
+  status,
+}: {
+  index: number;
+  status: ReturnType<typeof getModuleStatus>;
+}) {
+  const base =
+    'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold';
   const styles = {
-    completed:   `${base} bg-primary text-white`,
+    completed: `${base} bg-primary text-white`,
     in_progress: `${base} bg-primary/20 text-primary`,
-    available:   `${base} border-2 border-primary text-primary`,
-    locked:      `${base} border-2 border-border text-text-muted`,
+    available: `${base} border-2 border-primary text-primary`,
+    locked: `${base} border-2 border-border text-text-muted`,
   };
-  return (
-    <span className={styles[status]}>
-      {status === 'completed' ? '✓' : index}
-    </span>
-  );
+  return <span className={styles[status]}>{status === 'completed' ? '✓' : index}</span>;
 }
 
-function ModuleInfo({ meta, status }: { meta: { title: string; phase: string }; status: ReturnType<typeof getModuleStatus> }) {
+function ModuleInfo({
+  meta,
+  status,
+}: {
+  meta: { title: string; phase: string };
+  status: ReturnType<typeof getModuleStatus>;
+}) {
   return (
     <div className="flex-1 min-w-0">
       <p className="text-xs font-medium uppercase tracking-wide text-text-muted">{meta.phase}</p>
@@ -76,15 +85,31 @@ function ModuleInfo({ meta, status }: { meta: { title: string; phase: string }; 
 
 function LockIcon() {
   return (
-    <svg className="h-4 w-4 flex-shrink-0 text-text-muted" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" />
+    <svg
+      className="h-4 w-4 flex-shrink-0 text-text-muted"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        fillRule="evenodd"
+        d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z"
+        clipRule="evenodd"
+      />
     </svg>
   );
 }
 
 function ChevronIcon() {
   return (
-    <svg className="h-4 w-4 flex-shrink-0 text-text-muted" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+    <svg
+      className="h-4 w-4 flex-shrink-0 text-text-muted"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
     </svg>
   );

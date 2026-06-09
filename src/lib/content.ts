@@ -25,12 +25,12 @@ export function getModuleContent(moduleId: ModuleId): ModuleContent {
 }
 
 export const MODULE_META: Record<ModuleId, { title: string; phase: string }> = {
-  onboarding:         { title: 'Welkom & Intake',    phase: 'Start' },
-  recognition:        { title: 'Herkennen',           phase: 'Fundament' },
-  acceptance:         { title: 'Acceptatie',          phase: 'Fundament' },
-  defusion:           { title: 'Defusie',             phase: 'Kern' },
-  presence:           { title: 'Aanwezig zijn',       phase: 'Kern' },
-  'self-as-context':  { title: 'Zelf-als-context',    phase: 'Kern' },
-  values:             { title: 'Waarden',             phase: 'Kern' },
-  'committed-action': { title: 'Toegewijd handelen',  phase: 'Leven' },
+  onboarding: { title: 'Welkom & Intake', phase: 'Start' },
+  recognition: { title: 'Herkennen', phase: 'Fundament' },
+  acceptance: { title: 'Acceptatie', phase: 'Fundament' },
+  defusion: { title: 'Defusie', phase: 'Kern' },
+  presence: { title: 'Aanwezig zijn', phase: 'Kern' },
+  'self-as-context': { title: 'Zelf-als-context', phase: 'Kern' },
+  values: { title: 'Waarden', phase: 'Kern' },
+  'committed-action': { title: 'Toegewijd handelen', phase: 'Leven' },
 };

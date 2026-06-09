@@ -58,14 +58,14 @@ describe('isAccessible', () => {
 describe('withModuleUpdate', () => {
   it('creates a new module entry on first visit', () => {
     const updated = withModuleUpdate(base, 'onboarding', 'intro', false);
-    const mod = updated.modules.find(m => m.moduleId === 'onboarding');
+    const mod = updated.modules.find((m) => m.moduleId === 'onboarding');
     expect(mod?.status).toBe('in_progress');
     expect(mod?.lastStepId).toBe('intro');
   });
 
   it('marks module completed on final screen', () => {
     const updated = withModuleUpdate(base, 'onboarding', 'practical-task', true);
-    const mod = updated.modules.find(m => m.moduleId === 'onboarding');
+    const mod = updated.modules.find((m) => m.moduleId === 'onboarding');
     expect(mod?.status).toBe('completed');
     expect(mod?.completedAt).toBeDefined();
   });
@@ -73,7 +73,7 @@ describe('withModuleUpdate', () => {
   it('does not downgrade a completed module', () => {
     const withCompleted = withModuleUpdate(base, 'onboarding', 'practical-task', true);
     const updated = withModuleUpdate(withCompleted, 'onboarding', 'intro', false);
-    expect(updated.modules.find(m => m.moduleId === 'onboarding')?.status).toBe('completed');
+    expect(updated.modules.find((m) => m.moduleId === 'onboarding')?.status).toBe('completed');
   });
 
   it('unlocks dailyPractice when all modules completed', () => {
