@@ -93,8 +93,10 @@ export default function LoginScreen() {
               resizeMode="contain"
               style={{ width: 96, height: 96, marginBottom: 12 }}
             />
-            <Text className="font-serif text-3xl font-bold text-text">{common.app.name}</Text>
-            <Text className="mt-1 text-base text-text-subtle">{common.app.tagline}</Text>
+            <Text className="text-center font-serif text-3xl font-bold leading-tight text-text">
+              {common.app.nameDisplay}
+            </Text>
+            <Text className="mt-2 text-base text-text-subtle">{common.app.tagline}</Text>
           </View>
 
           {step === 'sent' ? (
