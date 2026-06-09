@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img">
+  <title>ACT notification icon</title>
+  <desc>Minimal monochrome notification icon. Android renders the foreground white and tints with notification colour.</desc>
+
+  <rect width="96" height="96" fill="#FFFFFF"/>
+  <circle cx="48" cy="48" r="30" fill="#3B6D11"/>
+  <circle cx="48" cy="48" r="8" fill="#FFFFFF"/>
+</svg>
