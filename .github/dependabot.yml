@@ -6,6 +6,13 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    # Never auto-propose major version bumps — they require manual migration work.
+    # Covers: Next.js 16, ESLint 10, TypeScript 6, Tailwind 4, Vitest 4, etc.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
+      production-dependencies:
+        dependency-type: production
       dev-dependencies:
         dependency-type: development
