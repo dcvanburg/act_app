@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { Link, type Href } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 
 import { MODULE_META } from '@/lib/content';
@@ -23,7 +23,10 @@ export function ProgramOverview({ progress }: Props) {
         const status = getModuleStatus(moduleId, progress);
         const meta = MODULE_META[moduleId];
         const locked = status === 'locked';
-        const href = moduleId === 'onboarding' ? '/onboarding' : `/modules/${moduleId}`;
+        const href: Href =
+          moduleId === 'onboarding'
+            ? '/onboarding'
+            : { pathname: '/modules/[id]', params: { id: moduleId } };
 
         if (locked) {
           return (

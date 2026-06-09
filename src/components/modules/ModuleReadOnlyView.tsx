@@ -123,7 +123,11 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
               <Text className="mb-3 text-sm font-semibold text-text-muted">Eerdere modules</Text>
               <View className="gap-2">
                 {content.backReferences.map((ref) => (
-                  <Link key={ref.moduleId} href={`/modules/${ref.moduleId}`} asChild>
+                  <Link
+                    key={ref.moduleId}
+                    href={{ pathname: '/modules/[id]', params: { id: ref.moduleId } }}
+                    asChild
+                  >
                     <Pressable className="rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft">
                       <Text className="text-sm text-text">→ {ref.label}</Text>
                     </Pressable>

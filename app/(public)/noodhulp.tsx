@@ -73,7 +73,19 @@ export default function NoodhulpScreen() {
           <Pressable
             accessibilityRole="link"
             accessibilityLabel={`Bel ${crisis.resources.crisisLine.name} op ${crisis.resources.crisisLine.phone}`}
-            onPress={() => Linking.openURL(crisis.resources.crisisLine.phoneUri)}
+            onPress={async () => {
+              // tel: URLs fail on the iOS Simulator (no Phone app) and on
+              // devices without a SIM. Swallow the rejection — the user can
+              // still read the number and dial manually.
+              try {
+                const supported = await Linking.canOpenURL(crisis.resources.crisisLine.phoneUri);
+                if (supported) {
+                  await Linking.openURL(crisis.resources.crisisLine.phoneUri);
+                }
+              } catch {
+                /* no-op: user falls back to reading the number visually */
+              }
+            }}
             className="flex-row items-center justify-between rounded-2xl bg-surface p-4 shadow-sm active:bg-primary-soft"
           >
             <View className="mr-3 flex-shrink">
@@ -100,11 +112,10 @@ export default function NoodhulpScreen() {
           </View>
         </View>
 
-        {/* Safety block */}
-        <View className="mt-6 rounded-2xl border border-border bg-surface p-4">
-          <Text className="mb-1 font-semibold text-text">{crisis.safetyBlock.title}</Text>
-          <Text className="text-sm text-text-subtle">{crisis.safetyBlock.body}</Text>
-        </View>
+        {/* The `safetyBlock` card from crisis.json belongs on the intake
+            safety-screening screen (lands in α5), not on /noodhulp. Showing
+            "We maken ons zorgen om je" here is redundant — the user already
+            came TO the crisis page for help. */}
       </View>
     </ScrollView>
   );
