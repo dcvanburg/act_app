@@ -7,8 +7,9 @@
 
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import { fileURLToPath } from 'url';
 
-const ROOT = resolve(import.meta.dirname, '..');
+const ROOT = resolve(fileURLToPath(new URL('.', import.meta.url)), '..');
 
 interface ValidationResult {
   file: string;
