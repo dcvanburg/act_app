@@ -22,7 +22,7 @@ jobs:
           fi
 
           # Developer branches must follow the convention
-          if echo "$BRANCH" | grep -qE '^(feature|fix|docs|chore|refactor|test|ci|hotfix)/[a-z0-9]'; then
+          if echo "$BRANCH" | grep -qE '^(feature|fix|docs|chore|refactor|test|ci|hotfix|release)/[a-z0-9]'; then
             echo "Branch name is valid."
             exit 0
           fi
@@ -43,5 +43,6 @@ jobs:
           echo "  refactor/  — code restructuring, no behaviour change"
           echo "  test/      — tests only"
           echo "  ci/        — CI/CD changes"
+          echo "  release/   — rolls multiple PRs from a stack into dev or main"
           echo ""
           exit 1
