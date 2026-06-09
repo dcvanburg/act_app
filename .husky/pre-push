@@ -1,0 +1,17 @@
+#!/bin/sh
+# Block direct pushes to protected branches.
+# All work must go through a feature branch → PR → dev → main.
+
+branch=$(git symbolic-ref HEAD 2>/dev/null | sed 's|refs/heads/||')
+
+if [ "$branch" = "main" ] || [ "$branch" = "dev" ]; then
+  echo ""
+  echo "  Direct push to '$branch' is not allowed."
+  echo "  Create a feature branch first:"
+  echo ""
+  echo "    git checkout -b feature/<short-description>"
+  echo ""
+  echo "  Allowed prefixes: feature/ fix/ docs/ chore/ refactor/ test/ ci/ hotfix/"
+  echo ""
+  exit 1
+fi
