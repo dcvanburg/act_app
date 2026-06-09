@@ -70,5 +70,10 @@
       "eslint --fix",
       "prettier --write"
     ]
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.61.0",
+    "@rollup/rollup-darwin-arm64": "^4.61.0",
+    "@rollup/rollup-darwin-x64": "^4.61.0"
   }
 }
