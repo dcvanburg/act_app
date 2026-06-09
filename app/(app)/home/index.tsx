@@ -2,6 +2,7 @@ import { Link } from 'expo-router';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { MoodHomeCard } from '@/components/mood/MoodHomeCard';
 import { ProgramOverview } from '@/components/modules/ProgramOverview';
 import common from '@/content/nl/common.json';
 import { useUserProgress } from '@/lib/progress-queries';
@@ -42,6 +43,8 @@ export default function HomeScreen() {
             </Text>
           </Link>
         </View>
+
+        <MoodHomeCard />
 
         {isLoading || !progress ? (
           <View className="items-center py-12">
