@@ -1,27 +1,106 @@
 {
-  "title": "Wat speelt er bij jou?",
-  "subtitle": "Dit helpt ons het programma op jou af te stemmen. Er is geen goed of fout antwoord.",
+  "title": "Welkom",
+  "subtitle": "Een paar korte vragen helpen ons het programma op jou af te stemmen.",
+  "welcome": {
+    "title": "Welkom",
+    "body": "Voor we beginnen stellen we een paar vragen. Je antwoorden bepalen welke voorbeelden je in het programma ziet en helpen ons inschatten of dit programma op dit moment passend voor je is."
+  },
   "complaintTypes": {
-    "pain": {
-      "label": "Chronische pijn",
-      "description": "Fysieke en/of psychosomatische pijn"
-    },
-    "mental": {
-      "label": "Mentale klachten",
-      "description": "Angst, burn-out, depressie, stress"
-    },
-    "alcohol": {
-      "label": "Alcohol of verslaving",
-      "description": "Alcoholproblematiek of andere verslavingsklachten"
-    },
-    "combination": {
-      "label": "Combinatie",
-      "description": "Meerdere van bovenstaande"
+    "title": "Wat speelt er bij jou?",
+    "subtitle": "Je kunt meerdere opties kiezen. Er is geen goed of fout antwoord.",
+    "options": {
+      "pain": {
+        "label": "Chronische pijn",
+        "description": "Fysieke en/of psychosomatische pijn"
+      },
+      "mental": {
+        "label": "Mentale klachten",
+        "description": "Angst, burn-out, depressie, stress"
+      },
+      "alcohol": {
+        "label": "Alcohol of verslaving",
+        "description": "Alcoholproblematiek of andere verslavingsklachten"
+      },
+      "combination": {
+        "label": "Combinatie",
+        "description": "Meerdere van bovenstaande"
+      }
     }
   },
   "safetyCheck": {
-    "title": "Veiligheidscheck",
-    "description": "[PLACEHOLDER — screeningvragen in te vullen door therapeut]",
-    "questions": []
+    "title": "Voor we beginnen",
+    "description": "Een paar vragen om te zien of dit programma op dit moment geschikt voor je is. We vragen het uit zorg, niet als test.",
+    "draftNotice": "[DRAFT vragen — moeten door een geregistreerde clinicus worden goedgekeurd voordat een pilotgebruiker deze ziet. Zie docs/SAFETY_SCREENING_EXAMPLES.md.]",
+    "questions": [
+      {
+        "id": "suicidal-thoughts",
+        "title": "De afgelopen twee weken — heb je gedachten gehad om jezelf iets aan te doen, of jezelf pijn te doen?",
+        "type": "single-choice",
+        "options": [
+          { "value": "never", "label": "Nee, helemaal niet", "blocking": "pass" },
+          { "value": "sometimes", "label": "Soms", "blocking": "flag" },
+          { "value": "often", "label": "Regelmatig of vaak", "blocking": "block-strong" }
+        ],
+        "helpText": "Je antwoord helpt ons inschatten of dit programma op dit moment passend is."
+      },
+      {
+        "id": "active-plan",
+        "title": "Heb je op dit moment een concreet plan om jezelf iets aan te doen?",
+        "type": "single-choice",
+        "options": [
+          { "value": "no", "label": "Nee", "blocking": "pass" },
+          { "value": "yes", "label": "Ja", "blocking": "block-strong" }
+        ],
+        "helpText": "Als je 'ja' antwoordt leiden we je direct naar hulp."
+      },
+      {
+        "id": "recent-self-harm",
+        "title": "Heb je jezelf de afgelopen zeven dagen opzettelijk pijn gedaan?",
+        "type": "single-choice",
+        "options": [
+          { "value": "no", "label": "Nee", "blocking": "pass" },
+          { "value": "yes", "label": "Ja", "blocking": "block-strong" }
+        ],
+        "helpText": "Bij 'ja' raden we eerst contact met je huisarts of de crisislijn aan."
+      },
+      {
+        "id": "substance-acute",
+        "title": "Drink je of gebruik je op dit moment zoveel dat stoppen zonder medische begeleiding gevaarlijk zou kunnen zijn?",
+        "type": "single-choice",
+        "options": [
+          { "value": "no", "label": "Nee", "blocking": "pass" },
+          { "value": "not-sure", "label": "Ik weet het niet", "blocking": "flag" },
+          { "value": "yes", "label": "Ja", "blocking": "block-medical" }
+        ],
+        "helpText": "Een huisarts of de verslavingszorg kan je veilig helpen afbouwen — dat valt buiten wat deze app kan bieden."
+      },
+      {
+        "id": "support-network",
+        "title": "Heb je iemand in je omgeving (familie, vriend, professional) waar je in moeilijke momenten contact mee kunt opnemen?",
+        "type": "single-choice",
+        "options": [
+          { "value": "yes", "label": "Ja", "blocking": "pass" },
+          { "value": "sometimes", "label": "Soms", "blocking": "pass" },
+          { "value": "no", "label": "Nee", "blocking": "pass" }
+        ],
+        "helpText": "We slaan dit op zodat we je een aangepaste lijst met hulpbronnen kunnen tonen. Het beïnvloedt niet of je het programma kunt starten."
+      }
+    ]
+  },
+  "blocked": {
+    "strong": {
+      "title": "We maken ons zorgen om je",
+      "body": "Op basis van je antwoorden raden we aan om eerst contact op te nemen met professionele hulp voordat je verder gaat met dit programma. Deze app is geen vervanging voor de juiste zorg op dit moment.",
+      "action": "Bekijk hulpmiddelen"
+    },
+    "medical": {
+      "title": "Eerst medische begeleiding",
+      "body": "Op basis van je antwoorden lijkt het verstandig om eerst contact op te nemen met je huisarts of de verslavingszorg. Veilig afbouwen valt buiten wat deze app kan bieden.",
+      "action": "Bekijk hulpmiddelen"
+    }
+  },
+  "complete": {
+    "title": "Klaar voor de start",
+    "body": "Dank je wel voor je antwoorden. Je kunt nu beginnen met het programma."
   }
 }
