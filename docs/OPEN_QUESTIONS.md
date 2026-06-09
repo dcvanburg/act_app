@@ -18,7 +18,7 @@ Answer these before or during Phase 1 implementation. Mark resolved items with d
 |---|----------|--------|--------|
 | 6 | **Database:** Confirm Supabase (EU) or alternative? | ADR-001 | _TBD_ |
 | 7 | **Push notifications:** Web push, email, or skip for v1? | P2 scope | **Resolved 2026-06-08:** Skip entirely for v1. Revisit after pilot. |
-| 8 | **Offline:** Required for emergency button only, or full modules? | PWA scope | **Resolved 2026-06-09:** Yes — works offline. Module content, crisis screen, grounding exercise, and journal writes all available without connectivity. Sync queues writes for when network returns. Implementation: bundle content JSON in the app binary; queue mutations in `expo-sqlite` or AsyncStorage; flush on reconnect via TanStack Query. |
+| 8 | **Offline:** Required for emergency button only, or full modules? | PWA scope | **Resolved 2026-06-09:** Connection required. App will NOT function without network. Crisis page, modules, journal — all require connectivity. Decision reaffirmed after brief reversal. |
 | 9 | **Analytics:** Any usage analytics (privacy-preserving)? | GDPR, consent UI | **Resolved 2026-06-08:** Decide after pilot. Env var placeholder kept in `.env.example`. No wiring in v1. |
 | 10 | **Domain:** Production URL? (e.g. `vanoverlevennaarleven.nl`) | Deploy config | _TBD_ |
 
@@ -58,6 +58,6 @@ Decisions made for the Next.js → Expo pivot:
 | 3 | Completed module revisit | Read-only single scrollable page. No pagination, status stays `completed`. | 2026-06-08 |
 | 4 | Monetization | Free pilot. `subscriptionTier: 'free'` on profile. No paywall logic in v1. | 2026-06-08 |
 | 7 | Push notifications | Skip for v1. Revisit after pilot. | 2026-06-08 |
-| 8 | Offline / PWA | ~~Skip for v1~~ → **Reversed 2026-06-09:** Works offline. Module content + crisis screen + journal/mood writes available without connectivity. Queue + sync on reconnect. | 2026-06-09 |
+| 8 | Offline / PWA | Connection required. Briefly reversed to "works offline" on 2026-06-09, then re-reversed same day. App will not function without network. | 2026-06-09 |
 | 9 | Analytics | Decide after pilot. Env var placeholder kept. No wiring in v1. | 2026-06-08 |
 | 13 | Audio | No audio in v1. Body exercises are text-only. Audio player added in a future sprint. | 2026-06-08 |
