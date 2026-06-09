@@ -1,30 +1,24 @@
-import { Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Redirect } from 'expo-router';
+import { ActivityIndicator, View } from 'react-native';
 
-import common from '@/content/nl/common.json';
+import { useAuth } from '@/providers/AuthProvider';
 
 /**
- * Placeholder landing screen.
+ * Root route — redirects based on auth state.
  *
- * This is α1 scaffold only — auth gating, magic-link login, and routing to /home
- * land in α2. For now this screen simply confirms the Expo scaffold is wired up
- * and Dutch content is reachable from the JSON content layer.
+ * The Expo splash screen stays up until this component mounts. The brief
+ * spinner only matters for cold starts where the secure-storage read is slow.
  */
 export default function IndexScreen() {
-  const insets = useSafeAreaInsets();
+  const { session, loading } = useAuth();
 
-  return (
-    <View
-      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
-      className="flex-1 items-center justify-center bg-background p-6"
-    >
-      <View className="w-full max-w-md items-center">
-        <Text className="mb-2 font-serif text-3xl font-bold text-text">{common.app.name}</Text>
-        <Text className="mb-8 text-center text-base text-text-subtle">{common.app.tagline}</Text>
-        <Text className="text-center text-sm text-text-muted">
-          Expo scaffold ready — auth + program flow land in α2 / α4.
-        </Text>
+  if (loading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-background">
+        <ActivityIndicator color="#3B6D11" />
       </View>
-    </View>
-  );
+    );
+  }
+
+  return <Redirect href={session ? '/home' : '/login'} />;
 }
