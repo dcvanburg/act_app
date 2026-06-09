@@ -25,8 +25,8 @@ export async function updateProfile(
     .from('profiles')
     .update({
       first_name: firstName.trim() || null,
-      last_name:  lastName.trim()  || null,
-      phone:      phone.trim()     || null,
+      last_name: lastName.trim() || null,
+      phone: phone.trim() || null,
     })
     .eq('id', user.id);
 
