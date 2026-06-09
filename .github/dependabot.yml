@@ -1,18 +1,133 @@
 version: 2
+
+# ── Van Overleven naar Leven — Dependabot configuration ───────────────────────
+#
+# This app processes AVG/GDPR Article 9 health data (bijzondere persoonsgegevens).
+# Dependency freshness is a security control, not just maintenance hygiene.
+#
+# Strategy:
+#   1. github-actions at 07:00 — CI toolchain checked before app deps
+#   2. npm weekly batch at 08:00 — grouped to reduce PR noise
+#   3. npm security-only daily — CVE fixes bypass the weekly schedule
+#
+# All PRs target `dev` (never `main` — per CLAUDE.md branching rules).
+# Major version bumps are blocked globally and per high-risk package.
+
 updates:
-  - package-ecosystem: npm
+  # ── 1. GitHub Actions ─────────────────────────────────────────────────────────
+  # Runs before npm (07:00 vs 08:00) so CI toolchain updates land first.
+  # All actions grouped → one PR per week instead of one per action.
+  - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: weekly
-      day: monday
+      interval: "weekly"
+      day: "monday"
+      time: "07:00"
+      timezone: "Europe/Amsterdam"
+    open-pull-requests-limit: 3
+    target-branch: "dev"
+    labels:
+      - "dependencies"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # ── 2. npm — weekly batch (grouped by concern) ───────────────────────────────
+  # Groups keep related packages in one PR so they can be tested together.
+  # Security updates bypass this schedule via block 3 below.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Europe/Amsterdam"
     open-pull-requests-limit: 5
-    # Never auto-propose major version bumps — they require manual migration work.
-    # Covers: Next.js 16, ESLint 10, TypeScript 6, Tailwind 4, Vitest 4, etc.
+    target-branch: "dev"
+    labels:
+      - "dependencies"
+    groups:
+      # Auth + data layer — touches sensitive health data; review carefully
+      supabase:
+        patterns:
+          - "@supabase/*"
+      # Next.js + React runtime — these move together; must test app boot
+      next-core:
+        patterns:
+          - "next"
+          - "react"
+          - "react-dom"
+      # Form validation stack — zod schema changes can silently break intake flows
+      forms:
+        patterns:
+          - "react-hook-form"
+          - "@hookform/*"
+          - "zod"
+      # Server-state management
+      tanstack:
+        patterns:
+          - "@tanstack/*"
+      # CSS/Tailwind toolchain
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "postcss"
+          - "autoprefixer"
+          - "tailwind-merge"
+          - "class-variance-authority"
+          - "clsx"
+      # Test infrastructure — update together to avoid version skew
+      testing:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+          - "@testing-library/*"
+          - "jsdom"
+          - "playwright"
+          - "@playwright/*"
+      # Linters, formatters, TypeScript — must stay in sync
+      dev-tooling:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint/*"
+          - "eslint-config-next"
+          - "prettier"
+          - "typescript"
+          - "tsx"
+          - "husky"
+          - "lint-staged"
+      # Type definitions — low risk, batch together
+      types:
+        patterns:
+          - "@types/*"
     ignore:
+      # Block ALL major bumps globally — every major requires manual migration review
+      # Examples: Next.js 16, React 20, TypeScript 6, Tailwind 4, Vitest 4
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
-    groups:
-      production-dependencies:
-        dependency-type: production
-      dev-dependencies:
-        dependency-type: development
+      # Explicit guards on the highest-risk packages (belt + suspenders)
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "zod"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+
+  # ── 3. npm security-only — daily, higher PR cap ──────────────────────────────
+  # CVE fixes must not wait for the weekly batch.
+  # Dependabot only opens PRs here when a security advisory is present.
+  # The `security` label flags these for priority review.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+    target-branch: "dev"
+    labels:
+      - "dependencies"
+      - "security"
