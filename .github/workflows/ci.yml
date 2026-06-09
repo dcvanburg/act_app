@@ -2,41 +2,132 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
+
+# ── Shared install step used by every job ─────────────────────────────────────
+# Each job re-installs deps from the npm cache (fast) to stay isolated.
 
 jobs:
-  verify:
-    name: Typecheck · Lint · Test · Build
+  # ── 1. Typecheck ─────────────────────────────────────────────────────────────
+  typecheck:
+    name: Typecheck
     runs-on: ubuntu-latest
-
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+      - run: npm ci
+      - run: npm run typecheck
 
-      - name: Install dependencies
-        run: npm ci
+  # ── 2. Lint ───────────────────────────────────────────────────────────────────
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
 
-      - name: Typecheck
-        run: npm run typecheck
+  # ── 3. Format ─────────────────────────────────────────────────────────────────
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run format:check
 
-      - name: Lint
-        run: npm run lint
+  # ── 4. Unit tests + coverage ──────────────────────────────────────────────────
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npx vitest run --coverage
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
 
-      - name: Unit tests
-        run: npm test
+  # ── 5. Dependency vulnerability audit (production deps only) ─────────────────
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm audit --audit-level=high --omit=dev
 
-      # Content validation — fails build if safety-critical placeholders are present
-      # Note: this will FAIL until the therapist fills intake.json safety questions.
-      # Remove the || true once content is complete.
-      - name: Validate content
-        run: npm run validate:content || true
+  # ── 6. Secrets scan ───────────────────────────────────────────────────────────
+  secrets:
+    name: Secrets scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  # ── 7. Content validation (non-blocking — therapist content pending) ──────────
+  content:
+    name: Content validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Validate safety-critical content
+        run: npm run validate:content
+        continue-on-error: true
+
+  # ── 8. Build (runs only when all checks pass) ─────────────────────────────────
+  build:
+    name: Build
+    needs: [typecheck, lint, format, test, audit, secrets]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
       - name: Build
         run: npm run build
         env:
