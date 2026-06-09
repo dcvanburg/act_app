@@ -1,13 +1,14 @@
 const tsParser = require('@typescript-eslint/parser');
 const tsPlugin = require('@typescript-eslint/eslint-plugin');
+const reactHooksPlugin = require('eslint-plugin-react-hooks');
 
 /**
- * Minimal flat-config for the α1 scaffold.
+ * Minimal flat-config for the Expo app.
  *
  * The full `eslint-config-expo` preset expects @typescript-eslint v7 (uses the
- * now-removed `ban-types` rule). Bringing it back without breaking the React
- * Native peer-dep chain lands in α2; until then this config covers the basics
- * we actually need: TS parsing, no-console, no-unused-vars.
+ * now-removed `ban-types` rule). We replace it with a slim hand-rolled config
+ * that covers: TS parsing, no-console, no-explicit-any, no-unused-vars, and
+ * the React Hooks rules of hooks + exhaustive-deps.
  */
 module.exports = [
   {
@@ -39,6 +40,7 @@ module.exports = [
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
+      'react-hooks': reactHooksPlugin,
     },
     rules: {
       'no-console': 'error',
@@ -48,6 +50,8 @@ module.exports = [
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
       '@typescript-eslint/no-explicit-any': 'error',
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
     },
   },
 ];

@@ -1,40 +1,56 @@
-import { Pressable, Text, View } from 'react-native';
+import { Link } from 'expo-router';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ProgramOverview } from '@/components/modules/ProgramOverview';
 import common from '@/content/nl/common.json';
-import { useAuth } from '@/providers/AuthProvider';
+import { useUserProgress } from '@/lib/progress-queries';
 
 /**
- * Home screen — α2 placeholder.
+ * /home — program overview.
  *
- * α4 will replace this with the real ProgramOverview (8 modules + unlock state).
- * For now it confirms the session is live and gives a sign-out affordance for
- * iteration.
+ * Loads UserProgress from Supabase via TanStack Query and renders the 8-module
+ * list with unlock state. Tapping any unlocked module routes to
+ * /onboarding (module 0) or /modules/<id>.
  */
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const { user, signOut } = useAuth();
+  const { data: progress, isLoading } = useUserProgress();
 
   return (
-    <View style={{ paddingTop: insets.top + 24 }} className="flex-1 bg-background px-6">
-      <Text className="font-serif text-2xl font-bold text-text">{common.app.name}</Text>
-      <Text className="mt-1 text-sm text-text-subtle">Ingelogd als {user?.email ?? '—'}</Text>
+    <ScrollView
+      className="flex-1 bg-background"
+      contentContainerStyle={{
+        paddingTop: insets.top + 24,
+        paddingBottom: insets.bottom + 112, // room for Noodknop
+        paddingHorizontal: 16,
+      }}
+    >
+      <View className="mx-auto w-full max-w-md">
+        <View className="mb-8 flex-row items-start justify-between gap-3">
+          <View className="flex-1">
+            <Text className="font-serif text-2xl font-bold text-text">{common.app.name}</Text>
+            <Text className="mt-1 text-sm text-text-subtle">{common.app.tagline}</Text>
+          </View>
+          <Link href="/account" asChild>
+            <Text
+              accessibilityRole="link"
+              accessibilityLabel="Mijn account"
+              className="h-10 w-10 rounded-full bg-primary-soft text-center text-base leading-10 text-primary"
+            >
+              {'\u{1F464}'}
+            </Text>
+          </Link>
+        </View>
 
-      <View className="mt-8 rounded-2xl bg-surface p-5 shadow-sm">
-        <Text className="font-serif text-lg font-semibold text-text">Bijna klaar</Text>
-        <Text className="mt-2 text-sm text-text-muted">
-          De moduleweergave en het programma-overzicht worden in α4 toegevoegd. Voor nu kun je
-          uitloggen en je magic-link flow testen.
-        </Text>
+        {isLoading || !progress ? (
+          <View className="items-center py-12">
+            <ActivityIndicator color="#3B6D11" />
+          </View>
+        ) : (
+          <ProgramOverview progress={progress} />
+        )}
       </View>
-
-      <Pressable
-        accessibilityRole="button"
-        onPress={() => signOut()}
-        className="mt-6 rounded-lg border border-border px-4 py-3 active:bg-surface-muted"
-      >
-        <Text className="text-center text-sm font-medium text-text-muted">Uitloggen</Text>
-      </Pressable>
-    </View>
+    </ScrollView>
   );
 }
