@@ -1,12 +1,14 @@
 # Van Overleven naar Leven
 
-A self-guided therapeutic web app based on **Acceptance and Commitment Therapy (ACT)** and body-oriented psychosomatic therapy.
+A self-guided therapeutic mobile app based on **Acceptance and Commitment Therapy (ACT)** and body-oriented psychosomatic therapy.
 
-**Status:** Pre-development — specifications and AI dev infrastructure in place; app scaffold not yet created.
+**Status:** Pivoting from Next.js web → Expo (React Native) as of 2026-06-09. Web implementation preserved at `git tag pre-expo-pivot-v0`. See [ARCHIVE_NOTICE.md](./ARCHIVE_NOTICE.md).
 
-## Getting started
+The instructions below describe the **target** Expo setup; they apply once the Expo scaffold (PR α1) lands. For the current Next.js setup, check out `pre-expo-pivot-v0`.
 
-**Prerequisites:** Node.js ≥ 20, a Supabase project (EU region).
+## Getting started (target Expo setup)
+
+**Prerequisites:** Node.js ≥ 20, an Expo account, a Supabase project (EU region), Xcode (iOS sim) and/or Android Studio (Android emulator).
 
 ```bash
 # 1. Install dependencies
@@ -14,19 +16,21 @@ npm install
 
 # 2. Configure environment
 cp .env.example .env.local
-# Fill in NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
+# Fill in EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY
 
 # 3. Run the dev server
-npm run dev          # http://localhost:3000
+npx expo start       # press i for iOS sim, a for Android emulator, or scan QR for Expo Go
 
 # 4. Other commands
-npm run typecheck    # TypeScript check
-npm run lint         # ESLint
-npm test             # Vitest unit tests
+npm run typecheck         # TypeScript check
+npm run lint              # ESLint
+npm test                  # Vitest unit tests
+npm run test:e2e          # Maestro E2E tests
 npm run validate:content  # Check for [PLACEHOLDER] in safety-critical content
+eas build --profile preview  # EAS Build (preview channel)
 ```
 
-**Supabase setup:** Create the tables in `docs/ADR/003-auth.md` → Supabase schema section. Enable email magic-link in the Auth settings.
+**Supabase setup:** Create the tables in `docs/ADR/003-auth.md` → Supabase schema section. Enable email magic-link in the Auth settings. Add `actapp://auth/callback` to the Redirect URLs allowlist.
 
 ## For developers
 

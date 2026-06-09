@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1284 2778" width="1284" height="2778" role="img">
+  <title>ACT splash screen</title>
+  <desc>Centered compass motif, app name "ACT", subtitle "Acceptance &amp; Commitment", tagline "Van overleven naar leven" on warm sand background.</desc>
+
+  <rect width="1284" height="2778" fill="#F5F0E8"/>
+
+  <!-- Compass icon, ~360px tall, centered horizontally at 642, vertically around 1180 -->
+  <g transform="translate(462 1000) scale(0.3516)">
+    <circle cx="512" cy="512" r="320" fill="none" stroke="#3B6D11" stroke-width="40"/>
+    <circle cx="512" cy="512" r="60" fill="#3B6D11"/>
+
+    <line x1="512" y1="172" x2="512" y2="100" stroke="#3B6D11" stroke-width="40" stroke-linecap="round"/>
+    <circle cx="512" cy="80" r="34" fill="#639922"/>
+
+    <line x1="752" y1="272" x2="800" y2="225" stroke="#3B6D11" stroke-width="40" stroke-linecap="round"/>
+    <circle cx="814" cy="210" r="34" fill="#639922"/>
+
+    <line x1="852" y1="512" x2="924" y2="512" stroke="#3B6D11" stroke-width="40" stroke-linecap="round"/>
+    <circle cx="944" cy="512" r="34" fill="#639922"/>
+
+    <line x1="752" y1="752" x2="800" y2="799" stroke="#3B6D11" stroke-width="40" stroke-linecap="round"/>
+    <circle cx="814" cy="814" r="34" fill="#639922"/>
+
+    <line x1="512" y1="852" x2="512" y2="924" stroke="#3B6D11" stroke-width="40" stroke-linecap="round"/>
+    <circle cx="512" cy="944" r="34" fill="#639922"/>
+
+    <line x1="272" y1="752" x2="225" y2="799" stroke="#3B6D11" stroke-width="40" stroke-linecap="round"/>
+    <circle cx="210" cy="814" r="34" fill="#639922"/>
+
+    <line x1="172" y1="512" x2="100" y2="512" stroke="#3B6D11" stroke-width="40" stroke-linecap="round"/>
+    <circle cx="85" cy="512" r="34" fill="#639922"/>
+
+    <line x1="272" y1="272" x2="225" y2="225" stroke="#3B6D11" stroke-width="40" stroke-linecap="round"/>
+    <circle cx="210" cy="210" r="34" fill="#639922"/>
+  </g>
+
+  <!-- "ACT" — serif, 128px (visually balanced with 360px icon on a 1284-wide canvas) -->
+  <text x="642" y="1560" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="128" font-weight="700" fill="#2C2C2A" letter-spacing="16">ACT</text>
+
+  <!-- Subtitle — serif, 40px -->
+  <text x="642" y="1640" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="40" fill="#5F5E5A" letter-spacing="4">Acceptance &amp; Commitment</text>
+
+  <!-- Tagline — sans, 32px -->
+  <text x="642" y="1740" text-anchor="middle"
+        font-family="Arial, 'Helvetica Neue', sans-serif"
+        font-size="32" fill="#888780">Van overleven naar leven</text>
+</svg>

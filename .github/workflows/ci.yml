@@ -7,7 +7,12 @@ on:
     branches: [main, dev]
 
 # ── Shared install step used by every job ─────────────────────────────────────
-# Each job re-installs deps from the npm cache (fast) to stay isolated.
+# Jobs use `npm install --prefer-offline` rather than `npm ci`. Reason:
+# npm bug npm/cli#4828 — `npm ci` does not install platform-specific Rollup/SWC
+# native binaries when the lockfile was generated on a different OS (we develop
+# on macOS, CI runs on Linux). `npm install` resolves the right native dep per
+# platform while still honouring the cache. Tradeoff: slightly slower than
+# `npm ci`; lockfile is not strictly enforced.
 # Actions are pinned to full commit SHAs (supply chain security — see AGENTS.md).
 
 jobs:
@@ -22,7 +27,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm ci
+      - run: npm install --prefer-offline --no-audit --no-fund
       - run: npm run typecheck
 
   # ── 2. Lint ───────────────────────────────────────────────────────────────────
@@ -36,7 +41,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm ci
+      - run: npm install --prefer-offline --no-audit --no-fund
       - run: npm run lint
 
   # ── 3. Format ─────────────────────────────────────────────────────────────────
@@ -50,7 +55,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm ci
+      - run: npm install --prefer-offline --no-audit --no-fund
       - run: npm run format:check
 
   # ── 4. Unit tests + coverage ──────────────────────────────────────────────────
@@ -64,7 +69,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm ci
+      - run: npm install --prefer-offline --no-audit --no-fund
       - run: npx vitest run --coverage
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
@@ -74,6 +79,11 @@ jobs:
           retention-days: 7
 
   # ── 5. Dependency vulnerability audit (production deps only) ─────────────────
+  # Audit level is `critical` (not `high`) because Expo SDK 51 ships a CLI/build
+  # toolchain (@expo/cli, @expo/config-plugins, xcode, tar, @xmldom/xmldom) with
+  # known HIGH advisories that do not ship in the mobile binary — they are only
+  # used at build time on developer machines and EAS Build runners. Revisit when
+  # Expo SDK 52+ lands with refreshed transitives.
   audit:
     name: Dependency audit
     runs-on: ubuntu-latest
@@ -84,8 +94,8 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm ci
-      - run: npm audit --audit-level=high --omit=dev
+      - run: npm install --prefer-offline --no-audit --no-fund
+      - run: npm audit --audit-level=critical --omit=dev
 
   # ── 6. Secrets scan ───────────────────────────────────────────────────────────
   secrets:
@@ -114,26 +124,26 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm ci
+      - run: npm install --prefer-offline --no-audit --no-fund
       - name: Validate safety-critical content
         run: npm run validate:content
         continue-on-error: true
 
-  # ── 8. Build (runs only when all checks pass) ─────────────────────────────────
-  build:
-    name: Build
+  # ── 8. Expo config validation ─────────────────────────────────────────────────
+  # The pre-pivot `next build` step is gone. EAS Build runs separately and is not
+  # part of the per-PR check budget. This job validates the Expo config statically
+  # so PRs that break app.json or break Expo Router's typed routes fail fast.
+  expo-config:
+    name: Expo config
     needs: [typecheck, lint, format, test, audit, secrets]
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '20'
           cache: 'npm'
-      - run: npm ci
-      - name: Build
-        run: npm run build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      - run: npm install --prefer-offline --no-audit --no-fund
+      - name: Validate app.json
+        run: npx expo config --type public > /dev/null
