@@ -20,7 +20,10 @@ export async function saveModuleProgress(
   // email is included so it's always present in the profiles table.
   await supabase
     .from('profiles')
-    .upsert({ id: user.id, email: user.email ?? null }, { onConflict: 'id', ignoreDuplicates: true });
+    .upsert(
+      { id: user.id, email: user.email ?? null },
+      { onConflict: 'id', ignoreDuplicates: true },
+    );
 
   const { data: existing } = await supabase
     .from('user_progress')
@@ -28,8 +31,7 @@ export async function saveModuleProgress(
     .eq('user_id', user.id)
     .single();
 
-  const current: UserProgress =
-    (existing?.progress as UserProgress | null) ?? getDefaultProgress();
+  const current: UserProgress = (existing?.progress as UserProgress | null) ?? getDefaultProgress();
 
   const updated = withModuleUpdate(current, moduleId, lastStepId, completed);
 
