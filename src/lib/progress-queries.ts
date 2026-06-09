@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase/client';
 import { getDefaultProgress, withModuleUpdate } from '@/lib/progress';
 import { useAuth } from '@/providers/AuthProvider';
-import type { ModuleId, UserProgress } from '@/types/content';
+import type { ComplaintType, ModuleId, SafetyOutcome, UserProgress } from '@/types/content';
 
 const PROGRESS_KEY = (userId: string | undefined) => ['user_progress', userId];
 
@@ -80,6 +80,80 @@ export function useSaveModuleProgress() {
         user_id: user.id,
         progress: updated,
         updated_at: new Date().toISOString(),
+      });
+
+      if (error) throw error;
+
+      return updated;
+    },
+    onSuccess: (updated) => {
+      queryClient.setQueryData(PROGRESS_KEY(user?.id), updated);
+    },
+  });
+}
+
+interface SaveIntakeArgs {
+  complaintTypes: ComplaintType[];
+  safetyOutcome: SafetyOutcome;
+  safetyPassed: boolean;
+}
+
+/**
+ * useSaveIntake — write the result of the onboarding intake (α5).
+ *
+ * Captures the complaint-type selection AND the resolved safety screening
+ * outcome. When the user is allowed in (pass / flag), we also mark module 0
+ * (`onboarding`) as completed so module 1 unlocks; otherwise we leave the
+ * module in-progress so /home keeps showing it as the next step.
+ */
+export function useSaveIntake() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ complaintTypes, safetyOutcome, safetyPassed }: SaveIntakeArgs) => {
+      if (!user) throw new Error('Niet ingelogd');
+
+      await supabase
+        .from('profiles')
+        .upsert(
+          { id: user.id, email: user.email ?? null },
+          { onConflict: 'id', ignoreDuplicates: true },
+        );
+
+      const { data: existing } = await supabase
+        .from('user_progress')
+        .select('progress')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const current =
+        (existing?.progress as UserProgress | null) ??
+        queryClient.getQueryData<UserProgress>(PROGRESS_KEY(user.id)) ??
+        getDefaultProgress();
+
+      const now = new Date().toISOString();
+      const updatedWithIntake: UserProgress = {
+        ...current,
+        intake: {
+          complaintTypes,
+          safetyOutcome,
+          completedAt: now,
+        },
+        safetyCheckPassed: safetyPassed,
+      };
+
+      // Mark module 0 (onboarding) complete iff the safety check allows the
+      // program to start. Blocking outcomes leave the module open so /home
+      // still routes here when the user retries.
+      const updated = safetyPassed
+        ? withModuleUpdate(updatedWithIntake, 'onboarding', 'practical-task', true)
+        : updatedWithIntake;
+
+      const { error } = await supabase.from('user_progress').upsert({
+        user_id: user.id,
+        progress: updated,
+        updated_at: now,
       });
 
       if (error) throw error;
