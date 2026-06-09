@@ -46,14 +46,14 @@ Wat de app biedt:
 — Stemmingstracker en wekelijkse check-in
 — Streak-systeem om consistentie te belonen
 — Noodknop voor directe grondingsoefening
-— Werkt offline
+
+Een internetverbinding is nodig om de app te gebruiken.
 
 ACT is geen vervanging voor professionele hulp bij ernstige klachten. Bij crisis: bel 0800-0113 of ga naar je huisarts.
 ```
 
-> ⚠ Two claims in this description don't match v1 scope as of 2026-06-09 and must be reconciled before submission:
-> - **"Werkt offline"** — PWA / offline was explicitly skipped for v1 (OPEN_QUESTIONS #8). Either implement offline support before launch or remove this line.
-> - **"Lichaamsgerichte oefeningen"** + **"audio oefeningen"** language is fine for text-only body exercises (v1 decision #13), but reviewers may expect audio. Add a clarifying note in the description or screenshots that v1 exercises are text-guided.
+> ⚠ One claim in this description still needs reconciling before submission:
+> - **"Lichaamsgerichte oefeningen"** language is fine for text-only body exercises (v1 decision #13), but reviewers may expect audio. Add a clarifying note in the description or screenshots that v1 exercises are text-guided.
 
 ## Keywords (100 chars max, comma-separated)
 
@@ -124,7 +124,7 @@ Data not collected: third-party analytics, advertising, crash logs containing us
 - [ ] Apple Developer + Google Play Console accounts (OPEN_QUESTIONS #16)
 - [ ] All [PLACEHOLDER] content filled (see `docs/CONTENT_PLACEHOLDERS.md` + `npm run validate:content`)
 - [ ] App name "ACT — Acceptance & Commitment" cleared with App Store reviewer guidance
-- [ ] "Werkt offline" claim either implemented or removed
+- [x] Description does NOT promise offline (removed; v1 requires connection per OPEN_QUESTIONS #8)
 - [ ] Crisis disclaimer present in description and visible in screenshots
 - [ ] Three iOS screenshots prepared (see `store/screenshots.md`)
 - [ ] Android adaptive icon foreground + background colour set
