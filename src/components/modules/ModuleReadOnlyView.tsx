@@ -21,7 +21,14 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
             aria-label="Terug naar overzicht"
             className="rounded-lg p-1.5 text-text-muted hover:bg-background hover:text-text"
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </Link>
@@ -29,15 +36,17 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
             <p className="text-xs font-medium text-text-muted">{content.phase} · Afgerond</p>
             <h1 className="text-sm font-semibold text-text">{content.title}</h1>
           </div>
-          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">✓ Afgerond</span>
+          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+            ✓ Afgerond
+          </span>
         </div>
       </header>
 
       <main className="mx-auto max-w-lg px-4 py-6 space-y-8">
         {/* Sections */}
-        {content.sections.map(section => {
+        {content.sections.map((section) => {
           const example = section.examples
-            ? (primaryComplaint && section.examples[primaryComplaint]) ?? null
+            ? ((primaryComplaint && section.examples[primaryComplaint]) ?? null)
             : null;
 
           return (
@@ -68,17 +77,23 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
 
         {/* Body exercise */}
         <section>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">{content.bodyWork}</p>
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
+            {content.bodyWork}
+          </p>
           <h2 className="mb-2 text-lg font-bold text-text">{content.bodyExercise.title}</h2>
           <p className="mb-4 text-text-muted">{content.bodyExercise.description}</p>
           <div className="rounded-xl bg-surface p-5 shadow-sm">
-            <p className="leading-relaxed text-text-muted whitespace-pre-line">{content.bodyExercise.transcript}</p>
+            <p className="leading-relaxed text-text-muted whitespace-pre-line">
+              {content.bodyExercise.transcript}
+            </p>
           </div>
         </section>
 
         {/* Practical task */}
         <section>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">Praktische opdracht</p>
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
+            Praktische opdracht
+          </p>
           <h2 className="mb-2 text-lg font-bold text-text">{content.practicalTask.title}</h2>
           <p className="leading-relaxed text-text-muted">{content.practicalTask.body}</p>
         </section>
@@ -88,7 +103,7 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
           <section>
             <h3 className="mb-3 text-sm font-semibold text-text-muted">Eerdere modules</h3>
             <div className="space-y-2">
-              {content.backReferences.map(ref => (
+              {content.backReferences.map((ref) => (
                 <Link
                   key={ref.moduleId}
                   href={`/modules/${ref.moduleId}`}

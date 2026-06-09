@@ -14,11 +14,11 @@ export async function GET(request: Request) {
       const meta = data.user.user_metadata ?? {};
       await supabase.from('profiles').upsert(
         {
-          id:         data.user.id,
-          email:      data.user.email ?? null,
+          id: data.user.id,
+          email: data.user.email ?? null,
           first_name: typeof meta['first_name'] === 'string' ? meta['first_name'] : null,
-          last_name:  typeof meta['last_name']  === 'string' ? meta['last_name']  : null,
-          phone:      typeof meta['phone']       === 'string' ? meta['phone']      : null,
+          last_name: typeof meta['last_name'] === 'string' ? meta['last_name'] : null,
+          phone: typeof meta['phone'] === 'string' ? meta['phone'] : null,
         },
         { onConflict: 'id', ignoreDuplicates: true },
       );

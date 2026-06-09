@@ -16,13 +16,13 @@ const primaryBtn = cn(
 );
 
 export function LoginForm() {
-  const [step, setStep]         = useState<Step>('email');
-  const [email, setEmail]       = useState('');
-  const [firstName, setFirst]   = useState('');
-  const [lastName, setLast]     = useState('');
-  const [phone, setPhone]       = useState('');
-  const [loading, setLoading]   = useState(false);
-  const [error, setError]       = useState<string | null>(null);
+  const [step, setStep] = useState<Step>('email');
+  const [email, setEmail] = useState('');
+  const [firstName, setFirst] = useState('');
+  const [lastName, setLast] = useState('');
+  const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // ── Step 1: check if email exists ─────────────────────────────────────────
   async function handleEmailSubmit(e: React.FormEvent) {
@@ -67,8 +67,8 @@ export function LoginForm() {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: {
           first_name: firstName.trim(),
-          last_name:  lastName.trim(),
-          phone:      phone.trim(),
+          last_name: lastName.trim(),
+          phone: phone.trim(),
         },
       },
     });
@@ -90,8 +90,7 @@ export function LoginForm() {
         <h2 className="mb-2 font-semibold text-text">Controleer je e-mail</h2>
         <p className="text-sm text-text-muted">
           We hebben een inloglink gestuurd naar{' '}
-          <span className="font-medium text-text">{email}</span>.
-          Klik op de link om verder te gaan.
+          <span className="font-medium text-text">{email}</span>. Klik op de link om verder te gaan.
         </p>
       </div>
     );
@@ -100,12 +99,13 @@ export function LoginForm() {
   // ── New user: personal details ────────────────────────────────────────────
   if (step === 'details') {
     return (
-      <form onSubmit={handleDetailsSubmit} className="rounded-xl bg-surface p-6 shadow-sm space-y-4">
+      <form
+        onSubmit={handleDetailsSubmit}
+        className="rounded-xl bg-surface p-6 shadow-sm space-y-4"
+      >
         <div>
           <h2 className="font-semibold text-text">Nieuw account aanmaken</h2>
-          <p className="mt-1 text-sm text-text-muted">
-            Vul je gegevens in om verder te gaan.
-          </p>
+          <p className="mt-1 text-sm text-text-muted">Vul je gegevens in om verder te gaan.</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -117,7 +117,7 @@ export function LoginForm() {
               id="firstName"
               type="text"
               value={firstName}
-              onChange={e => setFirst(e.target.value)}
+              onChange={(e) => setFirst(e.target.value)}
               required
               autoComplete="given-name"
               placeholder="Jan"
@@ -132,7 +132,7 @@ export function LoginForm() {
               id="lastName"
               type="text"
               value={lastName}
-              onChange={e => setLast(e.target.value)}
+              onChange={(e) => setLast(e.target.value)}
               required
               autoComplete="family-name"
               placeholder="de Vries"
@@ -149,7 +149,7 @@ export function LoginForm() {
             id="phone"
             type="tel"
             value={phone}
-            onChange={e => setPhone(e.target.value)}
+            onChange={(e) => setPhone(e.target.value)}
             required
             autoComplete="tel"
             placeholder="06 12345678"
@@ -165,7 +165,10 @@ export function LoginForm() {
 
         <button
           type="button"
-          onClick={() => { setStep('email'); setError(null); }}
+          onClick={() => {
+            setStep('email');
+            setError(null);
+          }}
           className="w-full text-sm text-text-muted hover:text-text transition-colors"
         >
           ← Ander e-mailadres gebruiken
@@ -185,7 +188,7 @@ export function LoginForm() {
           id="email"
           type="email"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           required
           autoComplete="email"
           placeholder="jouw@email.nl"

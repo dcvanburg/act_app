@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   // Exclude onboarding — it has its own route
-  return MODULE_ORDER.filter(id => id !== 'onboarding').map(id => ({ id }));
+  return MODULE_ORDER.filter((id) => id !== 'onboarding').map((id) => ({ id }));
 }
 
 export default async function ModulePage({ params }: Props) {
@@ -54,7 +54,7 @@ export default async function ModulePage({ params }: Props) {
 
   const content = getModuleContent(moduleId);
   const status = getModuleStatus(moduleId, progress);
-  const lastStepId = progress.modules.find(m => m.moduleId === moduleId)?.lastStepId ?? null;
+  const lastStepId = progress.modules.find((m) => m.moduleId === moduleId)?.lastStepId ?? null;
 
   // Completed: read-only scrollable view
   if (status === 'completed') {

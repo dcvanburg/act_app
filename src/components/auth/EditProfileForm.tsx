@@ -21,15 +21,15 @@ export function EditProfileForm({ firstName, lastName, phone }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const [first, setFirst] = useState(firstName ?? '');
-  const [last,  setLast]  = useState(lastName  ?? '');
-  const [tel,   setTel]   = useState(phone      ?? '');
+  const [last, setLast] = useState(lastName ?? '');
+  const [tel, setTel] = useState(phone ?? '');
 
   const fullName = [firstName, lastName].filter(Boolean).join(' ') || '—';
 
   function handleCancel() {
     setFirst(firstName ?? '');
-    setLast(lastName   ?? '');
-    setTel(phone       ?? '');
+    setLast(lastName ?? '');
+    setTel(phone ?? '');
     setError(null);
     setEditing(false);
   }
@@ -51,8 +51,8 @@ export function EditProfileForm({ firstName, lastName, phone }: Props) {
   if (!editing) {
     return (
       <div className="rounded-xl bg-surface shadow-sm divide-y divide-border">
-        <Row label="Volledige naam"  value={fullName} />
-        <Row label="Telefoonnummer"  value={phone ?? '—'} />
+        <Row label="Volledige naam" value={fullName} />
+        <Row label="Telefoonnummer" value={phone ?? '—'} />
         <div className="px-6 py-4">
           <button
             onClick={() => setEditing(true)}
@@ -78,7 +78,7 @@ export function EditProfileForm({ firstName, lastName, phone }: Props) {
             id="editFirst"
             type="text"
             value={first}
-            onChange={e => setFirst(e.target.value)}
+            onChange={(e) => setFirst(e.target.value)}
             required
             autoComplete="given-name"
             placeholder="Jan"
@@ -93,7 +93,7 @@ export function EditProfileForm({ firstName, lastName, phone }: Props) {
             id="editLast"
             type="text"
             value={last}
-            onChange={e => setLast(e.target.value)}
+            onChange={(e) => setLast(e.target.value)}
             required
             autoComplete="family-name"
             placeholder="de Vries"
@@ -110,7 +110,7 @@ export function EditProfileForm({ firstName, lastName, phone }: Props) {
           id="editPhone"
           type="tel"
           value={tel}
-          onChange={e => setTel(e.target.value)}
+          onChange={(e) => setTel(e.target.value)}
           required
           autoComplete="tel"
           placeholder="06 12345678"

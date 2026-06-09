@@ -31,10 +31,9 @@ export default async function AccountPage() {
     .eq('id', user.id)
     .single<ProfileRow>();
 
-  const fullName =
-    [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || null;
+  const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || null;
 
-  const email   = profile?.email ?? user.email ?? null;
+  const email = profile?.email ?? user.email ?? null;
   const initial = (fullName ?? email ?? '?').charAt(0).toUpperCase();
 
   const memberSince = profile?.created_at
@@ -48,7 +47,6 @@ export default async function AccountPage() {
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-lg px-4 py-8 pb-28 space-y-4">
-
         {/* Header */}
         <header className="flex items-center gap-3 mb-4">
           <Link
@@ -56,7 +54,14 @@ export default async function AccountPage() {
             aria-label="Terug naar programma"
             className="rounded-lg p-1.5 text-text-muted hover:bg-surface hover:text-text transition-colors"
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </Link>
@@ -83,14 +88,13 @@ export default async function AccountPage() {
 
         {/* Read-only details */}
         <div className="rounded-xl bg-surface shadow-sm divide-y divide-border">
-          <Row label="E-mailadres"  value={email ?? '—'} />
-          {memberSince && <Row label="Lid sinds"  value={memberSince} />}
-          <Row label="Abonnement"   value="Gratis pilot" />
+          <Row label="E-mailadres" value={email ?? '—'} />
+          {memberSince && <Row label="Lid sinds" value={memberSince} />}
+          <Row label="Abonnement" value="Gratis pilot" />
         </div>
 
         {/* Logout */}
         <LogoutButton />
-
       </div>
     </main>
   );

@@ -17,7 +17,7 @@ type Screen =
 
 function buildScreens(content: ModuleContent): Screen[] {
   return [
-    ...content.sections.map(s => ({ id: s.id, type: 'section' as const, data: s })),
+    ...content.sections.map((s) => ({ id: s.id, type: 'section' as const, data: s })),
     { id: 'body-exercise' as const, type: 'exercise' as const },
     { id: FINAL_SCREEN_ID, type: 'task' as const },
   ];
@@ -36,7 +36,10 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props
   const [isPending, startTransition] = useTransition();
   const screens = buildScreens(content);
   const initialIndex = initialScreenId
-    ? Math.max(0, screens.findIndex(s => s.id === initialScreenId))
+    ? Math.max(
+        0,
+        screens.findIndex((s) => s.id === initialScreenId),
+      )
     : 0;
 
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
@@ -62,11 +65,11 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props
       });
       return;
     }
-    setCurrentIndex(i => i + 1);
+    setCurrentIndex((i) => i + 1);
   }
 
   function goBack() {
-    if (!isFirst) setCurrentIndex(i => i - 1);
+    if (!isFirst) setCurrentIndex((i) => i - 1);
   }
 
   if (!currentScreen) return null;
@@ -81,7 +84,14 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props
             aria-label="Terug naar overzicht"
             className="rounded-lg p-1.5 text-text-muted hover:bg-background hover:text-text"
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -89,7 +99,9 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props
             <p className="text-xs font-medium text-text-muted">{content.phase}</p>
             <h1 className="text-sm font-semibold text-text leading-tight">{content.title}</h1>
           </div>
-          <span className="text-xs text-text-muted">{currentIndex + 1} / {screens.length}</span>
+          <span className="text-xs text-text-muted">
+            {currentIndex + 1} / {screens.length}
+          </span>
         </div>
         {/* Progress bar */}
         <div className="mx-auto mt-2 max-w-lg">
@@ -152,7 +164,7 @@ function ScreenContent({
   if (screen.type === 'section') {
     const { data: section } = screen;
     const example = section.examples
-      ? (complaintTypes[0] && section.examples[complaintTypes[0]]) ?? null
+      ? ((complaintTypes[0] && section.examples[complaintTypes[0]]) ?? null)
       : null;
 
     return (
