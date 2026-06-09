@@ -1,3 +1,4 @@
+import * as Linking from 'expo-linking';
 import { Redirect, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -21,7 +22,17 @@ import { useAuth } from '@/providers/AuthProvider';
 // Regenerate the PNG via assets/src/EXPORT_INSTRUCTIONS.md.
 const logo = require('../../assets/icon.png');
 
-const REDIRECT_URL = 'actapp://auth/callback';
+/**
+ * Where Supabase redirects the browser after verifying the magic link.
+ *
+ * `Linking.createURL` resolves to the right scheme automatically:
+ *   - In Expo Go dev: `exp://<lan-ip>:8081/--/auth/callback`
+ *   - In a standalone or dev-client build: `actapp://auth/callback`
+ *
+ * Both must be in Supabase → Authentication → URL Configuration → Redirect URLs.
+ * Easiest is to allowlist with wildcards: `actapp://**` and `exp://**`.
+ */
+const REDIRECT_URL = Linking.createURL('/auth/callback');
 
 type Step = 'email' | 'code';
 
