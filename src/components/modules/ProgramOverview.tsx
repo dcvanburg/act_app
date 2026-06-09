@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getModuleStatus, MODULE_ORDER } from '@/lib/progress';
 import { MODULE_META } from '@/lib/content';
-import type { ModuleId, UserProgress } from '@/types/content';
+import type { UserProgress } from '@/types/content';
 import common from '@/content/nl/common.json';
 
 interface Props {

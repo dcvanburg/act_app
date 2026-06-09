@@ -30,7 +30,7 @@ export async function updateProfile(
     })
     .eq('id', user.id);
 
-  if (error) return { error: `Opslaan mislukt: ${error.message} (code: ${error.code})` };
+  if (error) return { error: 'Opslaan mislukt. Probeer het opnieuw.' };
 
   return {};
 }
