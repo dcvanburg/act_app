@@ -66,8 +66,5 @@ coverage/
 *.mp3
 !src/content/**/placeholder.*
 
-# Generated PNGs from SVG masters (regenerate per assets/src/EXPORT_INSTRUCTIONS.md)
-/assets/icon.png
-/assets/splash.png
-/assets/adaptive-icon.png
-/assets/notification-icon.png
+# PNGs in /assets/ are checked in (Metro needs them at bundle time).
+# Regenerate from /assets/src/*.svg masters per assets/src/EXPORT_INSTRUCTIONS.md.
