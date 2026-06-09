@@ -1,0 +1,47 @@
+name: Branch name
+
+on:
+  pull_request:
+    branches: [dev]
+
+jobs:
+  check:
+    name: Validate branch name
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check branch naming convention
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          echo "Branch: $BRANCH"
+
+          # Dependabot branches are always valid
+          if echo "$BRANCH" | grep -qE '^dependabot/'; then
+            echo "Dependabot branch — skipping name check."
+            exit 0
+          fi
+
+          # Developer branches must follow the convention
+          if echo "$BRANCH" | grep -qE '^(feature|fix|docs|chore|refactor|test|ci|hotfix)/[a-z0-9]'; then
+            echo "Branch name is valid."
+            exit 0
+          fi
+
+          echo ""
+          echo "Branch '$BRANCH' does not match the required naming convention."
+          echo ""
+          echo "Rename your branch before opening a PR:"
+          echo "  git branch -m <new-name>"
+          echo "  git push origin -u <new-name>"
+          echo ""
+          echo "Allowed prefixes:"
+          echo "  feature/   — new functionality"
+          echo "  fix/       — bug fix"
+          echo "  hotfix/    — urgent production fix"
+          echo "  docs/      — documentation only"
+          echo "  chore/     — maintenance, dependencies"
+          echo "  refactor/  — code restructuring, no behaviour change"
+          echo "  test/      — tests only"
+          echo "  ci/        — CI/CD changes"
+          echo ""
+          exit 1

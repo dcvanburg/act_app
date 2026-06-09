@@ -8,7 +8,9 @@ version: 2
 # Strategy:
 #   1. github-actions at 07:00 — CI toolchain checked before app deps
 #   2. npm weekly batch at 08:00 — grouped to reduce PR noise
-#   3. npm security-only daily — CVE fixes bypass the weekly schedule
+#
+# Security updates: Dependabot raises CVE PRs automatically outside this schedule
+# via GitHub's vulnerability alerts — no separate block needed (duplicate error).
 #
 # All PRs target `dev` (never `main` — per CLAUDE.md branching rules).
 # Major version bumps are blocked globally and per high-risk package.
@@ -35,7 +37,7 @@ updates:
 
   # ── 2. npm — weekly batch (grouped by concern) ───────────────────────────────
   # Groups keep related packages in one PR so they can be tested together.
-  # Security updates bypass this schedule via block 3 below.
+  # CVE security updates are raised by Dependabot automatically outside this schedule.
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -118,16 +120,3 @@ updates:
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
 
-  # ── 3. npm security-only — daily, higher PR cap ──────────────────────────────
-  # CVE fixes must not wait for the weekly batch.
-  # Dependabot only opens PRs here when a security advisory is present.
-  # The `security` label flags these for priority review.
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    open-pull-requests-limit: 10
-    target-branch: "dev"
-    labels:
-      - "dependencies"
-      - "security"
