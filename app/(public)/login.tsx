@@ -2,6 +2,7 @@ import { Redirect, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -15,6 +16,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import common from '@/content/nl/common.json';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/providers/AuthProvider';
+
+// Compass / hexaflex mark — source SVG lives at assets/src/icon.svg.
+// Regenerate the PNG via assets/src/EXPORT_INSTRUCTIONS.md.
+const logo = require('../../assets/icon.png');
 
 const REDIRECT_URL = 'actapp://auth/callback';
 
@@ -82,8 +87,16 @@ export default function LoginScreen() {
       >
         <View className="w-full max-w-md self-center">
           <View className="mb-8 items-center">
-            <Text className="font-serif text-3xl font-bold text-text">{common.app.name}</Text>
-            <Text className="mt-1 text-base text-text-subtle">{common.app.tagline}</Text>
+            <Image
+              source={logo}
+              accessibilityLabel={common.app.name}
+              resizeMode="contain"
+              style={{ width: 96, height: 96, marginBottom: 12 }}
+            />
+            <Text className="text-center font-serif text-3xl font-bold leading-tight text-text">
+              {common.app.nameDisplay}
+            </Text>
+            <Text className="mt-2 text-base text-text-subtle">{common.app.tagline}</Text>
           </View>
 
           {step === 'sent' ? (
