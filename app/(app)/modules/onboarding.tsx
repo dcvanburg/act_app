@@ -77,9 +77,9 @@ export default function OnboardingScreen() {
         initialScreenId={null}
         complaintTypes={complaint ? [complaint] : []}
         onComplete={(notes) => {
-            setModuleNotes(notes);
-            setStep('complete');
-          }}
+          setModuleNotes(notes);
+          setStep('complete');
+        }}
       />
     );
   }
@@ -122,9 +122,7 @@ export default function OnboardingScreen() {
         {step === 'welcome' && (
           <WelcomeStep
             onContinue={() => setStep('complaint')}
-            onBack={() =>
-              inOnboarding ? router.replace('/mood?from=onboarding') : router.back()
-            }
+            onBack={() => (inOnboarding ? router.replace('/mood?from=onboarding') : router.back())}
             onSkip={() => router.replace('/home')}
             inOnboarding={inOnboarding}
           />
@@ -172,7 +170,12 @@ export default function OnboardingScreen() {
           <CompleteStep
             onComplete={() =>
               saveModuleProgress.mutate(
-                { moduleId: 'onboarding', lastStepId: 'practical-task', completed: true, notes: moduleNotes },
+                {
+                  moduleId: 'onboarding',
+                  lastStepId: 'practical-task',
+                  completed: true,
+                  notes: moduleNotes,
+                },
                 { onSuccess: () => router.replace('/home') },
               )
             }
@@ -405,13 +408,7 @@ function BlockedStep({
   );
 }
 
-function CompleteStep({
-  onComplete,
-  isSaving,
-}: {
-  onComplete: () => void;
-  isSaving: boolean;
-}) {
+function CompleteStep({ onComplete, isSaving }: { onComplete: () => void; isSaving: boolean }) {
   return (
     <View>
       <Text className="mb-2 font-serif text-3xl font-bold text-text">{intake.complete.title}</Text>

@@ -64,8 +64,7 @@ export function TodoBlock() {
       status === 'in_progress'
         ? home.todo.moduleContinueItem.replace('{title}', title)
         : home.todo.moduleStartItem.replace('{title}', title);
-    const href =
-      nextModuleId === 'onboarding' ? '/modules/onboarding' : `/modules/${nextModuleId}`;
+    const href = nextModuleId === 'onboarding' ? '/modules/onboarding' : `/modules/${nextModuleId}`;
     items.push({
       key: 'module',
       label,

@@ -83,7 +83,9 @@ export default function MoodCheckinScreen() {
               <Text className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
                 {mood.onboardingIntro.step1Label}
               </Text>
-              <Text className="mb-1 font-semibold text-text">{mood.onboardingIntro.step1Title}</Text>
+              <Text className="mb-1 font-semibold text-text">
+                {mood.onboardingIntro.step1Title}
+              </Text>
               <Text className="text-sm leading-snug text-text-subtle">
                 {mood.onboardingIntro.step1Body}
               </Text>
@@ -93,7 +95,9 @@ export default function MoodCheckinScreen() {
               <Text className="mb-1 text-xs font-semibold uppercase tracking-wide text-text-muted">
                 {mood.onboardingIntro.step2Label}
               </Text>
-              <Text className="mb-1 font-semibold text-text">{mood.onboardingIntro.step2Title}</Text>
+              <Text className="mb-1 font-semibold text-text">
+                {mood.onboardingIntro.step2Title}
+              </Text>
               <Text className="text-sm leading-snug text-text-subtle">
                 {mood.onboardingIntro.step2Body}
               </Text>

@@ -12,7 +12,13 @@ import { StarIcon } from '@/components/icons/StarIcon';
 import { TargetIcon } from '@/components/icons/TargetIcon';
 import { ThoughtIcon } from '@/components/icons/ThoughtIcon';
 import { MODULE_META } from '@/lib/content';
-import { getModuleStatus, getPhaseProgress, MODULE_ORDER, PROGRAM_PHASES, type ProgramPhaseId } from '@/lib/progress';
+import {
+  getModuleStatus,
+  getPhaseProgress,
+  MODULE_ORDER,
+  PROGRAM_PHASES,
+  type ProgramPhaseId,
+} from '@/lib/progress';
 import common from '@/content/nl/common.json';
 import type { ModuleId, ModuleStatus, UserProgress } from '@/types/content';
 
@@ -133,59 +139,20 @@ export function ProgramOverview({ progress, groupByPhase = false }: Props) {
                 </View>
               </Pressable>
             )}
-            {isExpanded && (() => {
-              const completedIds = phase.moduleIds.filter(
-                (id) => getModuleStatus(id, progress) === 'completed',
-              );
-              const otherIds = phase.moduleIds.filter(
-                (id) => getModuleStatus(id, progress) !== 'completed',
-              );
-              const hasCompletedSub = completedIds.length > 0 && otherIds.length > 0;
-              const subExpanded = expandedCompletedSubs.has(phase.id);
+            {isExpanded &&
+              (() => {
+                const completedIds = phase.moduleIds.filter(
+                  (id) => getModuleStatus(id, progress) === 'completed',
+                );
+                const otherIds = phase.moduleIds.filter(
+                  (id) => getModuleStatus(id, progress) !== 'completed',
+                );
+                const hasCompletedSub = completedIds.length > 0 && otherIds.length > 0;
+                const subExpanded = expandedCompletedSubs.has(phase.id);
 
-              return (
-                <View className="gap-2">
-                  {otherIds.map((moduleId) => (
-                    <ModuleRow
-                      key={moduleId}
-                      moduleId={moduleId}
-                      index={MODULE_ORDER.indexOf(moduleId)}
-                      progress={progress}
-                    />
-                  ))}
-
-                  {hasCompletedSub && (
-                    <View className="mt-1">
-                      <Pressable
-                        accessibilityRole="button"
-                        onPress={() => toggleCompletedSub(phase.id)}
-                        className="flex-row items-center justify-between rounded-lg px-3 py-2 active:bg-primary-soft"
-                      >
-                        <View className="flex-row items-center gap-2">
-                          <Text className="text-xs font-bold text-primary">{'✓'}</Text>
-                          <Text className="text-xs font-semibold text-text-muted">
-                            Afgeronde modules
-                          </Text>
-                        </View>
-                        <Text className="text-xs text-text-muted">{subExpanded ? '∧' : '∨'}</Text>
-                      </Pressable>
-                      {subExpanded && (
-                        <View className="mt-2 gap-2">
-                          {completedIds.map((moduleId) => (
-                            <ModuleRow
-                              key={moduleId}
-                              moduleId={moduleId}
-                              index={MODULE_ORDER.indexOf(moduleId)}
-                              progress={progress}
-                            />
-                          ))}
-                        </View>
-                      )}
-                    </View>
-                  )}
-
-                  {!hasCompletedSub &&
-                    completedIds.map((moduleId) => (
+                return (
+                  <View className="gap-2">
+                    {otherIds.map((moduleId) => (
                       <ModuleRow
                         key={moduleId}
                         moduleId={moduleId}
@@ -193,9 +160,49 @@ export function ProgramOverview({ progress, groupByPhase = false }: Props) {
                         progress={progress}
                       />
                     ))}
-                </View>
-              );
-            })()}
+
+                    {hasCompletedSub && (
+                      <View className="mt-1">
+                        <Pressable
+                          accessibilityRole="button"
+                          onPress={() => toggleCompletedSub(phase.id)}
+                          className="flex-row items-center justify-between rounded-lg px-3 py-2 active:bg-primary-soft"
+                        >
+                          <View className="flex-row items-center gap-2">
+                            <Text className="text-xs font-bold text-primary">{'✓'}</Text>
+                            <Text className="text-xs font-semibold text-text-muted">
+                              Afgeronde modules
+                            </Text>
+                          </View>
+                          <Text className="text-xs text-text-muted">{subExpanded ? '∧' : '∨'}</Text>
+                        </Pressable>
+                        {subExpanded && (
+                          <View className="mt-2 gap-2">
+                            {completedIds.map((moduleId) => (
+                              <ModuleRow
+                                key={moduleId}
+                                moduleId={moduleId}
+                                index={MODULE_ORDER.indexOf(moduleId)}
+                                progress={progress}
+                              />
+                            ))}
+                          </View>
+                        )}
+                      </View>
+                    )}
+
+                    {!hasCompletedSub &&
+                      completedIds.map((moduleId) => (
+                        <ModuleRow
+                          key={moduleId}
+                          moduleId={moduleId}
+                          index={MODULE_ORDER.indexOf(moduleId)}
+                          progress={progress}
+                        />
+                      ))}
+                  </View>
+                );
+              })()}
           </View>
         );
       })}

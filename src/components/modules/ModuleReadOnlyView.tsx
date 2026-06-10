@@ -26,8 +26,7 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
   const primaryComplaint = complaintTypes[0] ?? null;
   const { data: progress } = useUserProgress();
 
-  const savedNotes =
-    progress?.modules.find((m) => m.moduleId === content.id)?.notes ?? null;
+  const savedNotes = progress?.modules.find((m) => m.moduleId === content.id)?.notes ?? null;
 
   const currentIndex = MODULE_ORDER.indexOf(content.id);
 
@@ -44,9 +43,7 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
       ? MODULE_ORDER[currentIndex + 1]
       : null;
   const nextAccessible =
-    nextModuleId && progress
-      ? getModuleStatus(nextModuleId, progress) !== 'locked'
-      : false;
+    nextModuleId && progress ? getModuleStatus(nextModuleId, progress) !== 'locked' : false;
   const nextMeta = nextModuleId ? MODULE_META[nextModuleId] : null;
   const nextHref: Href | null = nextModuleId
     ? nextModuleId === 'onboarding'
