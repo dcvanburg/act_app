@@ -116,6 +116,7 @@ export function withModuleUpdate(
   moduleId: ModuleId,
   lastStepId: string,
   completed: boolean,
+  notes?: string,
 ): UserProgress {
   const now = new Date().toISOString();
   const existingIndex = progress.modules.findIndex((m) => m.moduleId === moduleId);
@@ -133,6 +134,7 @@ export function withModuleUpdate(
           ? 'completed'
           : 'in_progress',
       ...(completed && existing.status !== 'completed' ? { completedAt: now } : {}),
+      ...(notes !== undefined ? { notes } : {}),
     };
   } else {
     modules.push({
@@ -141,6 +143,7 @@ export function withModuleUpdate(
       startedAt: now,
       lastStepId,
       ...(completed ? { completedAt: now } : {}),
+      ...(notes !== undefined ? { notes } : {}),
     });
   }
 

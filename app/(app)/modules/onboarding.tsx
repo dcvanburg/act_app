@@ -46,6 +46,7 @@ export default function OnboardingScreen() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [questionIndex, setQuestionIndex] = useState(0);
   const [resolvedOutcome, setResolvedOutcome] = useState<SafetyOutcome | null>(null);
+  const [moduleNotes, setModuleNotes] = useState<string | undefined>(undefined);
 
   const currentQuestion = questions[questionIndex];
 
@@ -75,7 +76,10 @@ export default function OnboardingScreen() {
         content={content}
         initialScreenId={null}
         complaintTypes={complaint ? [complaint] : []}
-        onComplete={() => setStep('complete')}
+        onComplete={(notes) => {
+            setModuleNotes(notes);
+            setStep('complete');
+          }}
       />
     );
   }
@@ -168,7 +172,7 @@ export default function OnboardingScreen() {
           <CompleteStep
             onComplete={() =>
               saveModuleProgress.mutate(
-                { moduleId: 'onboarding', lastStepId: 'practical-task', completed: true },
+                { moduleId: 'onboarding', lastStepId: 'practical-task', completed: true, notes: moduleNotes },
                 { onSuccess: () => router.replace('/home') },
               )
             }

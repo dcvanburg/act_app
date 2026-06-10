@@ -105,6 +105,7 @@ export type ModuleProgress = {
   startedAt?: string;
   completedAt?: string;
   lastStepId?: string;
+  notes?: string;
 };
 
 export type SafetyOutcome = 'pass' | 'flag' | 'block-strong' | 'block-medical';

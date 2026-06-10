@@ -26,8 +26,9 @@ interface Props {
   initialScreenId: string | null;
   complaintTypes: ComplaintType[];
   /** When provided, called instead of router.replace('/home') on the last screen.
-   *  Also prevents auto-saving completed:true so the caller handles completion. */
-  onComplete?: () => void;
+   *  Also prevents auto-saving completed:true so the caller handles completion.
+   *  Receives the notes the user typed (undefined if empty). */
+  onComplete?: (notes?: string) => void;
 }
 
 /**
@@ -80,11 +81,16 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes, onCompl
     if (isLast) {
       if (onCompleteRef.current) {
         // Parent owns completion (e.g. onboarding → CompleteStep).
-        onCompleteRef.current();
+        onCompleteRef.current(notes.trim() || undefined);
       } else {
         // Regular module: save as completed then show the read-only view.
         saveMutation.mutate(
-          { moduleId: content.id, lastStepId: currentScreen!.id, completed: true },
+          {
+            moduleId: content.id,
+            lastStepId: currentScreen!.id,
+            completed: true,
+            notes: notes.trim() || undefined,
+          },
           {
             onSuccess: () =>
               router.replace({ pathname: '/modules/[id]', params: { id: content.id } }),
