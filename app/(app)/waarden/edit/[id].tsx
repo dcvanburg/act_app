@@ -6,9 +6,10 @@ import {
   useRouter,
 } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppTextInput } from '@/components/AppTextInput';
 import waarden from '@/content/nl/waarden.json';
 import { useRegisterUnsavedChangesGuard } from '@/providers/UnsavedChangesGuardProvider';
 import { useWaarden } from '@/providers/WaardenProvider';
@@ -253,25 +254,23 @@ export default function WaardeEditScreen() {
         <Text className="mb-6 font-serif text-2xl font-bold text-text">{waarden.edit.title}</Text>
 
         <FormGroup label={waarden.new.nameLabel}>
-          <TextInput
+          <AppTextInput
             value={naam}
             onChangeText={setNaam}
             placeholder={waarden.new.namePlaceholder}
-            className="rounded-xl border border-border bg-surface-muted px-3.5 py-3 text-base text-text"
-            placeholderTextColor="#888780"
+            className="rounded-xl bg-surface-muted px-3.5"
           />
         </FormGroup>
 
         <FormGroup label={`${waarden.new.descLabel} ${waarden.new.descOptional}`}>
-          <TextInput
+          <AppTextInput
             value={beschrijving}
             onChangeText={setBeschrijving}
             placeholder={waarden.new.descPlaceholder}
             multiline
             numberOfLines={3}
-            className="min-h-[88px] rounded-xl border border-border bg-surface-muted px-3.5 py-3 text-base text-text"
-            placeholderTextColor="#888780"
-            textAlignVertical="top"
+            className="rounded-xl bg-surface-muted px-3.5"
+            style={{ minHeight: 88 }}
           />
         </FormGroup>
 
@@ -332,7 +331,7 @@ export default function WaardeEditScreen() {
                       </Pressable>
                     ))}
                   </View>
-                  <TextInput
+                  <AppTextInput
                     value={draft.actie}
                     onChangeText={(text) =>
                       setActieDrafts((prev) => ({
@@ -340,8 +339,8 @@ export default function WaardeEditScreen() {
                         [item.id]: { ...draft, actie: text },
                       }))
                     }
-                    className="rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-text"
-                    placeholderTextColor="#888780"
+                    compact
+                    className="rounded-xl bg-surface px-3"
                   />
                   <Pressable
                     accessibilityRole="button"
@@ -397,7 +396,7 @@ export default function WaardeEditScreen() {
                     ))}
                   </View>
                   {draft.type === 'eigen' ? (
-                    <TextInput
+                    <AppTextInput
                       value={draft.eigenLabel}
                       onChangeText={(text) =>
                         setBarrierDrafts((prev) => ({
@@ -406,11 +405,11 @@ export default function WaardeEditScreen() {
                         }))
                       }
                       placeholder={waarden.detail.customBarrierPlaceholder}
-                      className="mb-2 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-text"
-                      placeholderTextColor="#888780"
+                      compact
+                      className="mb-2 rounded-xl bg-surface px-3"
                     />
                   ) : null}
-                  <TextInput
+                  <AppTextInput
                     value={draft.omschrijving}
                     onChangeText={(text) =>
                       setBarrierDrafts((prev) => ({
@@ -421,9 +420,9 @@ export default function WaardeEditScreen() {
                     placeholder={waarden.detail.barrierPlaceholder}
                     multiline
                     numberOfLines={2}
-                    className="min-h-[72px] rounded-xl border border-border bg-surface px-3 py-2.5 text-sm text-text"
-                    placeholderTextColor="#888780"
-                    textAlignVertical="top"
+                    compact
+                    className="rounded-xl bg-surface px-3"
+                    style={{ minHeight: 72 }}
                   />
                   <Pressable
                     accessibilityRole="button"

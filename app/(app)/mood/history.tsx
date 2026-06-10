@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { ActivityIndicator, Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BackButton } from '@/components/BackButton';
 import { MoodFace } from '@/components/mood/MoodFace';
 import { MoodStreakSummary } from '@/components/mood/MoodStreakSummary';
 import { MoodTrendChart } from '@/components/mood/MoodTrendChart';
@@ -45,15 +46,8 @@ export default function MoodHistoryScreen() {
       }}
     >
       <View className="mx-auto w-full max-w-md gap-4">
-        <View className="mb-2 flex-row items-center gap-3">
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Terug"
-            onPress={() => router.back()}
-            className="p-1"
-          >
-            <Text className="text-lg text-text-muted">‹</Text>
-          </Pressable>
+        <View className="mb-2 flex-row items-center gap-2">
+          <BackButton onPress={() => router.back()} />
           <Text className="font-serif text-xl font-bold text-text">{mood.history.title}</Text>
         </View>
 

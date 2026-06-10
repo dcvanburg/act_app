@@ -2,5 +2,5 @@ appId: nl.actapp.app
 ---
 - launchApp:
     clearState: true
-- assertVisible: "Van Overleven naar Leven"
-- assertVisible: "Noodknop"
+- assertVisible: 'Van Overleven naar Leven'
+- assertVisible: 'Noodknop'

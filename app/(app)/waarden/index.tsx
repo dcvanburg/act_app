@@ -2,6 +2,7 @@ import { Link, useRouter } from 'expo-router';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BackButton } from '@/components/BackButton';
 import { FlameIcon } from '@/components/icons/FlameIcon';
 import { StarIcon } from '@/components/icons/StarIcon';
 import { CheckinAntwoordIcon } from '@/components/waarden/CheckinAntwoordIcon';
@@ -55,15 +56,8 @@ export default function WaardenScreen() {
       }}
     >
       <View className="mx-auto w-full max-w-md">
-        <View className="mb-2 flex-row items-center gap-3">
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Terug"
-            onPress={() => router.back()}
-            className="p-1"
-          >
-            <Text className="text-lg text-text-muted">‹</Text>
-          </Pressable>
+        <View className="mb-2 flex-row items-center gap-2">
+          <BackButton onPress={() => router.back()} />
           <Text className="flex-1 font-serif text-2xl font-bold text-text">{waarden.title}</Text>
         </View>
 

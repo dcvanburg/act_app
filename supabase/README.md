@@ -21,13 +21,13 @@ applied (set up during the pre-pivot Next.js work). Re-applying
 
 Migrations apply in lexical order. Use a `NNNN_short_name.sql` filename pattern.
 
-| File | Adds |
-|------|------|
-| `0001_initial_schema.sql` | `profiles`, `user_progress`, `journal_entries`, RLS |
-| `0002_mood_logs.sql` | `mood_logs` (daily mood check-in) |
-| `0003_profiles_subscription_tier.sql` | Adds `subscription_tier` to pre-pivot `profiles` rows |
-| `0004_waarden.sql` | `waarden`, `waarde_acties`, `waarde_barriers`, `waarde_checkins` |
-| _(future)_ | `exercise_logs`, `streaks`, `user_badges`, `weekly_checkins` — Phase 2-γ |
+| File                                  | Adds                                                                     |
+| ------------------------------------- | ------------------------------------------------------------------------ |
+| `0001_initial_schema.sql`             | `profiles`, `user_progress`, `journal_entries`, RLS                      |
+| `0002_mood_logs.sql`                  | `mood_logs` (daily mood check-in)                                        |
+| `0003_profiles_subscription_tier.sql` | Adds `subscription_tier` to pre-pivot `profiles` rows                    |
+| `0004_waarden.sql`                    | `waarden`, `waarde_acties`, `waarde_barriers`, `waarde_checkins`         |
+| _(future)_                            | `exercise_logs`, `streaks`, `user_badges`, `weekly_checkins` — Phase 2-γ |
 
 ## Row Level Security
 

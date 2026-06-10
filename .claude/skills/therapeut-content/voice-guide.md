@@ -18,14 +18,14 @@
 
 ## ACT-consistent taalgebruik
 
-| Gebruik | Vermijd |
-|---------|---------|
-| Ruimte maken | Onderdrukken, wegwerken |
-| Waarden, richting, kompas | Doelen halen, genezen worden |
-| Observeren, opmerken | Analyseren, oplossen |
-| Ongemak toelaten | Positief denken, vechten tegen |
-| Kleine stap, experiment | Grote belofte, snelle fix |
-| Terugval is informatie | Mislukking, fout, falen |
+| Gebruik                   | Vermijd                        |
+| ------------------------- | ------------------------------ |
+| Ruimte maken              | Onderdrukken, wegwerken        |
+| Waarden, richting, kompas | Doelen halen, genezen worden   |
+| Observeren, opmerken      | Analyseren, oplossen           |
+| Ongemak toelaten          | Positief denken, vechten tegen |
+| Kleine stap, experiment   | Grote belofte, snelle fix      |
+| Terugval is informatie    | Mislukking, fout, falen        |
 
 ## Lichaamswerk-taal
 
@@ -36,12 +36,12 @@
 
 ## Per doelgroep (in examples, niet in hoofdtekst)
 
-| Type | Herkenbare invalshoek |
-|------|----------------------|
-| `pain` | Vermijden van beweging, medicatie, hoop op genezing, vermoeidheid |
-| `mental` | Piekeren, controle, terugtrekken, innerlijke criticus |
-| `alcohol` | Drang, schaamte, korte verlichting, sociale context |
-| `combination` | Overlap: vermijding werkt op meerdere vlakken tegelijk |
+| Type          | Herkenbare invalshoek                                             |
+| ------------- | ----------------------------------------------------------------- |
+| `pain`        | Vermijden van beweging, medicatie, hoop op genezing, vermoeidheid |
+| `mental`      | Piekeren, controle, terugtrekken, innerlijke criticus             |
+| `alcohol`     | Drang, schaamte, korte verlichting, sociale context               |
+| `combination` | Overlap: vermijding werkt op meerdere vlakken tegelijk            |
 
 ## Veiligheidstaal
 
@@ -61,7 +61,7 @@ Markers: [pauze 3 sec], [pauze 5 sec]
 
 ## Interpunctie
 
-- **Geen streepjes als leesteken** in user-facing copy: geen em dash (`—`), en dash (`–`), of koppelteken als pauze (` - `)
+- **Geen streepjes als leesteken** in user-facing copy: geen em dash (`—`), en dash (`–`), of koppelteken als pauze (`-`)
 - Gebruik in plaats daarvan: punt, komma, dubbele punt, of herformuleer de zin
 - Voorbeeld fout: `Acceptatie is niet opgeven — het is stoppen met vechten`
 - Voorbeeld goed: `Acceptatie is niet opgeven. Het is stoppen met vechten.` of `Acceptatie is niet opgeven: stoppen met vechten.`

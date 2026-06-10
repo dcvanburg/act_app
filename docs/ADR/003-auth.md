@@ -12,12 +12,12 @@ No anonymous or guest mode in v1.
 
 ## Rationale
 
-| Factor | Reasoning |
-|--------|-----------|
-| Data sensitivity | Progress and journal are health-related data — server-side storage is required from day one |
-| Therapeutic continuity | Users switch devices; progress must follow them |
-| Simplicity | Anonymous → upgrade migration adds complexity with little benefit given the target audience |
-| Low friction | Magic-link (passwordless) removes the barrier of password management; aligns with ACT's non-coercive tone |
+| Factor                 | Reasoning                                                                                                 |
+| ---------------------- | --------------------------------------------------------------------------------------------------------- |
+| Data sensitivity       | Progress and journal are health-related data — server-side storage is required from day one               |
+| Therapeutic continuity | Users switch devices; progress must follow them                                                           |
+| Simplicity             | Anonymous → upgrade migration adds complexity with little benefit given the target audience               |
+| Low friction           | Magic-link (passwordless) removes the barrier of password management; aligns with ACT's non-coercive tone |
 
 ## Consequences
 
@@ -32,7 +32,7 @@ No anonymous or guest mode in v1.
 ```
 Auth flow:
   / (landing)  →  /login (email input)  →  magic-link email  →  /auth/callback  →  / (home)
-  
+
 Protected routes (middleware): /onboarding, /modules/*, /oefeningen, /dagboek, /check-in
 Public routes:                 /, /noodhulp, /auth/*, /privacy
 ```
@@ -66,11 +66,11 @@ RLS policies on all tables: `auth.uid() = user_id`.
 
 ## Alternatives considered
 
-| Option | Rejected because |
-|--------|------------------|
-| Anonymous (localStorage) | Data lost on device change; journal not backed up; GDPR right-to-erasure harder to implement |
-| Anonymous + upgrade | Adds migration complexity; account still required eventually |
-| Social login (Google, etc.) | Third-party dependency; health-data scope concerns; magic-link is simpler |
+| Option                      | Rejected because                                                                             |
+| --------------------------- | -------------------------------------------------------------------------------------------- |
+| Anonymous (localStorage)    | Data lost on device change; journal not backed up; GDPR right-to-erasure harder to implement |
+| Anonymous + upgrade         | Adds migration complexity; account still required eventually                                 |
+| Social login (Google, etc.) | Third-party dependency; health-data scope concerns; magic-link is simpler                    |
 
 ## Open items from this decision
 

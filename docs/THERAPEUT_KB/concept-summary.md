@@ -1,6 +1,6 @@
 # Therapeut Knowledge Base — Concept Summary
 
-> Condensed from *ACT App Concept v1.0* (Dutch source document).
+> Condensed from _ACT App Concept v1.0_ (Dutch source document).
 > English for agent planning; all user-facing output is Dutch.
 
 ## One-liner
@@ -19,12 +19,12 @@ as guide.
 
 ## Core philosophy
 
-| Principle (NL) | Meaning |
-|----------------|---------|
-| Klachten zijn niet de vijand — vermijding wel | Target avoidance patterns, not symptom suppression |
-| Het lichaam is geen bijzaak — het is de poort | Body work integrated in every module |
-| Waarden zijn de kompas, niet symptoomvrij zijn | Direction over cure |
-| Terugval is informatie, geen mislukking | Non-punitive framing of setbacks |
+| Principle (NL)                                 | Meaning                                            |
+| ---------------------------------------------- | -------------------------------------------------- |
+| Klachten zijn niet de vijand — vermijding wel  | Target avoidance patterns, not symptom suppression |
+| Het lichaam is geen bijzaak — het is de poort  | Body work integrated in every module               |
+| Waarden zijn de kompas, niet symptoomvrij zijn | Direction over cure                                |
+| Terugval is informatie, geen mislukking        | Non-punitive framing of setbacks                   |
 
 ## Target audiences (overlapping)
 
@@ -47,16 +47,16 @@ ACT provides a transdiagnostic framework for all three.
 Three phases, **8 modules** (including onboarding). Linear progression; completed modules
 revisitable.
 
-| # | Module (NL) | ACT process | Body work |
-|---|-------------|-------------|-----------|
-| 0 | Welkom & Intake | Philosophy introduction | Body awareness intake |
-| 1 | Herkennen | Psycho-education avoidance cycle | Body scan |
-| 2 | Acceptatie | Making space, paradox of control | Breath space |
-| 3 | Defusie | Distancing from thoughts | Tension & release |
-| 4 | Aanwezig zijn | Mindfulness, the present | Sensory exercise |
-| 5 | Zelf-als-context | Observing self | Centering |
-| 6 | Waarden | Choosing direction despite pain | Heart-area exercise |
-| 7 | Toegewijd handelen | Committed action toward values | Movement exercise |
+| #   | Module (NL)        | ACT process                      | Body work             |
+| --- | ------------------ | -------------------------------- | --------------------- |
+| 0   | Welkom & Intake    | Philosophy introduction          | Body awareness intake |
+| 1   | Herkennen          | Psycho-education avoidance cycle | Body scan             |
+| 2   | Acceptatie         | Making space, paradox of control | Breath space          |
+| 3   | Defusie            | Distancing from thoughts         | Tension & release     |
+| 4   | Aanwezig zijn      | Mindfulness, the present         | Sensory exercise      |
+| 5   | Zelf-als-context   | Observing self                   | Centering             |
+| 6   | Waarden            | Choosing direction despite pain  | Heart-area exercise   |
+| 7   | Toegewijd handelen | Committed action toward values   | Movement exercise     |
 
 Full per-module detail: `docs/MODULES.md`
 
@@ -106,11 +106,11 @@ Practical tasks per module are `[PLACEHOLDER]` in v1 — track in
 
 ## App content locations
 
-| Area | Path |
-|------|------|
-| Module copy | `src/content/nl/modules/` |
-| Crisis | `src/content/nl/crisis.json` |
-| Intake | `src/content/nl/intake.json` |
-| Mood | `src/content/nl/mood.json` |
-| Daily practice | `src/content/nl/daily-practice.json` |
+| Area               | Path                                                |
+| ------------------ | --------------------------------------------------- |
+| Module copy        | `src/content/nl/modules/`                           |
+| Crisis             | `src/content/nl/crisis.json`                        |
+| Intake             | `src/content/nl/intake.json`                        |
+| Mood               | `src/content/nl/mood.json`                          |
+| Daily practice     | `src/content/nl/daily-practice.json`                |
 | Emergency exercise | `src/content/nl/exercises/emergency-grounding.json` |

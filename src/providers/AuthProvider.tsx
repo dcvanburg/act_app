@@ -14,16 +14,25 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+/** True when Supabase rejected the stored session (expired/revoked), not transient network. */
+function isInvalidSessionError(error: { message?: string; status?: number | undefined }): boolean {
+  const message = error.message?.toLowerCase() ?? '';
+  return (
+    error.status === 401 ||
+    error.status === 403 ||
+    message.includes('invalid') ||
+    message.includes('expired') ||
+    message.includes('session') ||
+    message.includes('jwt') ||
+    message.includes('refresh token')
+  );
+}
+
 /**
  * AuthProvider — owns the session lifecycle for the entire app.
  *
- * Responsibilities:
- *   1. Bootstrap a session from secure storage on mount.
- *   2. Listen for Supabase auth state changes (sign-in, sign-out, token refresh).
- *   3. Parse magic-link deep links (`actapp://auth/callback#access_token=...`)
- *      and hand the tokens to Supabase.
- *   4. Pause/resume the auto-refresh timer when the app goes background/foreground —
- *      Supabase's auto-refresh leaks timers in RN otherwise.
+ * Cold start validates the stored session with `getUser()` so expired magic-link
+ * sessions do not skip login and land on profile setup.
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -32,16 +41,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (!mounted) return;
-      setSession(data.session);
-      setLoading(false);
-    });
+    async function bootstrapSession() {
+      const {
+        data: { session: localSession },
+      } = await supabase.auth.getSession();
+
+      if (!localSession) {
+        if (mounted) {
+          setSession(null);
+          setLoading(false);
+        }
+        return;
+      }
+
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (error || !user) {
+        if (!error || isInvalidSessionError(error)) {
+          await supabase.auth.signOut();
+          if (mounted) {
+            setSession(null);
+            setLoading(false);
+          }
+          return;
+        }
+
+        if (mounted) {
+          setSession(localSession);
+          setLoading(false);
+        }
+        return;
+      }
+
+      const {
+        data: { session: validatedSession },
+      } = await supabase.auth.getSession();
+
+      if (mounted) {
+        setSession(validatedSession ?? localSession);
+        setLoading(false);
+      }
+    }
+
+    bootstrapSession();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
+      setLoading(false);
     });
 
     return () => {

@@ -28,9 +28,7 @@ function check(file: string, field: string, value: unknown) {
 // ── Safety-critical files ─────────────────────────────────────────────────────
 
 // 1. Crisis content must be complete
-const crisis = JSON.parse(
-  readFileSync(resolve(ROOT, 'src/content/nl/crisis.json'), 'utf8'),
-);
+const crisis = JSON.parse(readFileSync(resolve(ROOT, 'src/content/nl/crisis.json'), 'utf8'));
 check('crisis.json', 'disclaimer.body', crisis.disclaimer?.body);
 check('crisis.json', 'safetyBlock.body', crisis.safetyBlock?.body);
 
@@ -44,9 +42,7 @@ for (const step of grounding.steps ?? []) {
 check('emergency-grounding.json', 'transcript', grounding.transcript);
 
 // 3. Intake safety check must have questions (not empty array)
-const intake = JSON.parse(
-  readFileSync(resolve(ROOT, 'src/content/nl/intake.json'), 'utf8'),
-);
+const intake = JSON.parse(readFileSync(resolve(ROOT, 'src/content/nl/intake.json'), 'utf8'));
 if (!Array.isArray(intake.safetyCheck?.questions) || intake.safetyCheck.questions.length === 0) {
   failures.push({
     file: 'intake.json',

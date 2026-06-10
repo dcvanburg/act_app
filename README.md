@@ -40,15 +40,15 @@ eas build --profile preview  # EAS Build (preview channel)
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [PRODUCT.md](./docs/PRODUCT.md) | Vision, audience, program structure |
-| [MODULES.md](./docs/MODULES.md) | All 8 modules in detail |
-| [TECHNICAL_SPEC.md](./docs/TECHNICAL_SPEC.md) | Functional requirements |
-| [NAVIGATION.md](./docs/NAVIGATION.md) | Routes and unlock logic |
-| [SECURITY.md](./docs/SECURITY.md) | Safety, GDPR, crisis handling |
-| [OPEN_QUESTIONS.md](./docs/OPEN_QUESTIONS.md) | Decisions still needed |
-| [CONTENT_PLACEHOLDERS.md](./docs/CONTENT_PLACEHOLDERS.md) | Therapist content to fill |
+| Document                                                  | Description                         |
+| --------------------------------------------------------- | ----------------------------------- |
+| [PRODUCT.md](./docs/PRODUCT.md)                           | Vision, audience, program structure |
+| [MODULES.md](./docs/MODULES.md)                           | All 8 modules in detail             |
+| [TECHNICAL_SPEC.md](./docs/TECHNICAL_SPEC.md)             | Functional requirements             |
+| [NAVIGATION.md](./docs/NAVIGATION.md)                     | Routes and unlock logic             |
+| [SECURITY.md](./docs/SECURITY.md)                         | Safety, GDPR, crisis handling       |
+| [OPEN_QUESTIONS.md](./docs/OPEN_QUESTIONS.md)             | Decisions still needed              |
+| [CONTENT_PLACEHOLDERS.md](./docs/CONTENT_PLACEHOLDERS.md) | Therapist content to fill           |
 
 ## Content
 

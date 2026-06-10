@@ -4,16 +4,16 @@
 
 ## Module index
 
-| ID | Phase | Dutch title | English ID | Unlock rule |
-|----|-------|-------------|------------|-------------|
-| `0` | 0 — Onboarding | Welkom & Intake | `onboarding` | Always available |
-| `1` | 1 — Fundament | Herkennen | `recognition` | After module 0 complete |
-| `2` | 1 — Fundament | Acceptatie | `acceptance` | After module 1 complete |
-| `3` | 2 — Kern | Defusie | `defusion` | After module 2 complete |
-| `4` | 2 — Kern | Aanwezig zijn | `presence` | After module 3 complete |
-| `5` | 2 — Kern | Zelf-als-context | `self-as-context` | After module 4 complete |
-| `6` | 2 — Kern | Waarden | `values` | After module 5 complete |
-| `7` | 3 — Leven | Toegewijd handelen | `committed-action` | After module 6 complete |
+| ID  | Phase          | Dutch title        | English ID         | Unlock rule             |
+| --- | -------------- | ------------------ | ------------------ | ----------------------- |
+| `0` | 0 — Onboarding | Welkom & Intake    | `onboarding`       | Always available        |
+| `1` | 1 — Fundament  | Herkennen          | `recognition`      | After module 0 complete |
+| `2` | 1 — Fundament  | Acceptatie         | `acceptance`       | After module 1 complete |
+| `3` | 2 — Kern       | Defusie            | `defusion`         | After module 2 complete |
+| `4` | 2 — Kern       | Aanwezig zijn      | `presence`         | After module 3 complete |
+| `5` | 2 — Kern       | Zelf-als-context   | `self-as-context`  | After module 4 complete |
+| `6` | 2 — Kern       | Waarden            | `values`           | After module 5 complete |
+| `7` | 3 — Leven      | Toegewijd handelen | `committed-action` | After module 6 complete |
 
 **Daily practice** unlocks after module 7 completion.
 
@@ -222,9 +222,9 @@ Movement exercise — bringing the body in a new direction.
 
 ## Daily practice (post-completion)
 
-| Feature | Dutch label (suggested) | Description |
-|---------|-------------------------|-------------|
-| Standalone exercises | Losse oefeningen | Per-theme exercises, on demand |
-| Journal | Dagboek | Simple reflection entries |
-| Weekly check-in | Wekelijkse check-in | Values alignment check |
-| Emergency button | Noodknop | Always-available grounding/breath |
+| Feature              | Dutch label (suggested) | Description                       |
+| -------------------- | ----------------------- | --------------------------------- |
+| Standalone exercises | Losse oefeningen        | Per-theme exercises, on demand    |
+| Journal              | Dagboek                 | Simple reflection entries         |
+| Weekly check-in      | Wekelijkse check-in     | Values alignment check            |
+| Emergency button     | Noodknop                | Always-available grounding/breath |

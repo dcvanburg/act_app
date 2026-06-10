@@ -4,12 +4,12 @@ SVG masters in this folder are the single source of truth for the app's visual i
 
 ## Files
 
-| Master (SVG) | Target PNG | Size | Used by |
-|--------------|------------|------|---------|
-| `icon.svg` | `assets/icon.png` | 1024×1024 | iOS App Store icon, Expo `icon` field |
-| `adaptive-icon.svg` | `assets/adaptive-icon.png` | 1024×1024 (transparent bg) | Android adaptive icon foreground |
-| `splash.svg` | `assets/splash.png` | 1284×2778 (iPhone 14 Pro Max baseline) | Expo splash screen |
-| `notification-icon.svg` | `assets/notification-icon.png` | 96×96 | Android notification tray icon |
+| Master (SVG)            | Target PNG                     | Size                                   | Used by                               |
+| ----------------------- | ------------------------------ | -------------------------------------- | ------------------------------------- |
+| `icon.svg`              | `assets/icon.png`              | 1024×1024                              | iOS App Store icon, Expo `icon` field |
+| `adaptive-icon.svg`     | `assets/adaptive-icon.png`     | 1024×1024 (transparent bg)             | Android adaptive icon foreground      |
+| `splash.svg`            | `assets/splash.png`            | 1284×2778 (iPhone 14 Pro Max baseline) | Expo splash screen                    |
+| `notification-icon.svg` | `assets/notification-icon.png` | 96×96                                  | Android notification tray icon        |
 
 ## How to export
 
@@ -48,13 +48,13 @@ Once the Expo project is scaffolded (PR α1), an `npm run generate:assets` scrip
 
 ## Colours used
 
-| Hex | Use |
-|-----|-----|
-| `#F5F0E8` | Warm sand background |
+| Hex       | Use                                       |
+| --------- | ----------------------------------------- |
+| `#F5F0E8` | Warm sand background                      |
 | `#3B6D11` | Forest green primary (compass ring + dot) |
-| `#639922` | Light green accent (outer dots) |
-| `#2C2C2A` | Dark text ("ACT") |
-| `#5F5E5A` | Muted text (subtitle) |
-| `#888780` | Subtle text (tagline) |
+| `#639922` | Light green accent (outer dots)           |
+| `#2C2C2A` | Dark text ("ACT")                         |
+| `#5F5E5A` | Muted text (subtitle)                     |
+| `#888780` | Subtle text (tagline)                     |
 
 Flat only — no gradients, no shadows, no filters. See `.claude/rules/frontend.md` for full design system.

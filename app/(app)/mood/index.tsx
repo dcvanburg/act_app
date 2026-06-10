@@ -8,15 +8,17 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EmotionTagPicker } from '@/components/mood/EmotionTagPicker';
 import { MoodSelector } from '@/components/mood/MoodSelector';
+import { BackButton } from '@/components/BackButton';
+import { AppTextInput } from '@/components/AppTextInput';
 import mood from '@/content/nl/mood.json';
 import { useSaveMoodLog } from '@/lib/mood-queries';
+import { defaultTabBarStyle, hiddenTabBarStyle } from '@/lib/tab-bar';
 import type { EmotionTag, MoodScore } from '@/types/content';
 
 /**
@@ -42,9 +44,9 @@ export default function MoodCheckinScreen() {
 
   useEffect(() => {
     if (!inOnboarding) return;
-    navigation.setOptions({ tabBarStyle: { display: 'none' } });
-    return () => navigation.setOptions({ tabBarStyle: undefined });
-  }, [inOnboarding, navigation]);
+    navigation.setOptions({ tabBarStyle: hiddenTabBarStyle });
+    return () => navigation.setOptions({ tabBarStyle: defaultTabBarStyle(insets.bottom) });
+  }, [inOnboarding, navigation, insets.bottom]);
 
   const nextRoute = inOnboarding ? '/modules/onboarding?from=onboarding' : '/home';
 
@@ -125,14 +127,7 @@ export default function MoodCheckinScreen() {
       >
         <View className="mx-auto w-full max-w-md">
           <View className="mb-2 flex-row items-center gap-3">
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Terug"
-              onPress={() => (inOnboarding ? router.replace('/onboarding') : router.back())}
-              className="p-1"
-            >
-              <Text className="text-lg text-text-muted">‹</Text>
-            </Pressable>
+            {!inOnboarding && <BackButton onPress={() => router.back()} />}
             <Text className="flex-1 font-serif text-xl font-bold text-text">
               {mood.checkIn.title}
             </Text>
@@ -161,16 +156,13 @@ export default function MoodCheckinScreen() {
 
               <View className="mb-6 rounded-2xl bg-surface p-5 shadow-sm">
                 <Text className="mb-3 font-semibold text-text">{mood.checkIn.noteHeading}</Text>
-                <TextInput
+                <AppTextInput
                   value={note}
                   onChangeText={setNote}
                   placeholder={mood.checkIn.notePlaceholder}
-                  placeholderTextColor="#888780"
                   editable={!save.isPending}
                   multiline
                   numberOfLines={4}
-                  className="min-h-[96px] rounded-lg border border-border bg-background px-3 py-3 text-base text-text"
-                  textAlignVertical="top"
                 />
               </View>
 

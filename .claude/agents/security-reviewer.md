@@ -12,6 +12,7 @@ Run the security-review skill checklist against the current diff.
 Read `docs/SECURITY.md` and `src/content/nl/crisis.json`.
 
 Focus areas for act_app:
+
 - Safety screening cannot be bypassed
 - Crisis line 0800-0113 correct and clickable (`tel:`)
 - Journal entries treated as sensitive health-related data

@@ -20,7 +20,7 @@ export function Noodknop() {
   const isOnNoodhulp = pathname === '/noodhulp';
 
   // Hidden during the full onboarding flow (personal data screen + all sequential steps).
-  if (pathname === '/onboarding' || from === 'onboarding') return null;
+  if (pathname === '/wizard' || pathname === '/onboarding' || from === 'onboarding') return null;
 
   return (
     <View
