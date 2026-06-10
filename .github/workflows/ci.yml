@@ -129,12 +129,13 @@ jobs:
         run: npm run validate:content
         continue-on-error: true
 
-  # ── 8. Expo config validation ─────────────────────────────────────────────────
-  # The pre-pivot `next build` step is gone. EAS Build runs separately and is not
-  # part of the per-PR check budget. This job validates the Expo config statically
-  # so PRs that break app.json or break Expo Router's typed routes fail fast.
+  # ── 8. Build (Expo config validation) ────────────────────────────────────────
+  # Named "Build" so GitHub's expected-check entry (left from prior EAS runs) is
+  # satisfied on every PR. EAS Build itself runs separately and is not part of
+  # the per-PR check budget. This job validates the Expo config statically so
+  # PRs that break app.json or Expo Router typed routes fail fast.
   expo-config:
-    name: Expo config
+    name: Build
     needs: [typecheck, lint, format, test, audit, secrets]
     runs-on: ubuntu-latest
     timeout-minutes: 10
