@@ -1,4 +1,5 @@
-import { Link, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -18,8 +19,17 @@ import type { Waarde, WaardeCheckin, WaardeCheckinAntwoord } from '@/types/waard
 
 export default function WaardenScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { data, loading } = useWaarden();
+  const { from } = useLocalSearchParams<{ from?: string }>();
+  const inOnboarding = from === 'onboarding';
+
+  useEffect(() => {
+    if (!inOnboarding) return;
+    navigation.setOptions({ tabBarStyle: { display: 'none' } });
+    return () => navigation.setOptions({ tabBarStyle: undefined });
+  }, [inOnboarding, navigation]);
 
   if (loading) {
     return (
@@ -56,16 +66,35 @@ export default function WaardenScreen() {
     >
       <View className="mx-auto w-full max-w-md">
         <View className="mb-2 flex-row items-center gap-3">
+          {!inOnboarding && (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Terug"
+              onPress={() => router.back()}
+              className="p-1"
+            >
+              <Text className="text-lg text-text-muted">‹</Text>
+            </Pressable>
+          )}
+          <Text className="flex-1 font-serif text-2xl font-bold text-text">{waarden.title}</Text>
+          {inOnboarding && (
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => router.replace('/modules/onboarding?from=onboarding')}
+            >
+              <Text className="text-sm text-text-muted">Overslaan</Text>
+            </Pressable>
+          )}
+        </View>
+        {inOnboarding && (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Terug"
-            onPress={() => router.back()}
-            className="p-1"
+            onPress={() => router.replace('/modules/onboarding?from=onboarding')}
+            className="mb-2 rounded-lg bg-primary px-4 py-3 active:bg-primary-dark"
           >
-            <Text className="text-lg text-text-muted">‹</Text>
+            <Text className="text-center text-base font-semibold text-white">Doorgaan</Text>
           </Pressable>
-          <Text className="flex-1 font-serif text-2xl font-bold text-text">{waarden.title}</Text>
-        </View>
+        )}
 
         <View className="gap-4 pt-4">
           {streak > 0 ? (

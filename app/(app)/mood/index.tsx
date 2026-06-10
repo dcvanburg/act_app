@@ -1,5 +1,5 @@
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -28,20 +28,29 @@ import type { EmotionTag, MoodScore } from '@/types/content';
  */
 export default function MoodCheckinScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const save = useSaveMoodLog();
+  const { from } = useLocalSearchParams<{ from?: string }>();
+  const inOnboarding = from === 'onboarding';
 
   const [score, setScore] = useState<MoodScore | null>(null);
   const [tags, setTags] = useState<EmotionTag[]>([]);
   const [note, setNote] = useState('');
 
+  useEffect(() => {
+    if (!inOnboarding) return;
+    navigation.setOptions({ tabBarStyle: { display: 'none' } });
+    return () => navigation.setOptions({ tabBarStyle: undefined });
+  }, [inOnboarding, navigation]);
+
+  const nextRoute = inOnboarding ? '/waarden?from=onboarding' : '/home';
+
   async function handleSave() {
     if (score === null) return;
     save.mutate(
       { mood_score: score, emotion_tags: tags, note: note.trim() || null },
-      {
-        onSuccess: () => router.replace('/home'),
-      },
+      { onSuccess: () => router.replace(nextRoute) },
     );
   }
 
@@ -60,15 +69,27 @@ export default function MoodCheckinScreen() {
       >
         <View className="mx-auto w-full max-w-md">
           <View className="mb-2 flex-row items-center gap-3">
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Terug"
-              onPress={() => router.back()}
-              className="p-1"
-            >
-              <Text className="text-lg text-text-muted">‹</Text>
-            </Pressable>
-            <Text className="font-serif text-xl font-bold text-text">{mood.checkIn.title}</Text>
+            {!inOnboarding && (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Terug"
+                onPress={() => router.back()}
+                className="p-1"
+              >
+                <Text className="text-lg text-text-muted">‹</Text>
+              </Pressable>
+            )}
+            <Text className="flex-1 font-serif text-xl font-bold text-text">
+              {mood.checkIn.title}
+            </Text>
+            {inOnboarding && (
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.replace('/waarden?from=onboarding')}
+              >
+                <Text className="text-sm text-text-muted">Overslaan</Text>
+              </Pressable>
+            )}
           </View>
           <Text className="mb-6 text-sm text-text-subtle">{mood.checkIn.subtitle}</Text>
 

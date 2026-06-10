@@ -1,5 +1,5 @@
-import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
+import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -22,9 +22,20 @@ type Step = 'welcome' | 'complaint' | 'safety' | 'blocked' | 'complete';
  */
 export default function OnboardingScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { data: progress, isLoading } = useUserProgress();
   const saveIntake = useSaveIntake();
+  const { from } = useLocalSearchParams<{ from?: string }>();
+  const inOnboarding = from === 'onboarding';
+
+  useEffect(() => {
+    if (!inOnboarding) return;
+    // Hide the tab bar — this screen is inside a nested stack so we need the parent tab navigator
+    const tabNav = navigation.getParent();
+    tabNav?.setOptions({ tabBarStyle: { display: 'none' } });
+    return () => tabNav?.setOptions({ tabBarStyle: undefined });
+  }, [inOnboarding, navigation]);
 
   const questions = intake.safetyCheck.questions as SafetyQuestion[];
 
@@ -93,7 +104,11 @@ export default function OnboardingScreen() {
     >
       <View className="mx-auto w-full max-w-md">
         {step === 'welcome' && (
-          <WelcomeStep onContinue={() => setStep('complaint')} onClose={() => router.back()} />
+          <WelcomeStep
+            onContinue={() => setStep('complaint')}
+            onClose={() => (inOnboarding ? router.replace('/home') : router.back())}
+            inOnboarding={inOnboarding}
+          />
         )}
         {step === 'complaint' && (
           <ComplaintStep
@@ -140,12 +155,29 @@ export default function OnboardingScreen() {
   );
 }
 
-function WelcomeStep({ onContinue, onClose }: { onContinue: () => void; onClose: () => void }) {
+function WelcomeStep({
+  onContinue,
+  onClose,
+  inOnboarding,
+}: {
+  onContinue: () => void;
+  onClose: () => void;
+  inOnboarding: boolean;
+}) {
   return (
     <View>
-      <Pressable accessibilityRole="button" onPress={onClose} className="mb-4 self-start">
-        <Text className="text-sm text-text-muted">‹ {common.actions.back}</Text>
-      </Pressable>
+      <View className="mb-4 flex-row items-center justify-between">
+        <Pressable accessibilityRole="button" onPress={onClose} className="self-start">
+          <Text className="text-sm text-text-muted">
+            {inOnboarding ? `‹ ${common.actions.back}` : `‹ ${common.actions.back}`}
+          </Text>
+        </Pressable>
+        {inOnboarding && (
+          <Pressable accessibilityRole="button" onPress={onClose}>
+            <Text className="text-sm text-text-muted">Overslaan</Text>
+          </Pressable>
+        )}
+      </View>
       <Text className="mb-2 font-serif text-3xl font-bold text-text">{intake.welcome.title}</Text>
       <Text className="mb-8 text-base leading-relaxed text-text-subtle">{intake.welcome.body}</Text>
       <Pressable

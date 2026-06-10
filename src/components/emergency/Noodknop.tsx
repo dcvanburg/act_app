@@ -1,4 +1,4 @@
-import { usePathname, useRouter } from 'expo-router';
+import { useGlobalSearchParams, usePathname, useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -16,10 +16,11 @@ export function Noodknop() {
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
 
+  const { from } = useGlobalSearchParams<{ from?: string }>();
   const isOnNoodhulp = pathname === '/noodhulp';
 
-  // Hidden during onboarding — user is filling in personal data, not yet in the program.
-  if (pathname === '/onboarding') return null;
+  // Hidden during the full onboarding flow (personal data screen + all sequential steps).
+  if (pathname === '/onboarding' || from === 'onboarding') return null;
 
   return (
     <View
