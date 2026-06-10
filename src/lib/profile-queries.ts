@@ -10,6 +10,7 @@ export interface Profile {
   first_name: string | null;
   last_name: string | null;
   phone: string | null;
+  referral_source: string | null;
   subscription_tier: string | null;
   created_at: string;
 }
@@ -33,7 +34,7 @@ export function useProfile() {
       if (!user) return null;
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, first_name, last_name, phone, created_at')
+        .select('id, email, first_name, last_name, phone, referral_source, created_at')
         .eq('id', user.id)
         .maybeSingle<Omit<Profile, 'subscription_tier'>>();
       if (error) throw error;
@@ -46,6 +47,7 @@ export interface ProfileUpdate {
   first_name: string | null;
   last_name: string | null;
   phone: string | null;
+  referral_source?: string | null;
 }
 
 /**
@@ -69,12 +71,13 @@ export function useUpdateProfile() {
         first_name: update.first_name?.trim() || null,
         last_name: update.last_name?.trim() || null,
         phone: update.phone?.trim() || null,
+        referral_source: update.referral_source ?? null,
       };
 
       const { data, error } = await supabase
         .from('profiles')
         .upsert(payload, { onConflict: 'id' })
-        .select('id, email, first_name, last_name, phone, created_at')
+        .select('id, email, first_name, last_name, phone, referral_source, created_at')
         .single<Omit<Profile, 'subscription_tier'>>();
 
       if (error) throw error;
@@ -105,8 +108,14 @@ export function useDeleteAccount() {
     mutationFn: async (): Promise<void> => {
       if (!user) throw new Error('Niet ingelogd');
 
-      const { error } = await supabase.functions.invoke('delete-user');
-      if (error) throw error;
+      const { error, data } = await supabase.functions.invoke('delete-user');
+      if (error) {
+        // eslint-disable-next-line no-console
+        const body = await (error as { context?: Response }).context?.text?.().catch(() => '');
+        // eslint-disable-next-line no-console
+        console.error('[delete-user] body:', body, 'error:', error?.message);
+        throw error;
+      }
 
       await clearWaardenLocalStorage(user.id);
       queryClient.clear();
