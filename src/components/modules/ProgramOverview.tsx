@@ -1,10 +1,32 @@
 import { Link, type Href } from 'expo-router';
+import type { ComponentType } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
+import { AccountIcon } from '@/components/icons/AccountIcon';
+import { BoltIcon } from '@/components/icons/BoltIcon';
+import { CheckboxIcon } from '@/components/icons/CheckboxIcon';
+import { FlameIcon } from '@/components/icons/FlameIcon';
+import { MirrorIcon } from '@/components/icons/MirrorIcon';
+import { StarIcon } from '@/components/icons/StarIcon';
+import { TargetIcon } from '@/components/icons/TargetIcon';
+import { ThoughtIcon } from '@/components/icons/ThoughtIcon';
 import { MODULE_META } from '@/lib/content';
 import { getModuleStatus, MODULE_ORDER, PROGRAM_PHASES } from '@/lib/progress';
 import common from '@/content/nl/common.json';
 import type { ModuleId, ModuleStatus, UserProgress } from '@/types/content';
+
+type IconProps = { size?: number; color?: string };
+
+const MODULE_ICONS: Record<ModuleId, ComponentType<IconProps>> = {
+  onboarding: StarIcon,
+  recognition: ThoughtIcon,
+  acceptance: MirrorIcon,
+  defusion: BoltIcon,
+  presence: FlameIcon,
+  'self-as-context': AccountIcon,
+  values: TargetIcon,
+  'committed-action': CheckboxIcon,
+};
 
 interface Props {
   progress: UserProgress;
@@ -52,7 +74,6 @@ export function ProgramOverview({ progress, groupByPhase = false }: Props) {
 
 function ModuleRow({
   moduleId,
-  index,
   progress,
 }: {
   moduleId: ModuleId;
@@ -66,6 +87,7 @@ function ModuleRow({
     moduleId === 'onboarding'
       ? '/modules/onboarding'
       : { pathname: '/modules/[id]', params: { id: moduleId } };
+  const IconComponent = MODULE_ICONS[moduleId];
 
   if (locked) {
     return (
@@ -73,7 +95,7 @@ function ModuleRow({
         accessibilityLabel={common.progress.moduleLocked}
         className="flex-row items-center gap-3 rounded-2xl bg-surface-muted p-4 opacity-60"
       >
-        <ModuleIndicator index={index} status={status} />
+        <ModuleIndicator status={status} icon={IconComponent} />
         <ModuleInfo meta={meta} status={status} />
         <Text className="text-lg text-locked">{'\u{1F512}'}</Text>
       </View>
@@ -86,7 +108,7 @@ function ModuleRow({
         accessibilityRole="link"
         className="flex-row items-center gap-3 rounded-2xl bg-surface p-4 shadow-sm active:bg-primary-soft"
       >
-        <ModuleIndicator index={index} status={status} />
+        <ModuleIndicator status={status} icon={IconComponent} />
         <ModuleInfo meta={meta} status={status} />
         <Text className="text-text-muted">{'›'}</Text>
       </Pressable>
@@ -94,33 +116,38 @@ function ModuleRow({
   );
 }
 
-function ModuleIndicator({ index, status }: { index: number; status: ModuleStatus }) {
-  const baseClass =
-    'h-10 w-10 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold flex';
+function ModuleIndicator({
+  status,
+  icon: Icon,
+}: {
+  status: ModuleStatus;
+  icon: ComponentType<IconProps>;
+}) {
+  const base = 'h-10 w-10 flex-shrink-0 items-center justify-center rounded-full';
   if (status === 'completed') {
     return (
-      <View className={`${baseClass} bg-primary`}>
+      <View className={`${base} bg-primary`}>
         <Text className="text-sm font-bold text-white">{'✓'}</Text>
       </View>
     );
   }
   if (status === 'in_progress') {
     return (
-      <View className={`${baseClass} bg-primary-soft`}>
-        <Text className="text-sm font-bold text-primary">{index}</Text>
+      <View className={`${base} bg-primary-soft`}>
+        <Icon size={20} color="#3B6D11" />
       </View>
     );
   }
   if (status === 'available') {
     return (
-      <View className={`${baseClass} border-2 border-primary`}>
-        <Text className="text-sm font-bold text-primary">{index}</Text>
+      <View className={`${base} border-2 border-primary`}>
+        <Icon size={20} color="#3B6D11" />
       </View>
     );
   }
   return (
-    <View className={`${baseClass} border-2 border-border`}>
-      <Text className="text-sm font-bold text-locked">{index}</Text>
+    <View className={`${base} border-2 border-border`}>
+      <Icon size={20} color="#B4B2A9" />
     </View>
   );
 }
