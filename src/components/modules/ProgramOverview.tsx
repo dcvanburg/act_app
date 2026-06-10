@@ -81,18 +81,18 @@ export function ProgramOverview({ progress, groupByPhase = false }: Props) {
                 accessibilityRole="button"
                 accessibilityLabel={`${phase.label}, ${pp.completedCount} van ${pp.totalCount} modules afgerond, tik om ${isExpanded ? 'in te klappen' : 'uit te klappen'}`}
                 onPress={() => togglePhase(phase.id)}
-                className="mb-2 flex-row items-center gap-3 rounded-2xl border border-primary-border-soft bg-primary-soft p-4 shadow-sm active:opacity-70"
+                className="mb-2 flex-row items-center justify-between rounded-lg px-3 py-2 active:bg-primary-soft"
               >
-                <View className="h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary">
-                  <Text className="text-sm font-bold text-white">{'✓'}</Text>
-                </View>
-                <View className="flex-1">
-                  <Text className="font-semibold text-primary-dark">{phase.label}</Text>
-                  <Text className="mt-0.5 text-xs text-primary">
-                    {pp.completedCount}/{pp.totalCount} modules afgerond
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-xs font-bold text-primary">{'✓'}</Text>
+                  <Text className="text-xs font-semibold uppercase tracking-wide text-primary-dark">
+                    {phase.label}
+                  </Text>
+                  <Text className="text-xs text-primary">
+                    · {pp.completedCount}/{pp.totalCount} afgerond
                   </Text>
                 </View>
-                <Text className="text-sm font-bold text-primary">{isExpanded ? '∧' : '∨'}</Text>
+                <Text className="text-xs text-primary">{isExpanded ? '∧' : '∨'}</Text>
               </Pressable>
             ) : (
               <Text className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
