@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AppLogo } from '@/components/AppLogo';
 import { EmotionTagPicker } from '@/components/mood/EmotionTagPicker';
 import { MoodSelector } from '@/components/mood/MoodSelector';
 import mood from '@/content/nl/mood.json';
@@ -121,8 +120,7 @@ export default function MoodCheckinScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View className="mx-auto w-full max-w-md">
-          <AppLogo size={32} />
-          <View className="mb-2 mt-2 flex-row items-center gap-3">
+          <View className="mb-2 flex-row items-center gap-3">
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Terug"

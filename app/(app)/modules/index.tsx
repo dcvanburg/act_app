@@ -2,7 +2,6 @@ import { useRouter } from 'expo-router';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AppLogo } from '@/components/AppLogo';
 import { PhaseProgressSummary } from '@/components/modules/PhaseProgressSummary';
 import { ProgramOverview } from '@/components/modules/ProgramOverview';
 import common from '@/content/nl/common.json';
@@ -27,21 +26,18 @@ export default function ModulesScreen() {
       }}
     >
       <View className="mx-auto w-full max-w-md">
-        <View className="mb-6">
-          <AppLogo size={32} />
-          <View className="mt-2 flex-row items-center gap-3">
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Terug"
-              onPress={() => router.back()}
-              className="p-1"
-            >
-              <Text className="text-lg text-text-muted">‹</Text>
-            </Pressable>
-            <Text className="flex-1 font-serif text-2xl font-bold text-text">
-              {common.nav.modules}
-            </Text>
-          </View>
+        <View className="mb-6 flex-row items-center gap-3">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Terug"
+            onPress={() => router.back()}
+            className="p-1"
+          >
+            <Text className="text-lg text-text-muted">‹</Text>
+          </Pressable>
+          <Text className="flex-1 font-serif text-2xl font-bold text-text">
+            {common.nav.modules}
+          </Text>
         </View>
 
         {isLoading || !progress ? (

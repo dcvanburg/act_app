@@ -2,7 +2,6 @@ import { Link, useRouter } from 'expo-router';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AppLogo } from '@/components/AppLogo';
 import { FlameIcon } from '@/components/icons/FlameIcon';
 import { StarIcon } from '@/components/icons/StarIcon';
 import { CheckinAntwoordIcon } from '@/components/waarden/CheckinAntwoordIcon';
@@ -56,8 +55,7 @@ export default function WaardenScreen() {
       }}
     >
       <View className="mx-auto w-full max-w-md">
-        <AppLogo size={32} />
-        <View className="mb-2 mt-2 flex-row items-center gap-3">
+        <View className="mb-2 flex-row items-center gap-3">
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Terug"
