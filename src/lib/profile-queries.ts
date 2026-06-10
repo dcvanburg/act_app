@@ -108,14 +108,8 @@ export function useDeleteAccount() {
     mutationFn: async (): Promise<void> => {
       if (!user) throw new Error('Niet ingelogd');
 
-      const { error, data } = await supabase.functions.invoke('delete-user');
-      if (error) {
-        // eslint-disable-next-line no-console
-        const body = await (error as { context?: Response }).context?.text?.().catch(() => '');
-        // eslint-disable-next-line no-console
-        console.error('[delete-user] body:', body, 'error:', error?.message);
-        throw error;
-      }
+      const { error } = await supabase.functions.invoke('delete-user');
+      if (error) throw error;
 
       await clearWaardenLocalStorage(user.id);
       queryClient.clear();
