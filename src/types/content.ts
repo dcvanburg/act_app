@@ -124,22 +124,6 @@ export type SafetyQuestion = {
   helpText?: string;
 };
 
-export type SafetyOutcome = 'pass' | 'flag' | 'block-strong' | 'block-medical';
-
-export type SafetyAnswerOption = {
-  value: string;
-  label: string;
-  blocking: SafetyOutcome;
-};
-
-export type SafetyQuestion = {
-  id: string;
-  title: string;
-  type: 'single-choice';
-  options: SafetyAnswerOption[];
-  helpText?: string;
-};
-
 export type UserProgress = {
   intake: {
     complaintTypes: ComplaintType[];
