@@ -49,12 +49,12 @@ Each of the following is a **DRAFT** goal subject to clinical sign-off:
 
 Every outcome below is **DRAFT**. After the user submits answers, this DRAFT logic applies:
 
-| Outcome (DRAFT) | Trigger (DRAFT) | UI (DRAFT) |
-|---|---|---|
-| `pass` (DRAFT) | DRAFT — no blocking answers | DRAFT — continue to intake step 2 (complaint type) |
-| `block-strong` (DRAFT) | DRAFT — Q1 = "vaak" OR Q2 = "ja" OR Q3 = "ja" | DRAFT — full-screen safetyBlock (`crisis.json` → `safetyBlock`), only `/noodhulp` action visible, program is NOT unlocked |
-| `block-medical` (DRAFT) | DRAFT — Q4 = "ja" | DRAFT — full-screen safetyBlock variant: urge contact with huisarts / verslavingszorg before continuing |
-| `flag` (DRAFT) | DRAFT — Q1 = "soms" alone | DRAFT — soft warning + offer of `/noodhulp` link, but program continues if user opts in |
+| Outcome (DRAFT)         | Trigger (DRAFT)                               | UI (DRAFT)                                                                                                                |
+| ----------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `pass` (DRAFT)          | DRAFT — no blocking answers                   | DRAFT — continue to intake step 2 (complaint type)                                                                        |
+| `block-strong` (DRAFT)  | DRAFT — Q1 = "vaak" OR Q2 = "ja" OR Q3 = "ja" | DRAFT — full-screen safetyBlock (`crisis.json` → `safetyBlock`), only `/noodhulp` action visible, program is NOT unlocked |
+| `block-medical` (DRAFT) | DRAFT — Q4 = "ja"                             | DRAFT — full-screen safetyBlock variant: urge contact with huisarts / verslavingszorg before continuing                   |
+| `flag` (DRAFT)          | DRAFT — Q1 = "soms" alone                     | DRAFT — soft warning + offer of `/noodhulp` link, but program continues if user opts in                                   |
 
 **DRAFT.** `block-strong` and `block-medical` MUST persist on the user profile (`safetyCheckPassed = false`) so the program cannot be entered by direct URL. **DRAFT — persistence model to be confirmed in α5.**
 
@@ -71,14 +71,14 @@ Every outcome below is **DRAFT**. After the user submits answers, this DRAFT log
 id: suicidal-thoughts
 # DRAFT — title is draft wording
 title: De afgelopen twee weken — heb je gedachten gehad om jezelf iets aan te doen, of jezelf pijn te doen?
-type: single-choice  # DRAFT
+type: single-choice # DRAFT
 options:
   # DRAFT
-  - { value: never,     label: Nee, helemaal niet,      blocking: pass }
+  - { value: never, label: Nee, helemaal niet, blocking: pass }
   # DRAFT
-  - { value: sometimes, label: Soms,                    blocking: flag }
+  - { value: sometimes, label: Soms, blocking: flag }
   # DRAFT
-  - { value: often,     label: Regelmatig of vaak,      blocking: block-strong }
+  - { value: often, label: Regelmatig of vaak, blocking: block-strong }
 # DRAFT — helpText is draft
 helpText: Je antwoord helpt ons inschatten of dit programma op dit moment passend is. We vragen het uit zorg, niet als test.
 ```
@@ -92,12 +92,12 @@ helpText: Je antwoord helpt ons inschatten of dit programma op dit moment passen
 id: active-plan
 # DRAFT — title is draft wording
 title: Heb je op dit moment een concreet plan om jezelf iets aan te doen?
-type: single-choice  # DRAFT
+type: single-choice # DRAFT
 options:
   # DRAFT
-  - { value: no,  label: Nee, blocking: pass }
+  - { value: no, label: Nee, blocking: pass }
   # DRAFT
-  - { value: yes, label: Ja,  blocking: block-strong }
+  - { value: yes, label: Ja, blocking: block-strong }
 # DRAFT — helpText is draft
 helpText: Als je dit met "ja" beantwoordt, leiden we je direct naar hulp. Het programma kan op dit moment niet starten.
 ```
@@ -111,12 +111,12 @@ helpText: Als je dit met "ja" beantwoordt, leiden we je direct naar hulp. Het pr
 id: recent-self-harm
 # DRAFT — title is draft wording
 title: Heb je jezelf de afgelopen zeven dagen opzettelijk pijn gedaan?
-type: single-choice  # DRAFT
+type: single-choice # DRAFT
 options:
   # DRAFT
-  - { value: no,  label: Nee, blocking: pass }
+  - { value: no, label: Nee, blocking: pass }
   # DRAFT
-  - { value: yes, label: Ja,  blocking: block-strong }
+  - { value: yes, label: Ja, blocking: block-strong }
 # DRAFT — helpText is draft
 helpText: Bij "ja" raden we eerst contact met een huisarts of de crisislijn aan.
 ```
@@ -130,14 +130,14 @@ helpText: Bij "ja" raden we eerst contact met een huisarts of de crisislijn aan.
 id: substance-acute
 # DRAFT — title is draft wording
 title: Drink je of gebruik je op dit moment zoveel dat stoppen zonder medische begeleiding gevaarlijk zou kunnen zijn?
-type: single-choice  # DRAFT
+type: single-choice # DRAFT
 options:
   # DRAFT
-  - { value: no,        label: Nee,                blocking: pass }
+  - { value: no, label: Nee, blocking: pass }
   # DRAFT
-  - { value: not-sure,  label: Ik weet het niet,   blocking: flag }
+  - { value: not-sure, label: Ik weet het niet, blocking: flag }
   # DRAFT
-  - { value: yes,       label: Ja,                 blocking: block-medical }
+  - { value: yes, label: Ja, blocking: block-medical }
 # DRAFT — helpText is draft
 helpText: Een huisarts of de verslavingszorg kan je veilig helpen afbouwen — dat valt buiten wat deze app kan bieden.
 ```
@@ -151,14 +151,14 @@ helpText: Een huisarts of de verslavingszorg kan je veilig helpen afbouwen — d
 id: support-network
 # DRAFT — title is draft wording
 title: Heb je iemand in je omgeving (familie, vriend, professional) waar je in moeilijke momenten contact mee kunt opnemen?
-type: single-choice  # DRAFT
+type: single-choice # DRAFT
 options:
   # DRAFT
-  - { value: yes,        label: Ja,    blocking: pass }
+  - { value: yes, label: Ja, blocking: pass }
   # DRAFT
-  - { value: sometimes,  label: Soms,  blocking: pass }
+  - { value: sometimes, label: Soms, blocking: pass }
   # DRAFT
-  - { value: no,         label: Nee,   blocking: pass }
+  - { value: no, label: Nee, blocking: pass }
 # DRAFT — helpText is draft
 helpText: We slaan dit op zodat we je een aangepaste lijst met hulpbronnen kunnen tonen. Het beïnvloedt niet of je het programma kunt starten.
 ```

@@ -13,11 +13,11 @@ Show during onboarding and in footer/help:
 
 ### Crisis resources (Netherlands)
 
-| Resource | Display text (NL) | Action |
-|----------|-------------------|--------|
-| Crisislijn | Bel 0800-0113 (24/7) | `tel:08000113` link |
-| Huisarts | Neem contact op met je huisarts | Informational |
-| GGZ | Zoek hulp via je huisarts of GGZ | Informational |
+| Resource   | Display text (NL)                | Action              |
+| ---------- | -------------------------------- | ------------------- |
+| Crisislijn | Bel 0800-0113 (24/7)             | `tel:08000113` link |
+| Huisarts   | Neem contact op met je huisarts  | Informational       |
+| GGZ        | Zoek hulp via je huisarts of GGZ | Informational       |
 
 ## Safety check implementation
 
@@ -42,14 +42,14 @@ Never ship with an empty safety check that lets all users proceed without screen
 
 ## Data & privacy (GDPR)
 
-| Principle | Implementation |
-|-----------|----------------|
-| Data minimization | Store only progress, journal entries user creates, intake selections |
-| Consent | Explicit opt-in for notifications and analytics |
-| Storage | Prefer EU region; document processor in privacy policy |
-| Encryption | TLS in transit; encrypt sensitive data at rest |
-| Right to erasure | User can delete all local/account data |
-| No selling of health data | Hard rule — document in privacy policy |
+| Principle                 | Implementation                                                       |
+| ------------------------- | -------------------------------------------------------------------- |
+| Data minimization         | Store only progress, journal entries user creates, intake selections |
+| Consent                   | Explicit opt-in for notifications and analytics                      |
+| Storage                   | Prefer EU region; document processor in privacy policy               |
+| Encryption                | TLS in transit; encrypt sensitive data at rest                       |
+| Right to erasure          | User can delete all local/account data                               |
+| No selling of health data | Hard rule — document in privacy policy                               |
 
 ## Authentication (TBD)
 
@@ -69,6 +69,7 @@ Users have the right to delete all their data.
 2. **Email fallback** — Privacy policy documents: "Stuur een e-mail naar [contact] met het verzoek je account te verwijderen." Response within 30 days per GDPR.
 
 **What is deleted:**
+
 - `profiles` row (and all cascaded rows: `user_progress`, `journal_entries`)
 - Supabase Auth user record (call `supabase.auth.admin.deleteUser(id)` server-side)
 
@@ -76,13 +77,13 @@ No data is retained after deletion. Do not add soft-delete in v1.
 
 ## Application security
 
-| Threat | Mitigation |
-|--------|------------|
-| XSS in journal/user content | Sanitize output; CSP headers |
-| CSRF | Tokens on state-changing requests |
-| Secret leakage | No secrets in repo; `.env` gitignored |
-| Dependency vulnerabilities | `npm audit` in CI; regular updates |
-| Insecure direct object reference | User can only access own progress |
+| Threat                           | Mitigation                            |
+| -------------------------------- | ------------------------------------- |
+| XSS in journal/user content      | Sanitize output; CSP headers          |
+| CSRF                             | Tokens on state-changing requests     |
+| Secret leakage                   | No secrets in repo; `.env` gitignored |
+| Dependency vulnerabilities       | `npm audit` in CI; regular updates    |
+| Insecure direct object reference | User can only access own progress     |
 
 ## AI development security
 

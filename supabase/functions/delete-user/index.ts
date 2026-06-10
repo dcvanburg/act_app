@@ -25,7 +25,10 @@ Deno.serve(async (req: Request) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
     );
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
+    const {
+      data: { user },
+      error: userError,
+    } = await supabaseClient.auth.getUser(token);
 
     if (userError || !user) {
       return new Response(
@@ -44,10 +47,7 @@ Deno.serve(async (req: Request) => {
     // before auth.admin.deleteUser touches auth.users. Skipping this step
     // causes "Database error deleting user" on Supabase when FK cascades
     // from public tables are still pending.
-    const { error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .delete()
-      .eq('id', user.id);
+    const { error: profileError } = await supabaseAdmin.from('profiles').delete().eq('id', user.id);
 
     if (profileError) {
       return new Response(
@@ -59,10 +59,10 @@ Deno.serve(async (req: Request) => {
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id);
 
     if (deleteError) {
-      return new Response(
-        JSON.stringify({ error: `Delete failed: ${deleteError.message}` }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return new Response(JSON.stringify({ error: `Delete failed: ${deleteError.message}` }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     return new Response(JSON.stringify({ success: true }), {

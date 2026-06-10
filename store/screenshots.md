@@ -4,11 +4,11 @@ Three iOS screenshots required per device size. Same composition, scaled. The mo
 
 ## Required sizes
 
-| Device | Resolution | Count |
-|--------|------------|-------|
-| iPhone 6.7" (iPhone 14/15 Pro Max) | 1290 × 2796 px (portrait) | 3 — primary, mandatory |
-| iPhone 6.5" (iPhone XS Max / 11 Pro Max) | 1242 × 2688 px (portrait) | 3 — required for iOS-only, can scale from 6.7" |
-| iPad 12.9" (iPad Pro M2) | 2048 × 2732 px (portrait) | Optional, defer to post-v1 unless `supportsTablet: true` |
+| Device                                   | Resolution                | Count                                                    |
+| ---------------------------------------- | ------------------------- | -------------------------------------------------------- |
+| iPhone 6.7" (iPhone 14/15 Pro Max)       | 1290 × 2796 px (portrait) | 3 — primary, mandatory                                   |
+| iPhone 6.5" (iPhone XS Max / 11 Pro Max) | 1242 × 2688 px (portrait) | 3 — required for iOS-only, can scale from 6.7"           |
+| iPad 12.9" (iPad Pro M2)                 | 2048 × 2732 px (portrait) | Optional, defer to post-v1 unless `supportsTablet: true` |
 
 Android Play Console accepts the same compositions at 16:9 or 9:16 with phone screenshots; 1080 × 1920 px is fine.
 
@@ -27,6 +27,7 @@ Android Play Console accepts the same compositions at 16:9 or 9:16 with phone sc
 **Sub-caption:** `8 modules. Lineair opgebouwd. Op jouw tempo.`
 
 Must include:
+
 - Progress bar (28% — modules 0, 1 done, 2 in progress)
 - Module list with mixed states: 2× completed (✓), 1× current (highlighted), 2× locked (🔒)
 - Noodknop card visible at bottom — pill style, warm red `#D85A30`
@@ -34,6 +35,7 @@ Must include:
 - Dutch labels only
 
 Must NOT include:
+
 - Any real user data
 - Any [PLACEHOLDER] text
 - Status bar carrier name
@@ -46,6 +48,7 @@ Must NOT include:
 **Sub-caption:** `Stemming, dagboek en streak — alles op één plek.`
 
 Must include:
+
 - Mood selector (5 faces), neutral face selected
 - Journal preview text (sample Dutch only — no real user content; example: "Vandaag merkte ik dat ik meer ruimte kon maken voor de spanning in mijn borst…")
 - Streak card: 🔥 with "7 dagen"
@@ -61,6 +64,7 @@ Must include:
 **Sub-caption:** `Volg je voortgang per ACT-proces.`
 
 Must include:
+
 - 4 stat cards in 2×2 grid: Modules `2/8`, Oefeningen `14`, Dagboek `9`, Langste streak `12`
 - 2 cards in green tint (active engagement), 2 in neutral grey
 - ACT processen row: 4 tag chips — 2 filled green (Acceptatie, Defusie), 2 muted (Waarden, Handelen)
@@ -70,10 +74,10 @@ Must include:
 
 ## Dependency tree (which γ features must land before screenshots can be produced)
 
-| Screenshot | Blocks on |
-|---|---|
-| 1 — module overview | α4 (program flow) — present after α6 finishes |
-| 2 — mood + journal | γ-1 (mood tracker), γ-6 (enhanced journal), γ-3 (streaks) |
+| Screenshot             | Blocks on                                                   |
+| ---------------------- | ----------------------------------------------------------- |
+| 1 — module overview    | α4 (program flow) — present after α6 finishes               |
+| 2 — mood + journal     | γ-1 (mood tracker), γ-6 (enhanced journal), γ-3 (streaks)   |
 | 3 — progress dashboard | γ-5 (analytics) — depends on γ-1, γ-2, γ-6, γ-9 having data |
 
 Realistic store-submission readiness: after γ-5 lands. Until then, screenshots can be mocked from the design references but not captured from the running app.

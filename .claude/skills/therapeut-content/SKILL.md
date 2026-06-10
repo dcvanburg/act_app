@@ -19,13 +19,13 @@ allowed-tools: Read, Write, Edit, Grep, Glob
 
 ## Knowledge base (read first)
 
-| File | Purpose |
-|------|---------|
-| `docs/THERAPEUT_KB/concept-summary.md` | Vision, modules, safety boundaries |
-| `docs/THERAPEUT_KB/resiliens-act-coach-notes.md` | Hexaflex mapping + ACT Coach feature reference |
-| `.claude/skills/therapeut-content/voice-guide.md` | Dutch tone and style |
-| `.claude/skills/therapeut-content/hexaflex-map.md` | Module ↔ ACT process ↔ body work |
-| `.claude/skills/therapeut-content/complaint-examples.md` | Example angles per complaint type |
+| File                                                     | Purpose                                        |
+| -------------------------------------------------------- | ---------------------------------------------- |
+| `docs/THERAPEUT_KB/concept-summary.md`                   | Vision, modules, safety boundaries             |
+| `docs/THERAPEUT_KB/resiliens-act-coach-notes.md`         | Hexaflex mapping + ACT Coach feature reference |
+| `.claude/skills/therapeut-content/voice-guide.md`        | Dutch tone and style                           |
+| `.claude/skills/therapeut-content/hexaflex-map.md`       | Module ↔ ACT process ↔ body work               |
+| `.claude/skills/therapeut-content/complaint-examples.md` | Example angles per complaint type              |
 
 ## Workflow A — Module section
 
@@ -79,15 +79,15 @@ Run this checklist; report PASS or NEEDS REVISION:
 
 ## Content file map
 
-| Content | Path |
-|---------|------|
-| Modules 0–7 | `src/content/nl/modules/<n>-<id>.json` |
-| Crisis | `src/content/nl/crisis.json` |
-| Intake + safety | `src/content/nl/intake.json` |
+| Content            | Path                                                |
+| ------------------ | --------------------------------------------------- |
+| Modules 0–7        | `src/content/nl/modules/<n>-<id>.json`              |
+| Crisis             | `src/content/nl/crisis.json`                        |
+| Intake + safety    | `src/content/nl/intake.json`                        |
 | Emergency exercise | `src/content/nl/exercises/emergency-grounding.json` |
-| Daily practice | `src/content/nl/daily-practice.json` |
-| Mood | `src/content/nl/mood.json` |
-| Shared UI strings | `src/content/nl/common.json` |
+| Daily practice     | `src/content/nl/daily-practice.json`                |
+| Mood               | `src/content/nl/mood.json`                          |
+| Shared UI strings  | `src/content/nl/common.json`                        |
 
 ## Punctuation (mandatory)
 

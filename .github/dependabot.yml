@@ -19,104 +19,103 @@ updates:
   # ── 1. GitHub Actions ─────────────────────────────────────────────────────────
   # Runs before npm (07:00 vs 08:00) so CI toolchain updates land first.
   # All actions grouped → one PR per week instead of one per action.
-  - package-ecosystem: "github-actions"
-    directory: "/"
+  - package-ecosystem: 'github-actions'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "07:00"
-      timezone: "Europe/Amsterdam"
+      interval: 'weekly'
+      day: 'monday'
+      time: '07:00'
+      timezone: 'Europe/Amsterdam'
     open-pull-requests-limit: 3
-    target-branch: "dev"
+    target-branch: 'dev'
     labels:
-      - "dependencies"
+      - 'dependencies'
     groups:
       github-actions:
         patterns:
-          - "*"
+          - '*'
 
   # ── 2. npm — weekly batch (grouped by concern) ───────────────────────────────
   # Groups keep related packages in one PR so they can be tested together.
   # CVE security updates are raised by Dependabot automatically outside this schedule.
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "08:00"
-      timezone: "Europe/Amsterdam"
+      interval: 'weekly'
+      day: 'monday'
+      time: '08:00'
+      timezone: 'Europe/Amsterdam'
     open-pull-requests-limit: 5
-    target-branch: "dev"
+    target-branch: 'dev'
     labels:
-      - "dependencies"
+      - 'dependencies'
     groups:
       # Auth + data layer — touches sensitive health data; review carefully
       supabase:
         patterns:
-          - "@supabase/*"
+          - '@supabase/*'
       # Next.js + React runtime — these move together; must test app boot
       next-core:
         patterns:
-          - "next"
-          - "react"
-          - "react-dom"
+          - 'next'
+          - 'react'
+          - 'react-dom'
       # Form validation stack — zod schema changes can silently break intake flows
       forms:
         patterns:
-          - "react-hook-form"
-          - "@hookform/*"
-          - "zod"
+          - 'react-hook-form'
+          - '@hookform/*'
+          - 'zod'
       # Server-state management
       tanstack:
         patterns:
-          - "@tanstack/*"
+          - '@tanstack/*'
       # CSS/Tailwind toolchain
       tailwind:
         patterns:
-          - "tailwindcss"
-          - "postcss"
-          - "autoprefixer"
-          - "tailwind-merge"
-          - "class-variance-authority"
-          - "clsx"
+          - 'tailwindcss'
+          - 'postcss'
+          - 'autoprefixer'
+          - 'tailwind-merge'
+          - 'class-variance-authority'
+          - 'clsx'
       # Test infrastructure — update together to avoid version skew
       testing:
         patterns:
-          - "vitest"
-          - "@vitest/*"
-          - "@testing-library/*"
-          - "jsdom"
-          - "playwright"
-          - "@playwright/*"
+          - 'vitest'
+          - '@vitest/*'
+          - '@testing-library/*'
+          - 'jsdom'
+          - 'playwright'
+          - '@playwright/*'
       # Linters, formatters, TypeScript — must stay in sync
       dev-tooling:
         patterns:
-          - "eslint*"
-          - "@typescript-eslint/*"
-          - "eslint-config-next"
-          - "prettier"
-          - "typescript"
-          - "tsx"
-          - "husky"
-          - "lint-staged"
+          - 'eslint*'
+          - '@typescript-eslint/*'
+          - 'eslint-config-next'
+          - 'prettier'
+          - 'typescript'
+          - 'tsx'
+          - 'husky'
+          - 'lint-staged'
       # Type definitions — low risk, batch together
       types:
         patterns:
-          - "@types/*"
+          - '@types/*'
     ignore:
       # Block ALL major bumps globally — every major requires manual migration review
       # Examples: Next.js 16, React 20, TypeScript 6, Tailwind 4, Vitest 4
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
       # Explicit guards on the highest-risk packages (belt + suspenders)
-      - dependency-name: "next"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "react"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "react-dom"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "zod"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "typescript"
-        update-types: ["version-update:semver-major"]
-
+      - dependency-name: 'next'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'react'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'react-dom'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'zod'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']

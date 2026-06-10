@@ -62,7 +62,10 @@ export function AppTextInput({
   return (
     <View
       className={boxClass}
-      style={{ minHeight: compact ? BOX_HEIGHT.compact : BOX_HEIGHT.normal, justifyContent: 'center' }}
+      style={{
+        minHeight: compact ? BOX_HEIGHT.compact : BOX_HEIGHT.normal,
+        justifyContent: 'center',
+      }}
     >
       <TextInput
         {...props}

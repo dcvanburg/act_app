@@ -1,13 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import common from '@/content/nl/common.json';
@@ -99,10 +92,7 @@ export default function AccountScreen() {
     >
       <View className="mx-auto w-full max-w-md gap-4">
         <View className="mb-2 flex-row items-center gap-2">
-          <BackButton
-            accessibilityLabel="Terug naar programma"
-            onPress={() => router.back()}
-          />
+          <BackButton accessibilityLabel="Terug naar programma" onPress={() => router.back()} />
           <Text className="font-serif text-xl font-bold text-text">Mijn account</Text>
         </View>
 

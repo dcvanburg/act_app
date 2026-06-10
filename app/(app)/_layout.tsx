@@ -53,9 +53,7 @@ export default function AppLayout() {
     <WaardenProvider>
       <UnsavedChangesGuardProvider>
         {target === 'wizard' ? <Redirect href="/wizard" /> : null}
-        {profile?.first_name?.trim() && pathname === '/wizard' ? (
-          <Redirect href="/home" />
-        ) : null}
+        {profile?.first_name?.trim() && pathname === '/wizard' ? <Redirect href="/home" /> : null}
         <AppTabs insets={insets} />
       </UnsavedChangesGuardProvider>
     </WaardenProvider>

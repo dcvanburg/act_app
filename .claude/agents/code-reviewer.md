@@ -18,18 +18,21 @@ Review changes for the ACT therapeutic app.
 ## Categories
 
 ### Critical
+
 - Weakened crisis/safety flows
 - English in user-facing UI (not in content JSON)
 - Secrets or `.env` in diff
 - Hardcoded therapeutic copy bypassing content layer
 
 ### High
+
 - Incorrect module unlock logic
 - Missing emergency button on new layouts
 - Missing error handling
 - GDPR issues (excess data collection)
 
 ### Medium
+
 - Overly large functions/files
 - Missing tests for unlock/safety logic
 

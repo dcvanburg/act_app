@@ -53,6 +53,7 @@ ACT is geen vervanging voor professionele hulp bij ernstige klachten. Bij crisis
 ```
 
 > ⚠ One claim in this description still needs reconciling before submission:
+>
 > - **"Lichaamsgerichte oefeningen"** language is fine for text-only body exercises (v1 decision #13), but reviewers may expect audio. Add a clarifying note in the description or screenshots that v1 exercises are text-guided.
 
 ## Keywords (100 chars max, comma-separated)
@@ -89,6 +90,7 @@ Secondary: `Medical` (use with caution — "Medical" category triggers extra rev
 Recommended: **17+** (because the app discusses self-harm, suicide, addiction, and crisis support, even though it is referral-based, not depictive).
 
 Apple questionnaire answers:
+
 - Mature/Suggestive Themes: Frequent/Intense
 - Medical/Treatment Information: Infrequent/Mild
 - Alcohol, Tobacco, or Drug Use or References: Infrequent/Mild
@@ -102,6 +104,7 @@ Apple questionnaire answers:
 ## App Privacy declarations (Apple)
 
 Data collected (Article 9 — health/mental health):
+
 - Email address — linked to identity, used for account & magic-link auth
 - Mental health journal entries — linked to identity, NOT used for tracking
 - Mood logs — linked to identity, NOT used for tracking

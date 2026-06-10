@@ -6,10 +6,10 @@
 
 ## Where the old code lives
 
-| Snapshot | How to retrieve |
-|----------|-----------------|
-| Final state of the Next.js web app | `git checkout pre-expo-pivot-v0` |
-| Tag annotation (what was in the snapshot) | `git show pre-expo-pivot-v0` |
+| Snapshot                                  | How to retrieve                  |
+| ----------------------------------------- | -------------------------------- |
+| Final state of the Next.js web app        | `git checkout pre-expo-pivot-v0` |
+| Tag annotation (what was in the snapshot) | `git show pre-expo-pivot-v0`     |
 
 The tag captures the complete Next.js implementation as of merging PR #16: 8 ACT modules, Supabase magic-link auth via `@supabase/ssr`, `/noodhulp` crisis screen, Noodknop overlay, account management, Vercel deployment, and the full CI/Dependabot hardening from the June 2026 audit.
 
@@ -43,11 +43,11 @@ These are Next.js / DOM-specific and will be removed when the Expo scaffold land
 
 ## Pivot timeline
 
-| Phase | What | When |
-|-------|------|------|
-| Phase 0 | Cleanup + this notice + docs rewrite | This PR |
-| Phase 2-α | Expo scaffold (6 sequential PRs) | 4–6 weeks |
-| Phase 2-β | Core fixes alongside α | parallel |
-| Phase 2-γ | iCoach-inspired features (per-feature approval) | After α6 |
+| Phase     | What                                            | When      |
+| --------- | ----------------------------------------------- | --------- |
+| Phase 0   | Cleanup + this notice + docs rewrite            | This PR   |
+| Phase 2-α | Expo scaffold (6 sequential PRs)                | 4–6 weeks |
+| Phase 2-β | Core fixes alongside α                          | parallel  |
+| Phase 2-γ | iCoach-inspired features (per-feature approval) | After α6  |
 
 See `docs/OPEN_QUESTIONS.md` for unresolved decisions blocking the pivot.

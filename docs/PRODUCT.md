@@ -14,12 +14,12 @@ This is **not a course**. It is a therapeutic process the user completes at thei
 
 ### Core philosophy
 
-| Principle | Meaning |
-|-----------|---------|
-| Symptoms are not the enemy — avoidance is | Target avoidance patterns, not symptom suppression |
-| The body is not secondary — it is the gateway | Body work integrated in every module |
-| Values are the compass, not symptom-free living | Direction over cure |
-| Relapse is information, not failure | Non-punitive framing of setbacks |
+| Principle                                       | Meaning                                            |
+| ----------------------------------------------- | -------------------------------------------------- |
+| Symptoms are not the enemy — avoidance is       | Target avoidance patterns, not symptom suppression |
+| The body is not secondary — it is the gateway   | Body work integrated in every module               |
+| Values are the compass, not symptom-free living | Direction over cure                                |
+| Relapse is information, not failure             | Non-punitive framing of setbacks                   |
 
 ## Target audiences (overlapping)
 
@@ -39,16 +39,16 @@ Shared underlying patterns: avoidance, need for control, disconnection from the 
 
 Three phases, **8 modules** (including onboarding). Linear progression with free back-navigation to completed steps.
 
-| # | Module (NL) | ACT process | Body work |
-|---|-------------|-------------|-----------|
-| 0 | Onboarding | Philosophy introduction | Body awareness intake |
-| 1 | Herkennen | Psycho-education avoidance cycle | Body scan |
-| 2 | Acceptatie | Making space, paradox of control | Breath space |
-| 3 | Defusie | Distancing from thoughts | Tension & release |
-| 4 | Aanwezig zijn | Mindfulness, the present | Sensory exercise |
-| 5 | Zelf-als-context | Observing self | Centering |
-| 6 | Waarden | Choosing direction despite pain | Heart-area exercise |
-| 7 | Toegewijd handelen | Committed action toward values | Movement exercise |
+| #   | Module (NL)        | ACT process                      | Body work             |
+| --- | ------------------ | -------------------------------- | --------------------- |
+| 0   | Onboarding         | Philosophy introduction          | Body awareness intake |
+| 1   | Herkennen          | Psycho-education avoidance cycle | Body scan             |
+| 2   | Acceptatie         | Making space, paradox of control | Breath space          |
+| 3   | Defusie            | Distancing from thoughts         | Tension & release     |
+| 4   | Aanwezig zijn      | Mindfulness, the present         | Sensory exercise      |
+| 5   | Zelf-als-context   | Observing self                   | Centering             |
+| 6   | Waarden            | Choosing direction despite pain  | Heart-area exercise   |
+| 7   | Toegewijd handelen | Committed action toward values   | Movement exercise     |
 
 See [MODULES.md](./MODULES.md) for full per-module detail.
 

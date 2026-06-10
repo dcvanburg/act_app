@@ -25,18 +25,23 @@ Read: `docs/PRODUCT.md`, `docs/TECHNICAL_SPEC.md`, `docs/OPEN_QUESTIONS.md`, `AG
 ## Output format
 
 ### Summary
+
 One paragraph.
 
 ### Open blockers
+
 From `docs/OPEN_QUESTIONS.md` or new ones.
 
 ### Implementation steps
+
 Numbered steps with file paths and what to change.
 
 ### Verification
+
 How to confirm each step works.
 
 ### Risks
+
 Safety, GDPR, navigation edge cases.
 
 **Do not write code — plan only.**
