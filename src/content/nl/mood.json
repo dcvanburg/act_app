@@ -1,0 +1,47 @@
+{
+  "checkIn": {
+    "title": "Hoe voel je je vandaag?",
+    "subtitle": "Een korte check-in. Geen goed of fout antwoord.",
+    "saveAction": "Opslaan",
+    "savedMessage": "Stemming opgeslagen.",
+    "errorMessage": "Opslaan mislukt. Probeer het opnieuw.",
+    "tagsHeading": "Welke gevoelens herken je?",
+    "noteHeading": "Wil je iets noteren?",
+    "notePlaceholder": "Optioneel. Wat valt je op?",
+    "skipTagsHint": "Je kunt deze stap overslaan."
+  },
+  "history": {
+    "title": "Stemming",
+    "range7d": "7 dagen",
+    "range30d": "30 dagen",
+    "emptyTitle": "Nog geen check-ins",
+    "emptyBody": "Begin met je eerste stemming-check-in om hier je verloop te zien.",
+    "averageLabel": "Gemiddeld",
+    "entriesLabel": "check-ins"
+  },
+  "homeCard": {
+    "promptTitle": "Hoe voel je je vandaag?",
+    "promptBody": "Een korte check-in helpt je patronen op te merken.",
+    "promptAction": "Check-in doen",
+    "doneTitle": "Vandaag al ingecheckt",
+    "doneBody": "Je stemming van vandaag is bewaard.",
+    "doneAction": "Verloop bekijken"
+  },
+  "scores": [
+    { "value": 1, "emoji": "😞", "label": "Heel slecht" },
+    { "value": 2, "emoji": "🙁", "label": "Slecht" },
+    { "value": 3, "emoji": "😐", "label": "Neutraal" },
+    { "value": 4, "emoji": "🙂", "label": "Goed" },
+    { "value": 5, "emoji": "😄", "label": "Heel goed" }
+  ],
+  "tags": [
+    { "id": "angst", "label": "Angst" },
+    { "id": "verdriet", "label": "Verdriet" },
+    { "id": "boos", "label": "Boos" },
+    { "id": "stress", "label": "Stress" },
+    { "id": "rustig", "label": "Rustig" },
+    { "id": "hoopvol", "label": "Hoopvol" },
+    { "id": "pijn", "label": "Pijn" },
+    { "id": "vermoeid", "label": "Vermoeid" }
+  ]
+}
