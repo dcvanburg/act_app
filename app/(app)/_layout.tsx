@@ -121,7 +121,7 @@ function AppTabs({ insets }: { insets: { bottom: number } }) {
           ),
         }}
       />
-      <Tabs.Screen name="onboarding" options={{ href: null }} />
+      <Tabs.Screen name="onboarding" options={{ href: null, tabBarStyle: { display: 'none' } }} />
       <Tabs.Screen name="account/index" options={{ href: null }} />
       <Tabs.Screen name="mood/index" options={{ href: null }} />
       <Tabs.Screen name="mood/history" options={{ href: null }} />

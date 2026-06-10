@@ -18,6 +18,9 @@ export function Noodknop() {
 
   const isOnNoodhulp = pathname === '/noodhulp';
 
+  // Hidden during onboarding — user is filling in personal data, not yet in the program.
+  if (pathname === '/onboarding') return null;
+
   return (
     <View
       pointerEvents="box-none"
