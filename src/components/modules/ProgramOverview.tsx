@@ -112,7 +112,7 @@ export function ProgramOverview({ progress, groupByPhase = false }: Props) {
             ) : (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`${phase.label}, tik om ${isExpanded ? 'in te klappen' : 'uit te klappen'}`}
+                accessibilityLabel={`${phase.label}, ${pp.completedCount} van ${pp.totalCount} modules afgerond, tik om ${isExpanded ? 'in te klappen' : 'uit te klappen'}`}
                 onPress={() => togglePhase(phase.id)}
                 className="mb-2 flex-row items-center justify-between rounded-lg px-3 py-2 active:bg-surface-muted"
               >
@@ -121,9 +121,14 @@ export function ProgramOverview({ progress, groupByPhase = false }: Props) {
                 >
                   {phase.label}
                 </Text>
-                <Text className={`text-xs ${isLocked ? 'text-locked' : 'text-text-muted'}`}>
-                  {isExpanded ? '∧' : '∨'}
-                </Text>
+                <View className="flex-row items-center gap-2">
+                  <Text className={`text-xs ${isLocked ? 'text-locked' : 'text-text-muted'}`}>
+                    {pp.completedCount}/{pp.totalCount} afgerond
+                  </Text>
+                  <Text className={`text-xs ${isLocked ? 'text-locked' : 'text-text-muted'}`}>
+                    {isExpanded ? '∧' : '∨'}
+                  </Text>
+                </View>
               </Pressable>
             )}
             {isExpanded && (() => {
