@@ -50,9 +50,7 @@ function normalizeActie(raw: Partial<WaardeActie>): WaardeActie | null {
 
   const termijn = isTermijn(raw.termijn) ? raw.termijn : 'kort';
   const aangemaakt_op =
-    typeof raw.aangemaakt_op === 'string' && raw.aangemaakt_op
-      ? raw.aangemaakt_op
-      : isoDate();
+    typeof raw.aangemaakt_op === 'string' && raw.aangemaakt_op ? raw.aangemaakt_op : isoDate();
 
   return {
     id,
@@ -70,10 +68,7 @@ function isAntwoord(value: unknown): value is WaardeCheckinAntwoord {
 
 function isBarriereType(value: unknown): value is BarriereType {
   return (
-    value === 'vermijding' ||
-    value === 'gedachte' ||
-    value === 'zelfkritiek' ||
-    value === 'eigen'
+    value === 'vermijding' || value === 'gedachte' || value === 'zelfkritiek' || value === 'eigen'
   );
 }
 
@@ -104,10 +99,7 @@ function normalizeBarriere(raw: Partial<WaardeBarriere>): WaardeBarriere | null 
 }
 
 /** Whether a plan action or barrier was created on the given calendar day. */
-export function isWaardeItemFromToday(
-  aangemaakt_op: string,
-  today: string = isoDate(),
-): boolean {
+export function isWaardeItemFromToday(aangemaakt_op: string, today: string = isoDate()): boolean {
   return normalizeWaardeDatum(aangemaakt_op) === today;
 }
 
@@ -163,7 +155,10 @@ export function normalizeWaardeDatum(datum: string): string {
   return datum.length >= 10 ? datum.slice(0, 10) : datum;
 }
 
-export function todayCheckins(checkins: WaardeCheckin[], today: string = isoDate()): WaardeCheckin[] {
+export function todayCheckins(
+  checkins: WaardeCheckin[],
+  today: string = isoDate(),
+): WaardeCheckin[] {
   return checkins.filter((c) => normalizeWaardeDatum(c.datum) === today);
 }
 
@@ -222,10 +217,7 @@ export interface WaardeAntwoordCounts {
 }
 
 /** Number of waarden with a check-in today (latest per waarde). */
-export function todayCheckinCount(
-  checkins: WaardeCheckin[],
-  today: string = isoDate(),
-): number {
+export function todayCheckinCount(checkins: WaardeCheckin[], today: string = isoDate()): number {
   return todayCheckinByWaarde(checkins, today).size;
 }
 
@@ -330,13 +322,7 @@ export function buildCheckinSummary(
       barriere.type === 'eigen' && barriere.eigenLabel
         ? barriere.eigenLabel
         : barrierTypeLabels[barriere.type];
-    dailyFocus = fillReminderTemplate(
-      template,
-      actie,
-      barriere,
-      termijnLabel,
-      barrierTypeLabel,
-    );
+    dailyFocus = fillReminderTemplate(template, actie, barriere, termijnLabel, barrierTypeLabel);
   }
 
   return { actiesByTermijn, barriers: waardeBarriers, dailyFocus };

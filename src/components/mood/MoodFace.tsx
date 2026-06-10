@@ -17,7 +17,12 @@ interface Props {
  * the missing-glyph tofu. Drawing the faces ourselves keeps the affective
  * signal intact across devices, and inherits the program's earthy palette.
  */
-export function MoodFace({ score, size = 32, color = '#3B6D11', background = 'transparent' }: Props) {
+export function MoodFace({
+  score,
+  size = 32,
+  color = '#3B6D11',
+  background = 'transparent',
+}: Props) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" accessibilityRole="image">
       <Circle cx={12} cy={12} r={10.5} fill={background} stroke={color} strokeWidth={1.5} />

@@ -121,10 +121,7 @@ describe('dayBefore', () => {
 describe('computeCheckInStreakFromDates', () => {
   it('deduplicates multiple entries on the same day', () => {
     expect(
-      computeCheckInStreakFromDates(
-        ['2026-06-09', '2026-06-09', '2026-06-08'],
-        '2026-06-09',
-      ),
+      computeCheckInStreakFromDates(['2026-06-09', '2026-06-09', '2026-06-08'], '2026-06-09'),
     ).toEqual({ current: 2, totalDays: 2 });
   });
 });

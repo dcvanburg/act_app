@@ -42,27 +42,17 @@ export function WaardenHomeCard() {
       onPress={() => router.push('/waarden')}
       className={
         'mb-4 flex-row items-center gap-4 rounded-2xl p-4 shadow-sm active:opacity-90 ' +
-        (allDone
-          ? 'border border-primary-border-soft bg-primary-soft'
-          : 'bg-surface')
+        (allDone ? 'border border-primary-border-soft bg-primary-soft' : 'bg-surface')
       }
     >
       <View className="h-12 w-12 items-center justify-center rounded-full bg-primary-soft">
         <StarIcon size={26} color={allDone ? '#27500A' : '#3B6D11'} />
       </View>
       <View className="flex-1">
-        <Text
-          className={
-            'font-semibold ' + (allDone ? 'text-primary-dark' : 'text-text')
-          }
-        >
+        <Text className={'font-semibold ' + (allDone ? 'text-primary-dark' : 'text-text')}>
           {waarden.homeCard.title}
         </Text>
-        <Text
-          className={
-            'text-sm ' + (allDone ? 'text-primary' : 'text-text-subtle')
-          }
-        >
+        <Text className={'text-sm ' + (allDone ? 'text-primary' : 'text-text-subtle')}>
           {statusText}
         </Text>
         {streak > 0 ? (

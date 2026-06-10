@@ -44,9 +44,7 @@ export async function loadWaardenData(userId: string): Promise<WaardenData> {
       waarden: parsed.waarden ?? [],
       acties: parsed.acties ?? [],
       barriers: parsed.barriers ?? [],
-      checkins: (parsed.checkins ?? []).map((item) =>
-        normalizeCheckin(item as LegacyCheckin),
-      ),
+      checkins: (parsed.checkins ?? []).map((item) => normalizeCheckin(item as LegacyCheckin)),
     });
   } catch {
     return { ...EMPTY_WAARDEN_DATA };

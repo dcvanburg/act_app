@@ -68,101 +68,93 @@ export default function WaardenScreen() {
         </View>
 
         <View className="gap-4 pt-4">
-            {streak > 0 ? (
-              <View className="flex-row items-center gap-3 rounded-2xl bg-surface p-4 shadow-sm">
-                <View
-                  className="h-10 w-10 items-center justify-center rounded-full"
-                  style={{ backgroundColor: '#FFF3D6' }}
-                >
-                  <FlameIcon size={22} color="#E8A800" />
-                </View>
-                <Text className="font-semibold text-text">
-                  {streak} {waarden.streak.label}
-                </Text>
+          {streak > 0 ? (
+            <View className="flex-row items-center gap-3 rounded-2xl bg-surface p-4 shadow-sm">
+              <View
+                className="h-10 w-10 items-center justify-center rounded-full"
+                style={{ backgroundColor: '#FFF3D6' }}
+              >
+                <FlameIcon size={22} color="#E8A800" />
               </View>
-            ) : null}
+              <Text className="font-semibold text-text">
+                {streak} {waarden.streak.label}
+              </Text>
+            </View>
+          ) : null}
 
-            {data.waarden.length > 0 ? (
-              allDone ? (
-                <View className="rounded-2xl border border-primary-border-soft bg-primary-soft p-4">
-                  <Text className="text-sm font-bold text-primary-dark">
-                    {waarden.checkin.doneTitle}
-                  </Text>
-                  <Text className="mt-1 text-xs text-primary">{waarden.checkin.doneBody}</Text>
-                </View>
-              ) : (
-                <View className="flex-row items-center justify-between rounded-2xl border border-primary-border-soft bg-primary-soft p-4">
-                  <View className="flex-1 pr-3">
-                    <Text className="text-sm font-bold text-primary-dark">
-                      {waarden.checkin.bannerTitle}
-                    </Text>
-                    <Text className="mt-1 text-xs text-primary">
-                      {waarden.checkin.bannerSub
-                        .replace('{done}', String(doneToday))
-                        .replace('{total}', String(data.waarden.length))}
-                    </Text>
-                  </View>
-                  <Pressable
-                    accessibilityRole="button"
-                    onPress={() => router.push('/waarden/checkin')}
-                    className="rounded-xl bg-primary px-4 py-2.5 active:bg-primary-dark"
-                  >
-                    <Text className="text-xs font-semibold text-white">
-                      {waarden.checkin.bannerAction}
-                    </Text>
-                  </Pressable>
-                </View>
-              )
-            ) : null}
-
-            {data.waarden.length === 0 ? (
-              <View className="items-center rounded-2xl bg-surface px-6 py-12 shadow-sm">
-                <View className="mb-4 h-14 w-14 items-center justify-center rounded-full bg-primary-soft">
-                  <StarIcon size={30} color="#3B6D11" />
-                </View>
-                <Text className="mb-2 font-serif text-lg font-semibold text-text">
-                  {waarden.empty.title}
+          {data.waarden.length > 0 ? (
+            allDone ? (
+              <View className="rounded-2xl border border-primary-border-soft bg-primary-soft p-4">
+                <Text className="text-sm font-bold text-primary-dark">
+                  {waarden.checkin.doneTitle}
                 </Text>
-                <Text className="mb-6 text-center text-sm leading-5 text-text-subtle">
-                  {waarden.empty.body}
-                </Text>
-                <Link href="/waarden/new" asChild>
-                  <Pressable className="rounded-xl bg-primary px-5 py-3 active:bg-primary-dark">
-                    <Text className="font-semibold text-white">+ {waarden.empty.action}</Text>
-                  </Pressable>
-                </Link>
+                <Text className="mt-1 text-xs text-primary">{waarden.checkin.doneBody}</Text>
               </View>
             ) : (
-              <>
-                {data.waarden.map((waarde) => (
-                  <WaardeRow
-                    key={waarde.id}
-                    waarde={waarde}
-                    checkin={vandaagByWaarde.get(waarde.id) ?? null}
-                  />
-                ))}
-                <Link href="/waarden/new" asChild>
-                  <Pressable className="rounded-2xl border-2 border-dashed border-border py-4 active:bg-surface-muted">
-                    <Text className="text-center font-semibold text-text">
-                      + {waarden.addAction}
-                    </Text>
-                  </Pressable>
-                </Link>
-              </>
-            )}
+              <View className="flex-row items-center justify-between rounded-2xl border border-primary-border-soft bg-primary-soft p-4">
+                <View className="flex-1 pr-3">
+                  <Text className="text-sm font-bold text-primary-dark">
+                    {waarden.checkin.bannerTitle}
+                  </Text>
+                  <Text className="mt-1 text-xs text-primary">
+                    {waarden.checkin.bannerSub
+                      .replace('{done}', String(doneToday))
+                      .replace('{total}', String(data.waarden.length))}
+                  </Text>
+                </View>
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => router.push('/waarden/checkin')}
+                  className="rounded-xl bg-primary px-4 py-2.5 active:bg-primary-dark"
+                >
+                  <Text className="text-xs font-semibold text-white">
+                    {waarden.checkin.bannerAction}
+                  </Text>
+                </Pressable>
+              </View>
+            )
+          ) : null}
+
+          {data.waarden.length === 0 ? (
+            <View className="items-center rounded-2xl bg-surface px-6 py-12 shadow-sm">
+              <View className="mb-4 h-14 w-14 items-center justify-center rounded-full bg-primary-soft">
+                <StarIcon size={30} color="#3B6D11" />
+              </View>
+              <Text className="mb-2 font-serif text-lg font-semibold text-text">
+                {waarden.empty.title}
+              </Text>
+              <Text className="mb-6 text-center text-sm leading-5 text-text-subtle">
+                {waarden.empty.body}
+              </Text>
+              <Link href="/waarden/new" asChild>
+                <Pressable className="rounded-xl bg-primary px-5 py-3 active:bg-primary-dark">
+                  <Text className="font-semibold text-white">+ {waarden.empty.action}</Text>
+                </Pressable>
+              </Link>
+            </View>
+          ) : (
+            <>
+              {data.waarden.map((waarde) => (
+                <WaardeRow
+                  key={waarde.id}
+                  waarde={waarde}
+                  checkin={vandaagByWaarde.get(waarde.id) ?? null}
+                />
+              ))}
+              <Link href="/waarden/new" asChild>
+                <Pressable className="rounded-2xl border-2 border-dashed border-border py-4 active:bg-surface-muted">
+                  <Text className="text-center font-semibold text-text">+ {waarden.addAction}</Text>
+                </Pressable>
+              </Link>
+            </>
+          )}
         </View>
       </View>
     </ScrollView>
   );
 }
 
-function WaardeRow({
-  waarde,
-  checkin,
-}: {
-  waarde: Waarde;
-  checkin: WaardeCheckin | null;
-}) {
+function WaardeRow({ waarde, checkin }: { waarde: Waarde; checkin: WaardeCheckin | null }) {
   const checkedIn = checkin !== null;
 
   return (
@@ -185,9 +177,7 @@ function WaardeRow({
         {checkedIn ? (
           <View className="flex-row items-center gap-1.5">
             <CheckinAntwoordIcon antwoord={checkin.antwoord} size={16} />
-            <Text className="text-xs text-text-subtle">
-              {antwoordLabel(checkin.antwoord)}
-            </Text>
+            <Text className="text-xs text-text-subtle">{antwoordLabel(checkin.antwoord)}</Text>
           </View>
         ) : (
           <Text className="text-xs text-text-muted">{waarden.homeCard.pendingLabel}</Text>

@@ -5,7 +5,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import common from '@/content/nl/common.json';
 import { useAuth } from '@/providers/AuthProvider';
-import { UnsavedChangesGuardProvider, useUnsavedChangesGuard } from '@/providers/UnsavedChangesGuardProvider';
+import {
+  UnsavedChangesGuardProvider,
+  useUnsavedChangesGuard,
+} from '@/providers/UnsavedChangesGuardProvider';
 import { WaardenProvider } from '@/providers/WaardenProvider';
 
 /**

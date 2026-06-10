@@ -1,12 +1,6 @@
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import {
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AvoidIcon } from '@/components/icons/AvoidIcon';
@@ -58,9 +52,7 @@ function groupBarriers(barriers: WaardeBarriere[]): BarrierGroup[] {
 
   const eigenItems = barriers.filter((item) => item.type === 'eigen');
   const eigenLabels = [
-    ...new Set(
-      eigenItems.map((item) => item.eigenLabel?.trim() || waarden.barrierTypes.eigen),
-    ),
+    ...new Set(eigenItems.map((item) => item.eigenLabel?.trim() || waarden.barrierTypes.eigen)),
   ];
 
   for (const label of eigenLabels) {
@@ -127,11 +119,7 @@ export default function WaardeDetailScreen() {
     >
       <View className="mx-auto w-full max-w-md gap-4">
         <View className="flex-row items-center gap-2">
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => router.back()}
-            className="p-1"
-          >
+          <Pressable accessibilityRole="button" onPress={() => router.back()} className="p-1">
             <Text className="text-lg text-text-muted">‹</Text>
           </Pressable>
           <View className="min-w-0 flex-1 flex-row items-center gap-2.5">
@@ -178,12 +166,7 @@ export default function WaardeDetailScreen() {
         </View>
 
         {tab === 'plan' ? (
-          <PlanTab
-            waardeId={waardeId}
-            acties={acties}
-            onAdd={addActie}
-            onDelete={deleteActie}
-          />
+          <PlanTab waardeId={waardeId} acties={acties} onAdd={addActie} onDelete={deleteActie} />
         ) : null}
         {tab === 'barriers' ? (
           <BarriersTab
@@ -232,9 +215,7 @@ function TabButton({
         <HistoryTabIcon size={16} color={color} />
       )}
       <Text
-        className={
-          'text-sm ' + (active ? 'font-semibold text-primary-dark' : 'text-text-muted')
-        }
+        className={'text-sm ' + (active ? 'font-semibold text-primary-dark' : 'text-text-muted')}
       >
         {label}
       </Text>
@@ -361,12 +342,7 @@ function BarriersTab({
 }: {
   waardeId: string;
   barriers: WaardeBarriere[];
-  onAdd: (
-    waardeId: string,
-    type: BarriereType,
-    text: string,
-    eigenLabel?: string,
-  ) => void;
+  onAdd: (waardeId: string, type: BarriereType, text: string, eigenLabel?: string) => void;
   onDelete: (id: string) => void;
 }) {
   const [type, setType] = useState<BarriereType>('vermijding');

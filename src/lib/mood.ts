@@ -97,10 +97,7 @@ export function uniqueCheckInDays(logs: MoodLog[]): Set<string> {
  * Streak counts backward from today when checked in, otherwise from yesterday
  * so an open day does not break an active streak yet.
  */
-export function computeCheckInStreak(
-  logs: MoodLog[],
-  today: string = isoDate(),
-): CheckInStreak {
+export function computeCheckInStreak(logs: MoodLog[], today: string = isoDate()): CheckInStreak {
   return computeCheckInStreakFromDates([...uniqueCheckInDays(logs)], today);
 }
 

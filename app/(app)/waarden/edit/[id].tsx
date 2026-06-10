@@ -1,13 +1,12 @@
-import { Redirect, useFocusEffect, useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
-  Alert,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+  Redirect,
+  useFocusEffect,
+  useLocalSearchParams,
+  useNavigation,
+  useRouter,
+} from 'expo-router';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import waarden from '@/content/nl/waarden.json';
@@ -58,7 +57,9 @@ export default function WaardeEditScreen() {
     [data.barriers, waardeId],
   );
 
-  const [actieDrafts, setActieDrafts] = useState<Record<string, { actie: string; termijn: WaardeTermijn }>>({});
+  const [actieDrafts, setActieDrafts] = useState<
+    Record<string, { actie: string; termijn: WaardeTermijn }>
+  >({});
   const [barrierDrafts, setBarrierDrafts] = useState<
     Record<string, { type: BarriereType; omschrijving: string; eigenLabel: string }>
   >({});
@@ -79,8 +80,10 @@ export default function WaardeEditScreen() {
   }, [waardeActies]);
 
   useEffect(() => {
-    const nextBarriers: Record<string, { type: BarriereType; omschrijving: string; eigenLabel: string }> =
-      {};
+    const nextBarriers: Record<
+      string,
+      { type: BarriereType; omschrijving: string; eigenLabel: string }
+    > = {};
     for (const item of waardeBarriers) {
       nextBarriers[item.id] = {
         type: item.type,
@@ -118,16 +121,7 @@ export default function WaardeEditScreen() {
     }
 
     return false;
-  }, [
-    waarde,
-    naam,
-    beschrijving,
-    kleur,
-    waardeActies,
-    waardeBarriers,
-    actieDrafts,
-    barrierDrafts,
-  ]);
+  }, [waarde, naam, beschrijving, kleur, waardeActies, waardeBarriers, actieDrafts, barrierDrafts]);
 
   useFocusEffect(
     useCallback(() => {
@@ -354,7 +348,9 @@ export default function WaardeEditScreen() {
                     onPress={() => deleteActie(item.id)}
                     className="mt-2 self-end"
                   >
-                    <Text className="text-xs text-crisis">{waarden.detail.deleteConfirmAction}</Text>
+                    <Text className="text-xs text-crisis">
+                      {waarden.detail.deleteConfirmAction}
+                    </Text>
                   </Pressable>
                 </View>
               );
@@ -434,7 +430,9 @@ export default function WaardeEditScreen() {
                     onPress={() => deleteBarriere(item.id)}
                     className="mt-2 self-end"
                   >
-                    <Text className="text-xs text-crisis">{waarden.detail.deleteConfirmAction}</Text>
+                    <Text className="text-xs text-crisis">
+                      {waarden.detail.deleteConfirmAction}
+                    </Text>
                   </Pressable>
                 </View>
               );

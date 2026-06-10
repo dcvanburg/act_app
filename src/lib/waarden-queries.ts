@@ -1,10 +1,7 @@
 import { isoDate } from '@/lib/mood';
 import { supabase } from '@/lib/supabase/client';
 import { EMPTY_WAARDEN_DATA, normalizeWaardeDatum, normalizeWaardenData } from '@/lib/waarden';
-import {
-  clearWaardenLocalStorage,
-  loadWaardenData,
-} from '@/lib/waarden-storage';
+import { clearWaardenLocalStorage, loadWaardenData } from '@/lib/waarden-storage';
 import type {
   Waarde,
   WaardeActie,
@@ -21,12 +18,7 @@ async function ensureProfile(userId: string, email: string | null | undefined): 
   if (error) throw error;
 }
 
-function mapWaarde(row: {
-  id: string;
-  naam: string;
-  beschrijving: string;
-  kleur: string;
-}): Waarde {
+function mapWaarde(row: { id: string; naam: string; beschrijving: string; kleur: string }): Waarde {
   return {
     id: row.id,
     naam: row.naam,
@@ -327,7 +319,10 @@ export async function insertBarriere(
   if (error) throw error;
 }
 
-export async function updateBarriereRemote(userId: string, barriere: WaardeBarriere): Promise<void> {
+export async function updateBarriereRemote(
+  userId: string,
+  barriere: WaardeBarriere,
+): Promise<void> {
   const { error } = await supabase
     .from('waarde_barriers')
     .update({

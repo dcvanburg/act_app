@@ -32,7 +32,12 @@ export function PhaseProgressSummary({ phases }: Props) {
         <View
           pointerEvents="none"
           className="absolute flex-row"
-          style={{ top: LINE_TOP, left: edgeInset as `${number}%`, right: edgeInset as `${number}%`, height: 2 }}
+          style={{
+            top: LINE_TOP,
+            left: edgeInset as `${number}%`,
+            right: edgeInset as `${number}%`,
+            height: 2,
+          }}
         >
           {phases.slice(0, -1).map((phase) => (
             <View

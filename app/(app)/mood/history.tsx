@@ -106,11 +106,7 @@ export default function MoodHistoryScreen() {
               <View className="flex-row items-end gap-2">
                 {average !== null ? (
                   <>
-                    <MoodFace
-                      score={Math.round(average) as MoodScore}
-                      size={36}
-                      color="#3B6D11"
-                    />
+                    <MoodFace score={Math.round(average) as MoodScore} size={36} color="#3B6D11" />
                     <Text className="font-serif text-2xl font-bold text-text">
                       {average.toFixed(1)}
                     </Text>

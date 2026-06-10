@@ -70,12 +70,7 @@ export function MoodHomeCard() {
       onPress={() => router.push('/mood/history')}
       className="mb-4 flex-row items-center gap-4 rounded-2xl border border-primary-border-soft bg-primary-soft p-4 active:opacity-80"
     >
-      <MoodFace
-        score={today.mood_score}
-        size={40}
-        color="#2D5210"
-        background="#D4E8C0"
-      />
+      <MoodFace score={today.mood_score} size={40} color="#2D5210" background="#D4E8C0" />
       <View className="flex-1">
         <Text className="font-semibold text-primary-dark">{mood.homeCard.doneTitle}</Text>
         <Text className="text-sm text-primary-dark/80">

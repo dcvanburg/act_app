@@ -28,11 +28,7 @@ export function MoodStreakSummary({ streak, isLoading }: Props) {
         {mood.streak.title}
       </Text>
       <View className="flex-row gap-3">
-        <StreakStat
-          value={streak.current}
-          label={mood.streak.currentLabel}
-          highlight
-        />
+        <StreakStat value={streak.current} label={mood.streak.currentLabel} highlight />
         <StreakStat value={streak.totalDays} label={mood.streak.totalLabel} />
       </View>
     </View>

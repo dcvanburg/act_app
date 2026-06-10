@@ -1,13 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import waarden from '@/content/nl/waarden.json';
@@ -86,9 +79,7 @@ export default function NewWaardeScreen() {
           </View>
         </FormGroup>
 
-        <FormGroup
-          label={`${waarden.new.descLabel} ${waarden.new.descOptional}`}
-        >
+        <FormGroup label={`${waarden.new.descLabel} ${waarden.new.descOptional}`}>
           <TextInput
             value={beschrijving}
             onChangeText={setBeschrijving}

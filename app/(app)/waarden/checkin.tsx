@@ -453,8 +453,7 @@ function ChoiceButton({
         ? 'border-crisis-border bg-crisis-soft'
         : 'border-border bg-surface-muted';
 
-  const iconColor =
-    tone === 'ja' ? '#3B6D11' : tone === 'nee' ? '#D85A30' : '#888780';
+  const iconColor = tone === 'ja' ? '#3B6D11' : tone === 'nee' ? '#D85A30' : '#888780';
 
   return (
     <Pressable
