@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ModulePlayer } from '@/components/modules/ModulePlayer';
@@ -408,28 +408,12 @@ function CompleteStep({
   onComplete: () => void;
   isSaving: boolean;
 }) {
-  const [notes, setNotes] = useState('');
-
   return (
     <View>
       <Text className="mb-2 font-serif text-3xl font-bold text-text">{intake.complete.title}</Text>
       <Text className="mb-8 text-base leading-relaxed text-text-subtle">
         {intake.complete.body}
       </Text>
-
-      <View className="mb-8 rounded-2xl bg-surface p-5 shadow-sm">
-        <Text className="mb-3 font-semibold text-text">{intake.complete.notesTitle}</Text>
-        <TextInput
-          value={notes}
-          onChangeText={setNotes}
-          placeholder={intake.complete.notesPlaceholder}
-          placeholderTextColor="#888780"
-          multiline
-          textAlignVertical="top"
-          className="min-h-[120px] rounded-lg border border-border bg-background px-3 py-3 text-base text-text"
-        />
-      </View>
-
       <Pressable
         accessibilityRole="button"
         onPress={onComplete}

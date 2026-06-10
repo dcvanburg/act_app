@@ -38,5 +38,10 @@
     "moduleCompleted": "Afgerond",
     "moduleInProgress": "Bezig",
     "dailyPracticeLocked": "Dagelijkse praktijk wordt beschikbaar na het voltooien van het programma."
+  },
+  "module": {
+    "notesTitle": "Jouw notities",
+    "notesPlaceholder": "Schrijf hier gedachten, vragen of aandachtspunten...",
+    "completeButton": "Module afronden"
   }
 }

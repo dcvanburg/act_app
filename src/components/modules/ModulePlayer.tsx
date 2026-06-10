@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import common from '@/content/nl/common.json';
@@ -48,6 +48,7 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes, onCompl
       )
     : 0;
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [notes, setNotes] = useState('');
   const saveMutation = useSaveModuleProgress();
 
   // Keep a ref so the save effect can read the current value without
@@ -64,23 +65,28 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes, onCompl
 
   useEffect(() => {
     if (!currentScreen) return;
-    // When a parent handles completion (onComplete provided) we only save the
-    // current position; the parent is responsible for marking completed:true.
+    // Completion is always explicit (button press); the effect only saves
+    // the current position so the user can resume where they left off.
     saveMutation.mutate({
       moduleId: content.id,
       lastStepId: currentScreen.id,
-      completed: isLast && !onCompleteRef.current,
+      completed: false,
     });
-    // We intentionally do not include saveMutation or onCompleteRef in deps.
+    // We intentionally do not include saveMutation in deps — stable ref.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, content.id, isLast]);
+  }, [currentIndex, content.id]);
 
   function goNext() {
     if (isLast) {
       if (onCompleteRef.current) {
+        // Parent owns completion (e.g. onboarding → CompleteStep).
         onCompleteRef.current();
       } else {
-        router.replace('/home');
+        // Regular module: save as completed then go home.
+        saveMutation.mutate(
+          { moduleId: content.id, lastStepId: currentScreen!.id, completed: true },
+          { onSuccess: () => router.replace('/home') },
+        );
       }
       return;
     }
@@ -138,6 +144,20 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes, onCompl
       >
         <View className="mx-auto w-full max-w-md">
           <ScreenContent screen={currentScreen} content={content} complaintTypes={complaintTypes} />
+          {isLast && (
+            <View className="mt-6 rounded-2xl bg-surface p-5 shadow-sm">
+              <Text className="mb-3 font-semibold text-text">{common.module.notesTitle}</Text>
+              <TextInput
+                value={notes}
+                onChangeText={setNotes}
+                placeholder={common.module.notesPlaceholder}
+                placeholderTextColor="#888780"
+                multiline
+                textAlignVertical="top"
+                className="min-h-[120px] rounded-lg border border-border bg-background px-3 py-3 text-base text-text"
+              />
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -160,11 +180,16 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes, onCompl
           <Pressable
             accessibilityRole="button"
             onPress={goNext}
-            className="flex-1 rounded-xl bg-primary py-3 active:bg-primary-dark"
+            disabled={isLast && !onComplete && saveMutation.isPending}
+            className="flex-1 rounded-xl bg-primary py-3 active:bg-primary-dark disabled:opacity-60"
           >
-            <Text className="text-center text-sm font-semibold text-white">
-              {isLast ? common.actions.complete : common.actions.continue}
-            </Text>
+            {isLast && !onComplete && saveMutation.isPending ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text className="text-center text-sm font-semibold text-white">
+                {isLast && !onComplete ? common.module.completeButton : common.actions.continue}
+              </Text>
+            )}
           </Pressable>
         </View>
       </View>
