@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FeatureErrorBoundary } from '@/components/FeatureErrorBoundary';
+import { TodoBlock } from '@/components/home/TodoBlock';
 import { AccountIcon } from '@/components/icons/AccountIcon';
 import { MoodHomeCard } from '@/components/mood/MoodHomeCard';
 import { ProgramHomeCard } from '@/components/modules/ProgramHomeCard';
@@ -46,6 +47,9 @@ export default function HomeScreen() {
           </Link>
         </View>
 
+        <FeatureErrorBoundary>
+          <TodoBlock />
+        </FeatureErrorBoundary>
         <FeatureErrorBoundary>
           <MoodHomeCard />
         </FeatureErrorBoundary>
