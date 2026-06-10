@@ -92,22 +92,31 @@ function StepIndicator({ current }: { current: Step }) {
   );
 }
 
+const ANDERS = 'Anders';
+
 function PersonalDataForm({ onDone }: { onDone: () => void }) {
   const updateProfile = useUpdateProfile();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [referralSource, setReferralSource] = useState('');
+  const [customReferral, setCustomReferral] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  const andersSelected = referralSource === ANDERS;
+  const effectiveReferral = andersSelected ? customReferral.trim() : referralSource;
+
   const canSave =
-    firstName.trim().length > 0 && lastName.trim().length > 0 && referralSource.length > 0;
+    firstName.trim().length > 0 &&
+    lastName.trim().length > 0 &&
+    referralSource.length > 0 &&
+    (!andersSelected || customReferral.trim().length > 0);
 
   function handleSave() {
     if (!canSave) return;
     setError(null);
     updateProfile.mutate(
-      { first_name: firstName, last_name: lastName, phone, referral_source: referralSource },
+      { first_name: firstName, last_name: lastName, phone, referral_source: effectiveReferral },
       {
         onSuccess: onDone,
         onError: () => setError('Opslaan mislukt. Controleer je verbinding en probeer opnieuw.'),
@@ -159,7 +168,7 @@ function PersonalDataForm({ onDone }: { onDone: () => void }) {
       <Text className="mb-3 text-sm font-medium text-text">
         {content.step1.fields.referralSource}
       </Text>
-      <View className="mb-6 flex-row flex-wrap gap-2">
+      <View className="mb-3 flex-row flex-wrap gap-2">
         {content.step1.referralOptions.map((option) => (
           <Pressable
             key={option}
@@ -183,6 +192,20 @@ function PersonalDataForm({ onDone }: { onDone: () => void }) {
           </Pressable>
         ))}
       </View>
+
+      {andersSelected && (
+        <TextInput
+          value={customReferral}
+          onChangeText={setCustomReferral}
+          autoFocus
+          autoCapitalize="sentences"
+          placeholder="Vertel het ons..."
+          placeholderTextColor="#888780"
+          editable={!updateProfile.isPending}
+          className={`${inputClass} mb-6`}
+        />
+      )}
+      {!andersSelected && <View className="mb-3" />}
 
       {error ? <Text className="mb-3 text-sm text-crisis">{error}</Text> : null}
 
