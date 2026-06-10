@@ -154,9 +154,9 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
                 {common.module.prevModule}
               </Text>
               <Link href={prevHref} asChild>
-                <Pressable className="flex-row items-center gap-2 rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft">
+                <Pressable className="flex-row items-center justify-between rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft">
                   <Text className="text-text-muted">‹</Text>
-                  <Text className="flex-1 text-sm text-text">{prevMeta.title}</Text>
+                  <Text className="text-sm text-text">Teruggaan naar: {prevMeta.title}</Text>
                 </Pressable>
               </Link>
             </View>
