@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { supabase } from '@/lib/supabase/client';
+import { clearWaardenLocalStorage } from '@/lib/waarden-storage';
 import { useAuth } from '@/providers/AuthProvider';
 
 export interface Profile {
@@ -89,15 +90,12 @@ export function useUpdateProfile() {
 /**
  * useDeleteAccount — GDPR right-to-erasure.
  *
- * Deleting the `profiles` row cascades to `user_progress` and `journal_entries`
- * via the ON DELETE CASCADE FKs in 0001_initial_schema.sql. After the delete,
- * we sign the user out so the local SecureStore session is wiped.
- *
- * Known gap: this does NOT delete the `auth.users` row. Doing so requires the
- * service-role key, which is server-side only — implementing it cleanly needs
- * a Supabase Edge Function. Until that lands, the auth.users row remains
- * (just the email + auth hashes — no Article 9 data). Acceptable for v1 per
- * docs/SECURITY.md; revisit before the pilot.
+ * Sequence:
+ *   1. Call the `delete-user` Edge Function — uses service-role key to delete
+ *      the auth.users row, which cascades to all app data via ON DELETE CASCADE.
+ *   2. Clear the local AsyncStorage waarden cache so loadWaardenWithMigration
+ *      cannot re-migrate stale local data on the next login.
+ *   3. Wipe TanStack Query cache and sign out (clears SecureStore session).
  */
 export function useDeleteAccount() {
   const { user, signOut } = useAuth();
@@ -107,11 +105,10 @@ export function useDeleteAccount() {
     mutationFn: async (): Promise<void> => {
       if (!user) throw new Error('Niet ingelogd');
 
-      const { error } = await supabase.from('profiles').delete().eq('id', user.id);
+      const { error } = await supabase.functions.invoke('delete-user');
       if (error) throw error;
 
-      // Wipe local caches before signOut so a re-login after deletion doesn't
-      // see stale data flash.
+      await clearWaardenLocalStorage(user.id);
       queryClient.clear();
       await signOut();
     },
