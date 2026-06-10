@@ -97,7 +97,6 @@ function ModuleRow({
       >
         <ModuleIndicator status={status} icon={IconComponent} />
         <ModuleInfo meta={meta} status={status} />
-        <Text className="text-lg text-locked">{'\u{1F512}'}</Text>
       </View>
     );
   }
