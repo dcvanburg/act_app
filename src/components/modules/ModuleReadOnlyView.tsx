@@ -149,7 +149,7 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
                     asChild
                   >
                     <Pressable className="rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft">
-                      <Text className="text-sm text-text">→ {ref.label}</Text>
+                      <Text className="text-sm text-text">← {ref.label}</Text>
                     </Pressable>
                   </Link>
                 ))}
@@ -162,7 +162,7 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
               <Text className="mb-3 text-sm font-semibold text-text-muted">Volgende module</Text>
               <Link href={nextHref} asChild>
                 <Pressable className="flex-row items-center justify-between rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft">
-                  <Text className="text-sm text-text">{nextMeta.title}</Text>
+                  <Text className="text-sm text-text">Doorgaan naar: {nextMeta.title}</Text>
                   <Text className="text-text-muted">›</Text>
                 </Pressable>
               </Link>
