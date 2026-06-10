@@ -103,7 +103,7 @@ export default function AccountScreen() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Terug naar programma"
-            onPress={() => (router.canGoBack() ? router.back() : router.replace('/home'))}
+            onPress={() => router.back()}
             className="p-1"
           >
             <Text className="text-lg text-text-muted">‹</Text>

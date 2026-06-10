@@ -36,6 +36,7 @@ interface SaveArgs {
   moduleId: ModuleId;
   lastStepId: string;
   completed: boolean;
+  notes?: string;
 }
 
 /**
@@ -50,7 +51,7 @@ export function useSaveModuleProgress() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ moduleId, lastStepId, completed }: SaveArgs) => {
+    mutationFn: async ({ moduleId, lastStepId, completed, notes }: SaveArgs) => {
       if (!user) throw new Error('Niet ingelogd');
 
       // Profile row must exist before user_progress.user_id FK is satisfied.
@@ -63,18 +64,22 @@ export function useSaveModuleProgress() {
           { onConflict: 'id', ignoreDuplicates: true },
         );
 
-      const { data: existing } = await supabase
-        .from('user_progress')
-        .select('progress')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      // Prefer the in-memory cache: it always reflects the latest successful
+      // write and avoids a SELECT racing with a concurrent mutation.
+      const cached = queryClient.getQueryData<UserProgress>(PROGRESS_KEY(user.id));
+      let current: UserProgress;
+      if (cached) {
+        current = cached;
+      } else {
+        const { data: existing } = await supabase
+          .from('user_progress')
+          .select('progress')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        current = (existing?.progress as UserProgress | null) ?? getDefaultProgress();
+      }
 
-      const current =
-        (existing?.progress as UserProgress | null) ??
-        queryClient.getQueryData<UserProgress>(PROGRESS_KEY(user.id)) ??
-        getDefaultProgress();
-
-      const updated = withModuleUpdate(current, moduleId, lastStepId, completed);
+      const updated = withModuleUpdate(current, moduleId, lastStepId, completed, notes);
 
       const { error } = await supabase.from('user_progress').upsert({
         user_id: user.id,
@@ -143,12 +148,10 @@ export function useSaveIntake() {
         safetyCheckPassed: safetyPassed,
       };
 
-      // Mark module 0 (onboarding) complete iff the safety check allows the
-      // program to start. Blocking outcomes leave the module open so /home
-      // still routes here when the user retries.
-      const updated = safetyPassed
-        ? withModuleUpdate(updatedWithIntake, 'onboarding', 'practical-task', true)
-        : updatedWithIntake;
+      // Completion of module 0 is deferred: the user must tap "Onboarding
+      // afronden" on the CompleteStep screen. This mutation only persists the
+      // intake answers and safety outcome.
+      const updated = updatedWithIntake;
 
       const { error } = await supabase.from('user_progress').upsert({
         user_id: user.id,

@@ -1,0 +1,42 @@
+{
+  "step1": {
+    "title": "Welkom! Vertel ons iets over jezelf.",
+    "subtitle": "We gebruiken deze gegevens alleen om je programma persoonlijk te maken.",
+    "fields": {
+      "firstName": "Voornaam",
+      "firstNamePlaceholder": "Jouw voornaam",
+      "lastName": "Achternaam",
+      "lastNamePlaceholder": "Jouw achternaam",
+      "phone": "Telefoonnummer (optioneel)",
+      "phonePlaceholder": "0612345678",
+      "phoneError": "Vul een geldig mobiel nummer in (06 + 8 cijfers).",
+      "referralSource": "Hoe ken je deze app?"
+    },
+    "referralOptions": [
+      "Via de huisarts",
+      "Via een zorgverlener of instelling",
+      "Via iemand die ik ken",
+      "Via internet of social media",
+      "Anders"
+    ],
+    "saveButton": "Opslaan en verder"
+  },
+  "step2": {
+    "title": "Hoe voel je je vandaag?",
+    "description": "Begin met een korte stemming check-in. Dit duurt minder dan een minuut en helpt je bij te houden hoe het gaat.",
+    "startButton": "Stemming invullen",
+    "skipButton": "Overslaan, doe later"
+  },
+  "step3": {
+    "title": "Wat is belangrijk voor jou?",
+    "description": "Ontdek en beschrijf je persoonlijke waarden. Waarden geven richting aan je acties en helpen je leven te leven zoals jij dat wilt.",
+    "startButton": "Waarden verkennen",
+    "skipButton": "Overslaan, doe later"
+  },
+  "step4": {
+    "title": "Klaar voor de start?",
+    "description": "Module 1, Welkom & Intake, legt de basis voor het programma. Je leert wat ACT is en wat je kunt verwachten.",
+    "startButton": "Module starten",
+    "skipButton": "Overslaan, doe later"
+  }
+}

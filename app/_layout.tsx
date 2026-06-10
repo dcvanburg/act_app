@@ -1,9 +1,15 @@
 import '../global.css';
 
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+SplashScreen.preventAutoHideAsync().catch(() => {
+  // Splash already hidden or unavailable (e.g. web) — safe to ignore.
+});
 
 import { Noodknop } from '@/components/emergency/Noodknop';
 import { AuthProvider } from '@/providers/AuthProvider';
@@ -22,6 +28,12 @@ import { QueryProvider } from '@/providers/QueryProvider';
  *   - `actapp://` deep links are handled inside AuthProvider for magic-link auth.
  */
 export default function RootLayout() {
+  useEffect(() => {
+    SplashScreen.hideAsync().catch(() => {
+      // Non-fatal if splash was already dismissed.
+    });
+  }, []);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>

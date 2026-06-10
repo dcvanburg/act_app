@@ -1,4 +1,15 @@
 {
+  "onboardingIntro": {
+    "title": "Wat gaan we doen?",
+    "intro": "Je account is klaar. We lopen nu twee korte stappen door voordat je naar het startscherm gaat.",
+    "step1Label": "Stap 1 · Nu",
+    "step1Title": "Stemming check-in",
+    "step1Body": "Je geeft aan hoe je je vandaag voelt: een score, eventueel gevoelens en een korte notitie. Duurt minder dan een minuut. Je kunt deze stap ook overslaan.",
+    "step2Label": "Stap 2 · Daarna",
+    "step2Title": "Welkom & Intake",
+    "step2Body": "Een korte introductie van het programma en een paar vragen om te bekijken of het programma goed bij je past. Je kunt ook dit later doen.",
+    "closeButton": "Aan de slag"
+  },
   "checkIn": {
     "title": "Hoe voel je je vandaag?",
     "subtitle": "Een korte check-in. Geen goed of fout antwoord.",
@@ -19,6 +30,12 @@
     "averageLabel": "Gemiddeld",
     "entriesLabel": "check-ins"
   },
+  "streak": {
+    "title": "Check-in reeks",
+    "label": "dagen streak",
+    "currentLabel": "dagen op rij",
+    "totalLabel": "dagen ingecheckt"
+  },
   "homeCard": {
     "promptTitle": "Hoe voel je je vandaag?",
     "promptBody": "Een korte check-in helpt je patronen op te merken.",
@@ -28,20 +45,92 @@
     "doneAction": "Verloop bekijken"
   },
   "scores": [
-    { "value": 1, "emoji": "😞", "label": "Heel slecht" },
-    { "value": 2, "emoji": "🙁", "label": "Slecht" },
-    { "value": 3, "emoji": "😐", "label": "Neutraal" },
-    { "value": 4, "emoji": "🙂", "label": "Goed" },
-    { "value": 5, "emoji": "😄", "label": "Heel goed" }
+    {
+      "value": 1,
+      "emoji": "😞",
+      "label": "Heel slecht"
+    },
+    {
+      "value": 2,
+      "emoji": "🙁",
+      "label": "Slecht"
+    },
+    {
+      "value": 3,
+      "emoji": "😐",
+      "label": "Neutraal"
+    },
+    {
+      "value": 4,
+      "emoji": "🙂",
+      "label": "Goed"
+    },
+    {
+      "value": 5,
+      "emoji": "😄",
+      "label": "Heel goed"
+    }
   ],
   "tags": [
-    { "id": "angst", "label": "Angst" },
-    { "id": "verdriet", "label": "Verdriet" },
-    { "id": "boos", "label": "Boos" },
-    { "id": "stress", "label": "Stress" },
-    { "id": "rustig", "label": "Rustig" },
-    { "id": "hoopvol", "label": "Hoopvol" },
-    { "id": "pijn", "label": "Pijn" },
-    { "id": "vermoeid", "label": "Vermoeid" }
+    {
+      "id": "angst",
+      "label": "Angst"
+    },
+    {
+      "id": "verdriet",
+      "label": "Verdriet"
+    },
+    {
+      "id": "boos",
+      "label": "Boos"
+    },
+    {
+      "id": "stress",
+      "label": "Stress"
+    },
+    {
+      "id": "pijn",
+      "label": "Pijn"
+    },
+    {
+      "id": "vermoeid",
+      "label": "Vermoeid"
+    },
+    {
+      "id": "rustig",
+      "label": "Rustig"
+    },
+    {
+      "id": "ontspannen",
+      "label": "Ontspannen"
+    },
+    {
+      "id": "hoopvol",
+      "label": "Hoopvol"
+    },
+    {
+      "id": "blij",
+      "label": "Blij"
+    },
+    {
+      "id": "dankbaar",
+      "label": "Dankbaar"
+    },
+    {
+      "id": "tevreden",
+      "label": "Tevreden"
+    },
+    {
+      "id": "energiek",
+      "label": "Energiek"
+    },
+    {
+      "id": "trots",
+      "label": "Trots"
+    },
+    {
+      "id": "verbonden",
+      "label": "Verbonden"
+    }
   ]
 }

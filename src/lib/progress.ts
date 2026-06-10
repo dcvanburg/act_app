@@ -13,6 +13,71 @@ export const MODULE_ORDER: ModuleId[] = [
 
 export const FINAL_SCREEN_ID = 'practical-task';
 
+export type ProgramPhaseId = 'start' | 'fundament' | 'kern' | 'leven';
+
+export type PhaseStatus = 'locked' | 'current' | 'completed';
+
+export interface ProgramPhase {
+  id: ProgramPhaseId;
+  label: string;
+  moduleIds: ModuleId[];
+}
+
+/** Four program phases matching MODULE_META.phase groupings. */
+export const PROGRAM_PHASES: ProgramPhase[] = [
+  { id: 'start', label: 'Start', moduleIds: ['onboarding'] },
+  { id: 'fundament', label: 'Fundament', moduleIds: ['recognition', 'acceptance'] },
+  { id: 'kern', label: 'Kern', moduleIds: ['defusion', 'presence', 'self-as-context', 'values'] },
+  { id: 'leven', label: 'Leven', moduleIds: ['committed-action'] },
+];
+
+export interface PhaseProgress {
+  id: ProgramPhaseId;
+  label: string;
+  completedCount: number;
+  totalCount: number;
+  status: PhaseStatus;
+}
+
+/** Per-phase completion for the modules tab progression summary. */
+export function getPhaseProgress(progress: UserProgress): PhaseProgress[] {
+  let currentAssigned = false;
+
+  return PROGRAM_PHASES.map((phase, index) => {
+    const completedCount = phase.moduleIds.filter(
+      (id) => getModuleStatus(id, progress) === 'completed',
+    ).length;
+    const totalCount = phase.moduleIds.length;
+    const allComplete = completedCount === totalCount;
+
+    const previousPhasesComplete = PROGRAM_PHASES.slice(0, index).every((p) =>
+      p.moduleIds.every((id) => getModuleStatus(id, progress) === 'completed'),
+    );
+
+    let status: PhaseStatus;
+    if (allComplete) {
+      status = 'completed';
+    } else if (!currentAssigned && previousPhasesComplete) {
+      status = 'current';
+      currentAssigned = true;
+    } else {
+      status = 'locked';
+    }
+
+    return {
+      id: phase.id,
+      label: phase.label,
+      completedCount,
+      totalCount,
+      status,
+    };
+  });
+}
+
+export function countCompletedModules(progress: UserProgress): number {
+  return MODULE_ORDER.filter((id) => getModuleStatus(id, progress) === 'completed').length;
+}
+
 export function getModuleStatus(moduleId: ModuleId, progress: UserProgress): ModuleStatus {
   const stored = progress.modules.find((m) => m.moduleId === moduleId);
   if (stored) return stored.status;
@@ -51,6 +116,7 @@ export function withModuleUpdate(
   moduleId: ModuleId,
   lastStepId: string,
   completed: boolean,
+  notes?: string,
 ): UserProgress {
   const now = new Date().toISOString();
   const existingIndex = progress.modules.findIndex((m) => m.moduleId === moduleId);
@@ -68,6 +134,7 @@ export function withModuleUpdate(
           ? 'completed'
           : 'in_progress',
       ...(completed && existing.status !== 'completed' ? { completedAt: now } : {}),
+      ...(notes !== undefined ? { notes } : {}),
     };
   } else {
     modules.push({
@@ -76,6 +143,7 @@ export function withModuleUpdate(
       startedAt: now,
       lastStepId,
       ...(completed ? { completedAt: now } : {}),
+      ...(notes !== undefined ? { notes } : {}),
     });
   }
 

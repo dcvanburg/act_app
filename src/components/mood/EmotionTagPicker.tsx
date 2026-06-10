@@ -13,9 +13,9 @@ interface Props {
 
 /**
  * Multi-select chip row for emotion tags. Order in the JSON is intentional:
- * we lead with the difficult emotions (angst, verdriet, boos, stress) and then
- * the resourceful ones (rustig, hoopvol) so the most-relevant words for a low
- * mood are at the top of a wrapping list.
+ * we lead with difficult emotions (angst, verdriet, boos, stress, pijn,
+ * vermoeid) and then resourceful ones (rustig, blij, dankbaar, …) so the
+ * most-relevant words for a low mood are at the top of a wrapping list.
  */
 export function EmotionTagPicker({ value, onChange, disabled }: Props) {
   function toggle(id: EmotionTag) {

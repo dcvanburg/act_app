@@ -58,8 +58,14 @@ coverage/
 # TypeScript
 *.tsbuildinfo
 
+# Supabase CLI cache
+supabase/.temp/
+
 # Vercel (legacy — from pre-pivot Next.js deployment)
 .vercel
+
+# Next.js (legacy — pre-pivot build output)
+.next/
 
 # Audio source (large files — use storage/CDN)
 *.wav

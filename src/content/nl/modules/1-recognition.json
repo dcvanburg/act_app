@@ -10,28 +10,34 @@
     {
       "id": "how-it-works",
       "title": "Hoe klachten werken",
-      "body": "[PLACEHOLDER — hoe pijn/stress/drang werkt in het systeem]"
+      "body": "Pijn, angst en drang zijn signalen. Je lichaam en brein proberen je te beschermen, soms op manieren die op korte termijn helpen, maar op lange termijn je wereld kleiner maken.\n\nEen klacht wordt vaak een probleem niet doordat het er is, maar doordat we er zo hard tegen vechten. We passen ons leven aan om het ongemak te vermijden. Dat voelt logisch. Het is ook menselijk.\n\nIn deze module leer je je eigen patroon herkennen. Niet om jezelf te veroordelen, maar om te zien wat er gebeurt, zodat je later een andere keuze kunt maken."
     },
     {
       "id": "avoidance-cycle",
       "title": "De vermijdingscirkel",
-      "body": "[PLACEHOLDER — korte termijn opluchting, lange termijn versterking]"
+      "body": "De vermijdingscirkel werkt zo: er is ongemak: pijn, angst, drang, verdriet. Je doet iets om het weg te nemen. Even is er opluchting. Maar het ongemak komt terug, vaak sterker. En je wereld wordt een stukje kleiner.\n\nVermijden is geen zwakte. Het is een overlevingsstrategie. Je brein doet precies wat het geleerd heeft. Het probleem is niet dat je vermijdt: het probleem is dat vermijden je op lange termijn gevangen houdt.",
+      "examples": {
+        "pain": "Je blijft op de bank liggen omdat bewegen pijn geeft. Even rust, maar na een week voel je je stijver, somberder, en ga je nog minder bewegen.",
+        "mental": "Je zegt een afspraak af omdat de angst te groot voelt. Directe opluchting, maar je voelt je eenzamer en de angst voor de volgende afspraak groeit.",
+        "alcohol": "Na een zware dag pak je een glas. De spanning zakt. Maar de schaamte de volgende ochtend en de groeiende drang maken de cyclus sterker.",
+        "combination": "Je begint de dag met pijnstillers en 's avonds met alcohol om alles draaglijker te maken. Korte verlichting, maar je voelt je steeds meer uitgeput en afgesloten."
+      }
     },
     {
       "id": "brain",
       "title": "Het brein als overlevingsmachine",
-      "body": "[PLACEHOLDER — psycho-educatie]"
+      "body": "Je brein is geen vijand. Het is een overlevingsmachine die constant scant op gevaar (fysiek, emotioneel, sociaal. Bij chronische pijn, angst of verslaving staat dat alarmsysteem vaak op standje hoog.\n\nHet brein leert snel: 'dit voelt slecht, vermijd het.' Dat is nuttig als je echt in gevaar bent. Minder nuttig als het je leven inkrimpt.\n\nHet goede nieuws: je brein kan ook nieuwe patronen leren. Niet door te vechten tegen het alarmsysteem, maar door te begrijpen hoe het werkt. Dat begint met herkennen."
     }
   ],
   "bodyExercise": {
     "title": "Bodyscan",
     "description": "Waar leef jij in je lichaam? Welke gebieden zijn er, welke zijn er niet?",
     "audioUrl": null,
-    "transcript": "[PLACEHOLDER]"
+    "transcript": "Ga zitten of liggen op een plek waar je niet gestoord wordt. Laat je handen rusten waar ze willen.\n\n[pauze 3 sec]\n\nSluit je ogen. Begin bij je voeten. Voel je ze? Merk je warmte, kou, tinteling, of juist weinig?\n\n[pauze 5 sec]\n\nTrek je aandacht langzaam omhoog: enkels, kuiten, knieën, bovenbenen. Waar voel je spanning? Waar voel je niets, alsof dat deel er niet is?\n\n[pauze 5 sec]\n\nJe bekken, je onderrug, je buik. Sommige mensen leven vooral hier. Anderen vermijden dit gebied. Merk op wat bij jou klopt, zonder oordeel.\n\n[pauze 5 sec]\n\nJe borst, je schouders, je nek. Waar draag je de last van je dag? Laat je schouders een millimeter zakken.\n\n[pauze 5 sec]\n\nJe armen, je handen, je gezicht. Waar leef jij in je lichaam? En waar ben je afwezig?\n\n[pauze 5 sec]\n\nDit is geen oefening om iets te fixen. Het is een kaart maken van waar je nu bent. Die kaart is het begin van verandering.\n\n[pauze 3 sec]\n\nOpen je ogen als je klaar bent."
   },
   "practicalTask": {
     "title": "Praktische opdracht",
-    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+    "body": "De komende drie dagen: merk één moment per dag op waarop je iets vermijdt vanwege ongemak. Schrijf kort op:\n\n• Wat was het ongemak? (pijn, angst, drang, verdriet)\n• Wat deed je om het weg te nemen?\n• Gaf het korte-termijn opluchting?\n• Wat was het effect op langere termijn?\n\nJe hoeft niets te veranderen, alleen observeren. Herkenning is de eerste stap."
   },
   "backReferences": []
 }

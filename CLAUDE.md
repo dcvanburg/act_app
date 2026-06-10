@@ -34,9 +34,17 @@ Self-guided ACT therapeutic mobile app. Dutch UI, English codebase.
 - Run `/verify` before opening a PR
 - Minimize diff scope
 
+## Therapeutic content
+
+- Use agent `therapeut` or `/therapeut` for Dutch module copy, exercises, placeholders
+- Knowledge base: `docs/THERAPEUT_KB/`
+- Skill: `.claude/skills/therapeut-content/`
+- Reference (methodology only): [Resiliens ACT Coach](https://www.resiliens.com/nl/act-coach)
+
 ## Before implementing features
 
 1. Read relevant doc in `docs/`
 2. Check `docs/OPEN_QUESTIONS.md` for unresolved decisions
 3. Use `/plan` for multi-file work
 4. Use `/security` for intake, auth, journal, or crisis changes
+5. Use `/therapeut` for therapeutic content writing or review

@@ -11,7 +11,7 @@ import type { ModuleId, ModuleProgress } from '@/types/content';
 /**
  * /modules/[id] — module screen for modules 1–7.
  *
- * Onboarding (module 0) has its own route at /onboarding.
+ * Onboarding (module 0) lives at /modules/onboarding.
  *
  * Locked module → redirect home.
  * Completed module → ModuleReadOnlyView (single scrollable page).
@@ -22,7 +22,7 @@ export default function ModuleScreen() {
   const { data: progress, isLoading } = useUserProgress();
 
   if (!id || !MODULE_ORDER.includes(id as ModuleId) || id === 'onboarding') {
-    return <Redirect href="/home" />;
+    return <Redirect href="/modules/onboarding" />;
   }
   const moduleId = id as ModuleId;
 

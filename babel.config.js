@@ -6,8 +6,8 @@ module.exports = function (api) {
       'nativewind/babel',
     ],
     plugins: [
-      // react-native-reanimated/plugin must be listed last
-      'react-native-reanimated/plugin',
+      // react-native-worklets/plugin must be listed last (Reanimated 4)
+      'react-native-worklets/plugin',
     ],
   };
 };

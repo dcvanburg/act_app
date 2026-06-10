@@ -1,8 +1,9 @@
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -28,20 +29,30 @@ import type { EmotionTag, MoodScore } from '@/types/content';
  */
 export default function MoodCheckinScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const save = useSaveMoodLog();
+  const { from } = useLocalSearchParams<{ from?: string }>();
+  const inOnboarding = from === 'onboarding';
 
+  const [showIntro, setShowIntro] = useState(inOnboarding);
   const [score, setScore] = useState<MoodScore | null>(null);
   const [tags, setTags] = useState<EmotionTag[]>([]);
   const [note, setNote] = useState('');
+
+  useEffect(() => {
+    if (!inOnboarding) return;
+    navigation.setOptions({ tabBarStyle: { display: 'none' } });
+    return () => navigation.setOptions({ tabBarStyle: undefined });
+  }, [inOnboarding, navigation]);
+
+  const nextRoute = inOnboarding ? '/modules/onboarding?from=onboarding' : '/home';
 
   async function handleSave() {
     if (score === null) return;
     save.mutate(
       { mood_score: score, emotion_tags: tags, note: note.trim() || null },
-      {
-        onSuccess: () => router.replace('/home'),
-      },
+      { onSuccess: () => router.replace(nextRoute) },
     );
   }
 
@@ -50,6 +61,60 @@ export default function MoodCheckinScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1 bg-background"
     >
+      <Modal
+        visible={showIntro}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowIntro(false)}
+      >
+        <View
+          className="flex-1 items-center justify-center px-6"
+          style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+        >
+          <View className="w-full max-w-sm rounded-2xl bg-surface p-6 shadow-lg">
+            <Text className="mb-1 font-serif text-xl font-bold text-text">
+              {mood.onboardingIntro.title}
+            </Text>
+            <Text className="mb-5 text-sm leading-relaxed text-text-subtle">
+              {mood.onboardingIntro.intro}
+            </Text>
+
+            <View className="mb-3 rounded-xl bg-primary-soft p-4">
+              <Text className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
+                {mood.onboardingIntro.step1Label}
+              </Text>
+              <Text className="mb-1 font-semibold text-text">
+                {mood.onboardingIntro.step1Title}
+              </Text>
+              <Text className="text-sm leading-snug text-text-subtle">
+                {mood.onboardingIntro.step1Body}
+              </Text>
+            </View>
+
+            <View className="mb-6 rounded-xl border border-border bg-surface-muted p-4">
+              <Text className="mb-1 text-xs font-semibold uppercase tracking-wide text-text-muted">
+                {mood.onboardingIntro.step2Label}
+              </Text>
+              <Text className="mb-1 font-semibold text-text">
+                {mood.onboardingIntro.step2Title}
+              </Text>
+              <Text className="text-sm leading-snug text-text-subtle">
+                {mood.onboardingIntro.step2Body}
+              </Text>
+            </View>
+
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setShowIntro(false)}
+              className="rounded-lg bg-primary px-4 py-3 active:bg-primary-dark"
+            >
+              <Text className="text-center text-base font-semibold text-white">
+                {mood.onboardingIntro.closeButton}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
       <ScrollView
         contentContainerStyle={{
           paddingTop: insets.top + 12,
@@ -63,12 +128,22 @@ export default function MoodCheckinScreen() {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Terug"
-              onPress={() => (router.canGoBack() ? router.back() : router.replace('/home'))}
+              onPress={() => (inOnboarding ? router.replace('/onboarding') : router.back())}
               className="p-1"
             >
               <Text className="text-lg text-text-muted">‹</Text>
             </Pressable>
-            <Text className="font-serif text-xl font-bold text-text">{mood.checkIn.title}</Text>
+            <Text className="flex-1 font-serif text-xl font-bold text-text">
+              {mood.checkIn.title}
+            </Text>
+            {inOnboarding && (
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.replace('/modules/onboarding?from=onboarding')}
+              >
+                <Text className="text-sm text-text-muted">Overslaan</Text>
+              </Pressable>
+            )}
           </View>
           <Text className="mb-6 text-sm text-text-subtle">{mood.checkIn.subtitle}</Text>
 

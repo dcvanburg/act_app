@@ -5,33 +5,39 @@
   "phase": "Kern",
   "actProcess": "Contact met het huidige moment",
   "bodyWork": "Zintuigenoefening",
-  "goal": "Je verankert je in het nu — zonder zweverigheid.",
+  "goal": "Je verankert je in het nu, zonder zweverigheid.",
   "sections": [
     {
       "id": "mindfulness-skill",
       "title": "Mindfulness als vaardigheid",
-      "body": "[PLACEHOLDER — niet als levensfilosofie]"
+      "body": "Mindfulness is geen levensfilosofie en geen zweverige toestand. Het is een vaardigheid: bewust aanwezig zijn bij wat er nu is, zonder er direct iets mee te doen.\n\nJe hoeft niet alles te accepteren of alles te begrijpen. Je merkt alleen op: dit is er nu. Een gedachte, een gevoel, een lichamelijke sensatie in dit moment.\n\nDat klinkt simpel. Het is dat ook. Maar het is niet makkelijk, vooral als je gewend bent om weg te denken, weg te voelen, of weg te doen."
     },
     {
       "id": "present-moment",
       "title": "Het heden",
-      "body": "[PLACEHOLDER — enige plek waar verandering mogelijk is]"
+      "body": "Het verleden is voorbij. De toekomst bestaat nog niet. Het enige moment waarop je iets kunt doen, iets kunt voelen, iets kunt kiezen, is nu.\n\nVeel lijden komt niet door wat er nu is, maar door wat er was of wat er zou kunnen komen. Piekeren over morgen. Terugblikken op gisteren. Terwijl het leven hier plaatsvindt.\n\nAanwezig zijn is niet het verleden vergeten of de toekomst negeren. Het is je anker vinden in het nu, zodat je van daaruit kunt bewegen.",
+      "examples": {
+        "pain": "Je lichaam doet pijn, nu. Niet gisteren, niet morgen. Door je voeten op de vloer te voelen, kom je terug in het moment dat je werkelijk leeft.",
+        "mental": "Je hoofd is vol zorgen over straks. Eén ademhaling, volledig gevolgd, brengt je terug naar het enige moment dat telt: dit moment.",
+        "alcohol": "De drang is er, nu. Niet over een uur, niet morgenochtend. Door te voelen waar de drang in je lichaam zit, hoef je er niet meteen naar te handelen.",
+        "combination": "Alles vraagt tegelijk aandacht. Eén zintuig: wat je hoort, wat je voelt onder je voeten, kan je terugbrengen naar hier."
+      }
     },
     {
       "id": "daily-anchors",
       "title": "Ankers voor het dagelijks leven",
-      "body": "[PLACEHOLDER — praktische ankers]"
+      "body": "Je hebt geen meditatiekussen nodig om aanwezig te zijn. Kleine ankers in je dagelijkse leven werken net zo goed:\n\n• **Drie ademhalingen** voor je opstaat. Niet snel, gewoon voelen.\n• **Eén zintuig** tijdens een routine: de smaak van je koffie, het geluid van regen, de structuur van een deurklink.\n• **Pauze voor een deuropost**: elke keer als je een kamer binnenkomt, één seconde voelen waar je bent.\n\nKies één anker. Doe het deze week elke dag. Consistentie telt meer dan duur."
     }
   ],
   "bodyExercise": {
     "title": "Zintuigenoefening",
     "description": "Het lichaam als anker in het nu.",
     "audioUrl": null,
-    "transcript": "[PLACEHOLDER]"
+    "transcript": "Je kunt deze oefening overal doen (zittend, staand of lopend).\n\n[pauze 3 sec]\n\nBegin met vijf dingen die je ziet. Kijk rustig om je heen. Noem ze in je hoofd, of hardop als je alleen bent. Vijf dingen. Een muur. Een schaduw. Een kleur.\n\n[pauze 5 sec]\n\nVier dingen die je voelt. De temperatuur op je huid. De stof van je kleren. Je voeten op de grond. De spanning in je schouders.\n\n[pauze 5 sec]\n\nDrie dingen die je hoort. Verkeer in de verte. Je eigen adem. Stilte tussen de geluiden.\n\n[pauze 5 sec]\n\nTwee dingen die je ruikt. Misschien subtiel, dat is goed. Neem de geuren waar die er zijn.\n\n[pauze 5 sec]\n\nEén ding dat je proeft. Je tong in je mond. De nasmaak van je laatste drankje of maaltijd.\n\n[pauze 5 sec]\n\nJe bent hier. In je lichaam. In dit moment. Niet ergens anders.\n\n[pauze 3 sec]\n\nGa verder met je dag, vanuit hier."
   },
   "practicalTask": {
     "title": "Praktische opdracht",
-    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+    "body": "Doe vandaag de zintuigenoefening (5-4-3-2-1) op een moment dat je gestrest, afwezig of overweldigd bent.\n\nMerk op: veranderde er iets? Niet het probleem: je relatie tot het probleem. Je hoeft niets op te schrijven tenzij je dat wilt."
   },
   "backReferences": [
     {
