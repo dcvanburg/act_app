@@ -1,7 +1,13 @@
 {
   "onboardingIntro": {
-    "title": "Stemming bijhouden",
-    "body": "Elke dag kun je hier in een minuut bijhouden hoe je je voelt. Je kiest een score van 1 tot 5, voegt eventueel gevoelens toe en schrijft een korte notitie. Zo leer je patronen herkennen in je welzijn. Je kunt deze check-in altijd overslaan en later doen.",
+    "title": "Wat gaan we doen?",
+    "intro": "Je account is klaar. We lopen nu twee korte stappen door voordat je naar het startscherm gaat.",
+    "step1Label": "Stap 1 · Nu",
+    "step1Title": "Stemming check-in",
+    "step1Body": "Je geeft aan hoe je je vandaag voelt: een score, eventueel gevoelens en een korte notitie. Duurt minder dan een minuut. Je kunt deze stap ook overslaan.",
+    "step2Label": "Stap 2 · Daarna",
+    "step2Title": "Welkom & Intake",
+    "step2Body": "Een korte introductie van het programma en een paar vragen om te bekijken of het programma goed bij je past. Je kunt ook dit later doen.",
     "closeButton": "Aan de slag"
   },
   "checkIn": {

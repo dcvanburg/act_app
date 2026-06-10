@@ -72,12 +72,33 @@ export default function MoodCheckinScreen() {
           style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
         >
           <View className="w-full max-w-sm rounded-2xl bg-surface p-6 shadow-lg">
-            <Text className="mb-3 font-serif text-xl font-bold text-text">
+            <Text className="mb-1 font-serif text-xl font-bold text-text">
               {mood.onboardingIntro.title}
             </Text>
-            <Text className="mb-6 text-base leading-relaxed text-text-subtle">
-              {mood.onboardingIntro.body}
+            <Text className="mb-5 text-sm leading-relaxed text-text-subtle">
+              {mood.onboardingIntro.intro}
             </Text>
+
+            <View className="mb-3 rounded-xl bg-primary-soft p-4">
+              <Text className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
+                {mood.onboardingIntro.step1Label}
+              </Text>
+              <Text className="mb-1 font-semibold text-text">{mood.onboardingIntro.step1Title}</Text>
+              <Text className="text-sm leading-snug text-text-subtle">
+                {mood.onboardingIntro.step1Body}
+              </Text>
+            </View>
+
+            <View className="mb-6 rounded-xl border border-border bg-surface-muted p-4">
+              <Text className="mb-1 text-xs font-semibold uppercase tracking-wide text-text-muted">
+                {mood.onboardingIntro.step2Label}
+              </Text>
+              <Text className="mb-1 font-semibold text-text">{mood.onboardingIntro.step2Title}</Text>
+              <Text className="text-sm leading-snug text-text-subtle">
+                {mood.onboardingIntro.step2Body}
+              </Text>
+            </View>
+
             <Pressable
               accessibilityRole="button"
               onPress={() => setShowIntro(false)}
