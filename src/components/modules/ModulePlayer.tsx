@@ -1,7 +1,9 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { AppTextInput } from '@/components/AppTextInput';
 
 import common from '@/content/nl/common.json';
 import { FINAL_SCREEN_ID } from '@/lib/progress';
@@ -156,14 +158,12 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes, onCompl
           {isLast && (
             <View className="mt-6 rounded-2xl bg-surface p-5 shadow-sm">
               <Text className="mb-3 font-semibold text-text">{common.module.notesTitle}</Text>
-              <TextInput
+              <AppTextInput
                 value={notes}
                 onChangeText={setNotes}
                 placeholder={common.module.notesPlaceholder}
-                placeholderTextColor="#888780"
                 multiline
-                textAlignVertical="top"
-                className="min-h-[120px] rounded-lg border border-border bg-background px-3 py-3 text-base text-text"
+                style={{ minHeight: 120 }}
               />
             </View>
           )}

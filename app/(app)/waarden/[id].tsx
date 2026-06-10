@@ -1,8 +1,10 @@
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppTextInput } from '@/components/AppTextInput';
+import { BackButton } from '@/components/BackButton';
 import { AvoidIcon } from '@/components/icons/AvoidIcon';
 import { BarrierTabIcon } from '@/components/icons/BarrierTabIcon';
 import { BoltIcon } from '@/components/icons/BoltIcon';
@@ -118,10 +120,8 @@ export default function WaardeDetailScreen() {
       }}
     >
       <View className="mx-auto w-full max-w-md gap-4">
-        <View className="flex-row items-center gap-2">
-          <Pressable accessibilityRole="button" onPress={() => router.back()} className="p-1">
-            <Text className="text-lg text-text-muted">‹</Text>
-          </Pressable>
+        <View className="flex-row items-center gap-1">
+          <BackButton onPress={() => router.back()} />
           <View className="min-w-0 flex-1 flex-row items-center gap-2.5">
             <View className="h-3.5 w-3.5 rounded" style={{ backgroundColor: waarde.kleur }} />
             <Text className="flex-1 font-serif text-xl font-bold text-text" numberOfLines={1}>
@@ -313,14 +313,14 @@ function TermijnBlock({
         </View>
       ))}
       <View className="mt-1 flex-row gap-2">
-        <TextInput
+        <AppTextInput
           value={input}
           onChangeText={setInput}
           placeholder={placeholder}
           onSubmitEditing={submit}
           returnKeyType="done"
-          className="flex-1 rounded-xl border border-border bg-surface-muted px-3 py-2.5 text-sm text-text"
-          placeholderTextColor="#888780"
+          compact
+          className="flex-1 rounded-xl bg-surface-muted px-3"
         />
         <Pressable
           accessibilityRole="button"
@@ -429,25 +429,25 @@ function BarriersTab({
             <Text className="mb-1.5 text-xs font-medium text-text-subtle">
               {waarden.detail.customBarrierLabel}
             </Text>
-            <TextInput
+            <AppTextInput
               value={eigenLabel}
               onChangeText={setEigenLabel}
               placeholder={waarden.detail.customBarrierPlaceholder}
               returnKeyType="next"
-              className="rounded-xl border border-border bg-surface-muted px-3 py-2.5 text-sm text-text"
-              placeholderTextColor="#888780"
+              compact
+              className="rounded-xl bg-surface-muted px-3"
             />
           </View>
         ) : null}
         <View className="flex-row gap-2">
-          <TextInput
+          <AppTextInput
             value={input}
             onChangeText={setInput}
             placeholder={waarden.detail.barrierPlaceholder}
             onSubmitEditing={submit}
             returnKeyType="done"
-            className="flex-1 rounded-xl border border-border bg-surface-muted px-3 py-2.5 text-sm text-text"
-            placeholderTextColor="#888780"
+            compact
+            className="flex-1 rounded-xl bg-surface-muted px-3"
           />
           <Pressable
             accessibilityRole="button"

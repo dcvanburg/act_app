@@ -1,7 +1,9 @@
 import { useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { AppTextInput } from '@/components/AppTextInput';
 
 import waarden from '@/content/nl/waarden.json';
 import { defaultKleurForIndex } from '@/lib/waarden';
@@ -46,12 +48,11 @@ export default function NewWaardeScreen() {
         <Text className="mb-6 font-serif text-2xl font-bold text-text">{waarden.new.title}</Text>
 
         <FormGroup label={waarden.new.nameLabel}>
-          <TextInput
+          <AppTextInput
             value={naam}
             onChangeText={setNaam}
             placeholder={waarden.new.namePlaceholder}
-            className="rounded-xl border border-border bg-surface-muted px-3.5 py-3 text-base text-text"
-            placeholderTextColor="#888780"
+            className="rounded-xl bg-surface-muted px-3.5"
           />
           <View className="mt-2.5 flex-row flex-wrap gap-2">
             {waarden.suggestions.map((suggestion) => (
@@ -80,15 +81,14 @@ export default function NewWaardeScreen() {
         </FormGroup>
 
         <FormGroup label={`${waarden.new.descLabel} ${waarden.new.descOptional}`}>
-          <TextInput
+          <AppTextInput
             value={beschrijving}
             onChangeText={setBeschrijving}
             placeholder={waarden.new.descPlaceholder}
             multiline
             numberOfLines={3}
-            className="min-h-[88px] rounded-xl border border-border bg-surface-muted px-3.5 py-3 text-base text-text"
-            placeholderTextColor="#888780"
-            textAlignVertical="top"
+            className="rounded-xl bg-surface-muted px-3.5"
+            style={{ minHeight: 88 }}
           />
         </FormGroup>
 

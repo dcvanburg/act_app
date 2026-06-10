@@ -6,16 +6,15 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import common from '@/content/nl/common.json';
+import { BackButton } from '@/components/BackButton';
+import { AppTextInput } from '@/components/AppTextInput';
 import { useDeleteAccount, useProfile, useUpdateProfile } from '@/lib/profile-queries';
 import { useAuth } from '@/providers/AuthProvider';
-
-const inputClass = 'rounded-lg border border-border bg-background px-3 py-3 text-base text-text';
 
 /**
  * /account — profile + GDPR controls (α6).
@@ -99,15 +98,11 @@ export default function AccountScreen() {
       }}
     >
       <View className="mx-auto w-full max-w-md gap-4">
-        <View className="mb-2 flex-row items-center gap-3">
-          <Pressable
-            accessibilityRole="button"
+        <View className="mb-2 flex-row items-center gap-2">
+          <BackButton
             accessibilityLabel="Terug naar programma"
             onPress={() => router.back()}
-            className="p-1"
-          >
-            <Text className="text-lg text-text-muted">‹</Text>
-          </Pressable>
+          />
           <Text className="font-serif text-xl font-bold text-text">Mijn account</Text>
         </View>
 
@@ -268,41 +263,35 @@ function EditForm({
       <View className="flex-row gap-3">
         <View className="flex-1">
           <Text className="mb-1 text-xs font-medium text-text-muted">Voornaam</Text>
-          <TextInput
+          <AppTextInput
             value={firstName}
             onChangeText={onChangeFirstName}
             autoComplete="given-name"
             placeholder="Jan"
-            placeholderTextColor="#888780"
             editable={!isSaving}
-            className={inputClass}
           />
         </View>
         <View className="flex-1">
           <Text className="mb-1 text-xs font-medium text-text-muted">Achternaam</Text>
-          <TextInput
+          <AppTextInput
             value={lastName}
             onChangeText={onChangeLastName}
             autoComplete="family-name"
             placeholder="de Vries"
-            placeholderTextColor="#888780"
             editable={!isSaving}
-            className={inputClass}
           />
         </View>
       </View>
 
       <View>
         <Text className="mb-1 text-xs font-medium text-text-muted">Telefoonnummer</Text>
-        <TextInput
+        <AppTextInput
           value={phone}
           onChangeText={onChangePhone}
           autoComplete="tel"
           keyboardType="phone-pad"
           placeholder="06 12345678"
-          placeholderTextColor="#888780"
           editable={!isSaving}
-          className={inputClass}
         />
       </View>
 

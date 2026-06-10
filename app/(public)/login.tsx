@@ -9,12 +9,12 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import common from '@/content/nl/common.json';
+import { AppTextInput } from '@/components/AppTextInput';
 import { supabase, SUPABASE_CONFIGURED } from '@/lib/supabase/client';
 import { useAuth } from '@/providers/AuthProvider';
 
@@ -173,7 +173,7 @@ function EmailForm(props: {
   return (
     <View className="rounded-2xl bg-surface p-6 shadow-sm">
       <Text className="mb-1 text-sm font-medium text-text">E-mailadres</Text>
-      <TextInput
+      <AppTextInput
         value={props.email}
         onChangeText={props.onChangeEmail}
         autoComplete="email"
@@ -181,8 +181,7 @@ function EmailForm(props: {
         keyboardType="email-address"
         editable={!props.loading}
         placeholder="jouw@email.nl"
-        placeholderTextColor="#888780"
-        className="mb-4 rounded-lg border border-border bg-background px-3 py-3 text-base text-text"
+        className="mb-4"
       />
 
       {props.error ? <Text className="mb-3 text-sm text-crisis">{props.error}</Text> : null}
