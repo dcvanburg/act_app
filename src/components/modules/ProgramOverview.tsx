@@ -103,11 +103,13 @@ export function ProgramOverview({ progress, groupByPhase = false }: Props) {
                   <Text className="text-xs font-semibold uppercase tracking-wide text-primary-dark">
                     {phase.label}
                   </Text>
-                  <Text className="text-xs text-primary">
-                    · {pp.completedCount}/{pp.totalCount} afgerond
-                  </Text>
                 </View>
-                <Text className="text-xs text-primary">{isExpanded ? '∧' : '∨'}</Text>
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-xs text-primary">
+                    {pp.completedCount}/{pp.totalCount} afgerond
+                  </Text>
+                  <Text className="text-xs text-primary">{isExpanded ? '∧' : '∨'}</Text>
+                </View>
               </Pressable>
             ) : (
               <Pressable
