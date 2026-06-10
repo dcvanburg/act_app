@@ -15,7 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import common from '@/content/nl/common.json';
-import { supabase } from '@/lib/supabase/client';
+import { supabase, SUPABASE_CONFIGURED } from '@/lib/supabase/client';
 import { useAuth } from '@/providers/AuthProvider';
 
 // Compass / hexaflex mark — source SVG lives at assets/src/icon.svg.
@@ -62,6 +62,12 @@ export default function LoginScreen() {
 
   async function handleSubmitEmail() {
     if (!email.trim()) return;
+
+    if (!SUPABASE_CONFIGURED) {
+      setError('App is niet geconfigureerd. Neem contact op met de beheerder.');
+      return;
+    }
+
     setError(null);
     setLoading(true);
 
@@ -73,6 +79,8 @@ export default function LoginScreen() {
     setLoading(false);
 
     if (signInError) {
+      // eslint-disable-next-line no-console
+      console.error('[Login] signInWithOtp failed:', signInError.message, signInError.status);
       setError('Er is iets misgegaan. Controleer het e-mailadres en probeer opnieuw.');
       return;
     }
