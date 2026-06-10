@@ -143,12 +143,10 @@ export function useSaveIntake() {
         safetyCheckPassed: safetyPassed,
       };
 
-      // Mark module 0 (onboarding) complete iff the safety check allows the
-      // program to start. Blocking outcomes leave the module open so /home
-      // still routes here when the user retries.
-      const updated = safetyPassed
-        ? withModuleUpdate(updatedWithIntake, 'onboarding', 'practical-task', true)
-        : updatedWithIntake;
+      // Completion of module 0 is deferred: the user must tap "Onboarding
+      // afronden" on the CompleteStep screen. This mutation only persists the
+      // intake answers and safety outcome.
+      const updated = updatedWithIntake;
 
       const { error } = await supabase.from('user_progress').upsert({
         user_id: user.id,

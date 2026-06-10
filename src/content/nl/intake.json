@@ -153,6 +153,9 @@
   },
   "complete": {
     "title": "Klaar voor de start",
-    "body": "Dank je wel voor je antwoorden. Je kunt nu beginnen met het programma."
+    "body": "Dank je wel voor je antwoorden. Je kunt nu beginnen met het programma.",
+    "notesTitle": "Jouw notities",
+    "notesPlaceholder": "Schrijf hier gedachten, vragen of aandachtspunten...",
+    "completeButton": "Onboarding afronden"
   }
 }
