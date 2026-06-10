@@ -44,7 +44,7 @@ export default function MoodCheckinScreen() {
     return () => navigation.setOptions({ tabBarStyle: undefined });
   }, [inOnboarding, navigation]);
 
-  const nextRoute = inOnboarding ? '/waarden?from=onboarding' : '/home';
+  const nextRoute = inOnboarding ? '/modules/onboarding?from=onboarding' : '/home';
 
   async function handleSave() {
     if (score === null) return;
