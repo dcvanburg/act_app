@@ -5,19 +5,19 @@
   "steps": [
     {
       "id": "pause",
-      "instruction": "[PLACEHOLDER — neem een moment]"
+      "instruction": "Stop even met wat je deed. Je hoeft niets op te lossen. Neem alleen dit moment."
     },
     {
       "id": "breath",
-      "instruction": "[PLACEHOLDER — ademhaling]"
+      "instruction": "Adem vier tellen in door je neus. Houd twee tellen vast. Adem zes tellen uit door je mond. Herhaal drie keer."
     },
     {
       "id": "ground",
-      "instruction": "[PLACEHOLDER — voel contact met de grond]"
+      "instruction": "Voel je voeten op de grond. Druk ze zacht aan. Noem vijf dingen die je ziet. Je bent hier, in dit moment."
     }
   ],
   "audioUrl": null,
-  "transcript": "[PLACEHOLDER — noodknop oefening]",
+  "transcript": "Je hoeft niets te presteren. Je bent er gewoon.\n\n[pauze 3 sec]\n\nStop even met wat je deed. Laat je schouders zakken. Er is geen haast.\n\n[pauze 3 sec]\n\nAdem in: één, twee, drie, vier. Houd vast: één, twee. Adem uit: één, twee, drie, vier, vijf, zes.\n\n[pauze 3 sec]\n\nNog een keer. In door je neus. Langzaam uit door je mond. Alsof je de spanning mee uitblaast.\n\n[pauze 3 sec]\n\nNog een keer. Je adem is je anker.\n\n[pauze 3 sec]\n\nVoel je voeten op de grond. Druk ze zacht aan. Je wordt gedragen.\n\n[pauze 3 sec]\n\nKijk om je heen. Noem vijf dingen die je ziet. Een muur. Een kleur. Een voorwerp. Neem je tijd.\n\n[pauze 5 sec]\n\nJe bent hier. In dit moment. Niet in het verleden, niet in de toekomst.\n\n[pauze 3 sec]\n\nAls je meer hulp nodig hebt, kun je de hulpmiddelen op het crisischerm bekijken. Je hoeft dit niet alleen te doen.",
   "crisisLink": {
     "label": "Meer hulp nodig?",
     "path": "/noodhulp"

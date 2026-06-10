@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { supabase } from '@/lib/supabase/client';
-import { daysAgo, isoDate } from '@/lib/mood';
+import { computeCheckInStreakFromDates, daysAgo, isoDate, type CheckInStreak } from '@/lib/mood';
 import { useAuth } from '@/providers/AuthProvider';
 import type { EmotionTag, MoodLog, MoodScore } from '@/types/content';
 
@@ -15,6 +15,8 @@ const MOOD_LOGS_KEY = (userId: string | undefined, range: MoodRange) => [
   range,
 ];
 const TODAY_KEY = (userId: string | undefined) => ['mood_logs', userId, 'today'];
+const STREAK_KEY = (userId: string | undefined) => ['mood_logs', userId, 'streak'];
+const STREAK_LOOKBACK_DAYS = 365;
 
 /**
  * useMoodLogs — load all mood entries in the requested window for the signed-in
@@ -72,6 +74,30 @@ export interface SaveMoodLogArgs {
   mood_score: MoodScore;
   emotion_tags: EmotionTag[];
   note: string | null;
+}
+
+/**
+ * useCheckInStreak — consecutive check-in days + total unique days (365d window).
+ */
+export function useCheckInStreak() {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: STREAK_KEY(user?.id),
+    enabled: !!user,
+    queryFn: async (): Promise<CheckInStreak> => {
+      if (!user) return { current: 0, totalDays: 0 };
+      const from = daysAgo(STREAK_LOOKBACK_DAYS - 1);
+      const { data, error } = await supabase
+        .from('mood_logs')
+        .select('date')
+        .eq('user_id', user.id)
+        .gte('date', from);
+      if (error) throw error;
+      const dates = (data ?? []).map((row) => row.date as string);
+      return computeCheckInStreakFromDates(dates);
+    },
+  });
 }
 
 /**

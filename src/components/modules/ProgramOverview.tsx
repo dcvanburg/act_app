@@ -2,60 +2,95 @@ import { Link, type Href } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 
 import { MODULE_META } from '@/lib/content';
-import { getModuleStatus, MODULE_ORDER } from '@/lib/progress';
+import { getModuleStatus, MODULE_ORDER, PROGRAM_PHASES } from '@/lib/progress';
 import common from '@/content/nl/common.json';
-import type { ModuleStatus, UserProgress } from '@/types/content';
+import type { ModuleId, ModuleStatus, UserProgress } from '@/types/content';
 
 interface Props {
   progress: UserProgress;
+  /** Group modules under Start / Fundament / Kern / Leven headers. */
+  groupByPhase?: boolean;
 }
 
 /**
  * ProgramOverview — list of all 8 modules + the locked/in-progress/completed state.
  *
- * Tap on an unlocked module → routes to /onboarding (module 0) or /modules/<id>.
+ * Tap on an unlocked module → routes to /modules/onboarding (module 0) or /modules/<id>.
  * Locked modules render as disabled cards with a lock icon.
  */
-export function ProgramOverview({ progress }: Props) {
+export function ProgramOverview({ progress, groupByPhase = false }: Props) {
+  if (!groupByPhase) {
+    return (
+      <View accessibilityLabel="Programma overzicht" className="gap-2">
+        {MODULE_ORDER.map((moduleId, index) => (
+          <ModuleRow key={moduleId} moduleId={moduleId} index={index} progress={progress} />
+        ))}
+      </View>
+    );
+  }
+
   return (
-    <View accessibilityLabel="Programma overzicht" className="gap-2">
-      {MODULE_ORDER.map((moduleId, index) => {
-        const status = getModuleStatus(moduleId, progress);
-        const meta = MODULE_META[moduleId];
-        const locked = status === 'locked';
-        const href: Href =
-          moduleId === 'onboarding'
-            ? '/onboarding'
-            : { pathname: '/modules/[id]', params: { id: moduleId } };
-
-        if (locked) {
-          return (
-            <View
-              key={moduleId}
-              accessibilityLabel={common.progress.moduleLocked}
-              className="flex-row items-center gap-3 rounded-2xl bg-surface-muted p-4 opacity-60"
-            >
-              <ModuleIndicator index={index} status={status} />
-              <ModuleInfo meta={meta} status={status} />
-              <Text className="text-lg text-locked">{'\u{1F512}'}</Text>
-            </View>
-          );
-        }
-
-        return (
-          <Link key={moduleId} href={href} asChild>
-            <Pressable
-              accessibilityRole="link"
-              className="flex-row items-center gap-3 rounded-2xl bg-surface p-4 shadow-sm active:bg-primary-soft"
-            >
-              <ModuleIndicator index={index} status={status} />
-              <ModuleInfo meta={meta} status={status} />
-              <Text className="text-text-muted">{'›'}</Text>
-            </Pressable>
-          </Link>
-        );
-      })}
+    <View accessibilityLabel="Programma overzicht" className="gap-6">
+      {PROGRAM_PHASES.map((phase) => (
+        <View key={phase.id}>
+          <Text className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
+            {phase.label}
+          </Text>
+          <View className="gap-2">
+            {phase.moduleIds.map((moduleId) => {
+              const index = MODULE_ORDER.indexOf(moduleId);
+              return (
+                <ModuleRow key={moduleId} moduleId={moduleId} index={index} progress={progress} />
+              );
+            })}
+          </View>
+        </View>
+      ))}
     </View>
+  );
+}
+
+function ModuleRow({
+  moduleId,
+  index,
+  progress,
+}: {
+  moduleId: ModuleId;
+  index: number;
+  progress: UserProgress;
+}) {
+  const status = getModuleStatus(moduleId, progress);
+  const meta = MODULE_META[moduleId];
+  const locked = status === 'locked';
+  const href: Href =
+    moduleId === 'onboarding'
+      ? '/modules/onboarding'
+      : { pathname: '/modules/[id]', params: { id: moduleId } };
+
+  if (locked) {
+    return (
+      <View
+        accessibilityLabel={common.progress.moduleLocked}
+        className="flex-row items-center gap-3 rounded-2xl bg-surface-muted p-4 opacity-60"
+      >
+        <ModuleIndicator index={index} status={status} />
+        <ModuleInfo meta={meta} status={status} />
+        <Text className="text-lg text-locked">{'\u{1F512}'}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <Link href={href} asChild>
+      <Pressable
+        accessibilityRole="link"
+        className="flex-row items-center gap-3 rounded-2xl bg-surface p-4 shadow-sm active:bg-primary-soft"
+      >
+        <ModuleIndicator index={index} status={status} />
+        <ModuleInfo meta={meta} status={status} />
+        <Text className="text-text-muted">{'›'}</Text>
+      </Pressable>
+    </Link>
   );
 }
 
@@ -99,14 +134,14 @@ function ModuleInfo({
 }) {
   return (
     <View className="flex-1">
-      <Text className="text-xs font-medium uppercase tracking-wide text-text-muted">
-        {meta.phase}
-      </Text>
       <Text className="font-semibold text-text" numberOfLines={1}>
         {meta.title}
       </Text>
       {status === 'in_progress' && (
         <Text className="mt-0.5 text-xs text-primary">{common.progress.moduleInProgress}</Text>
+      )}
+      {status === 'completed' && (
+        <Text className="mt-0.5 text-xs text-text-muted">{common.progress.moduleCompleted}</Text>
       )}
     </View>
   );

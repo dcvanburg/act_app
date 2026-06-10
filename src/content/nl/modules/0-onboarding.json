@@ -10,19 +10,19 @@
     {
       "id": "intro",
       "title": "Welkom",
-      "body": "[PLACEHOLDER — warme introductie op de filosofie van de app]"
+      "body": "Welkom bij Van Overleven naar Leven. Als je hier bent, heb je waarschijnlijk al veel geprobeerd om van je klachten af te komen, en merk je dat dat niet altijd lukt. Dat is geen falen.\n\nDit programma gaat niet over het wegmaken van pijn, angst of drang. Het gaat over leren leven met wat er is, terwijl je beweegt in de richting van wat voor jou telt. Je hoeft niet te wachten tot alles beter is om weer te gaan leven.\n\nJe doorloopt het programma in je eigen tempo. Er is geen haast en geen toets aan het einde."
     },
     {
       "id": "how-it-works",
       "title": "Hoe het programma werkt",
-      "body": "[PLACEHOLDER — uitleg programma en ACT]"
+      "body": "Het programma bestaat uit acht modules. Je begint hier met een korte intake, daarna doorloop je de modules één voor één. Elke module bouwt voort op de vorige, maar je kunt altijd terug naar wat je al hebt afgerond.\n\nDe methode heet Acceptance and Commitment Therapy (ACT). Dat betekent: accepteren wat je niet kunt veranderen, afstand nemen van onhelpende gedachten, en handelen vanuit wat voor jou belangrijk is. In elke module zit ook lichaamswerk: je lichaam is geen bijzaak, het is de poort naar verandering.\n\nDe noodknop is altijd bereikbaar. Als je even vastloopt, kun je daar een korte grondingoefening doen of hulpbronnen vinden."
     },
     {
       "id": "philosophy",
       "title": "Onze filosofie",
       "points": [
-        "Klachten zijn niet de vijand — vermijding wel.",
-        "Het lichaam is geen bijzaak — het is de poort.",
+        "Klachten zijn niet de vijand: vermijding wel.",
+        "Het lichaam is geen bijzaak. Het is de poort.",
         "Waarden zijn het kompas, niet symptoomvrij zijn.",
         "Terugval is informatie, geen mislukking."
       ]
@@ -32,11 +32,11 @@
     "title": "Eerste kennismaking",
     "description": "Korte bodyscan om te voelen waar je nu bent.",
     "audioUrl": null,
-    "transcript": "[PLACEHOLDER — transcript lichaamsgerichte oefening]"
+    "transcript": "Neem een moment om te landen. Je hoeft niets te presteren. Je bent er gewoon.\n\n[pauze 3 sec]\n\nGa comfortabel zitten of liggen. Laat je schouders zakken. Sluit je ogen als dat prettig voelt, of kijk zacht voor je uit.\n\n[pauze 3 sec]\n\nBegin bij je voeten. Wat merk je daar? Warmte, kou, druk, contact met de vloer? Je hoeft niets te veranderen, alleen opmerken.\n\n[pauze 5 sec]\n\nBeweeg je aandacht langzaam omhoog: je benen, je buik, je borst. Waar voel je spanning? Waar voel je juist rust? Alles mag er zijn.\n\n[pauze 5 sec]\n\nMerk op waar je adem nu zit. In je buik, in je borst, hoog of laag. Volg één ademhaling helemaal tot het einde.\n\n[pauze 5 sec]\n\nWaar ben je nu, in dit moment? Niet waar je zou moeten zijn, maar waar je werkelijk bent. Je lichaam weet het antwoord.\n\n[pauze 3 sec]\n\nAls je klaar bent, open je ogen langzaam. Welkom."
   },
   "practicalTask": {
     "title": "Praktische opdracht",
-    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+    "body": "Neem vijf minuten om op te schrijven in je hoofd, op papier, of in het dagboek als dat beschikbaar is:\n\n1. Wat bracht je hier? Wat hoop je te vinden in dit programma?\n2. Wat heb je al geprobeerd om van je klachten af te komen?\n3. Wat zou er veranderen als je stopte met vechten tegen wat er is?\n\nEr is geen goed antwoord. Dit is een begin, geen toets."
   },
   "backReferences": []
 }

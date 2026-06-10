@@ -6,6 +6,7 @@
   },
   "nav": {
     "home": "Home",
+    "modules": "Modules",
     "program": "Programma",
     "exercises": "Oefeningen",
     "journal": "Dagboek",
@@ -26,6 +27,11 @@
     "title": "Grondingsoefening",
     "crisisLine": "Crisislijn: 0800-0113",
     "crisisLineDescription": "24 uur per dag, 7 dagen per week bereikbaar"
+  },
+  "program": {
+    "title": "Je programma",
+    "homeTeaser": "Bekijk je modules en voortgang",
+    "openModules": "Open modules overzicht"
   },
   "progress": {
     "moduleLocked": "Deze module wordt beschikbaar na het afronden van de vorige stap.",

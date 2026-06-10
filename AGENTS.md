@@ -26,11 +26,12 @@ Self-guided ACT therapeutic mobile app. **UI: Dutch. Code: English.**
 | `docs/ADR/002-i18n.md` | Dutch content in `src/content/nl/` |
 | `docs/ADR/003-auth.md` | **Accepted:** account required, Supabase magic-link via deep link |
 | `docs/CONTENT_PLACEHOLDERS.md` | Therapist content still needed |
+| `docs/THERAPEUT_KB/` | Therapist agent knowledge base (concept + ACT reference) |
 | `docs/OPEN_QUESTIONS.md` | Unresolved decisions |
 
 ## Stack (post-pivot)
 
-- Expo SDK 51+, React Native, TypeScript (strict)
+- Expo SDK 54+, React Native, TypeScript (strict), Node ≥ 20.19.4
 - **Routing:** Expo Router (file-based, mirrors Next.js App Router mental model)
 - **Styling:** NativeWind (Tailwind for RN) — same design tokens as the web app
 - **State:** TanStack Query (server) + React context (auth/session) + component state (UI)
@@ -105,6 +106,7 @@ act_app/
 
 | Situation | Agent |
 |-----------|-------|
+| Module copy, exercises, placeholders, therapeutic review | `therapeut` |
 | 3+ files or architecture change | `planner` |
 | Code complete, before PR | `code-reviewer` |
 | Auth, intake, journal, crisis | `security-reviewer` |

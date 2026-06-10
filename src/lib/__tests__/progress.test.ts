@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
+  countCompletedModules,
   getModuleStatus,
+  getPhaseProgress,
   isAccessible,
   getResumeScreenId,
   withModuleUpdate,
@@ -82,6 +84,31 @@ describe('withModuleUpdate', () => {
       progress = withModuleUpdate(progress, id, 'practical-task', true);
     }
     expect(progress.dailyPracticeUnlocked).toBe(true);
+  });
+});
+
+describe('getPhaseProgress', () => {
+  it('marks Start as current for a new user', () => {
+    const phases = getPhaseProgress(base);
+    expect(phases[0]?.status).toBe('current');
+    expect(phases[0]?.label).toBe('Start');
+    expect(phases[1]?.status).toBe('locked');
+  });
+
+  it('marks Fundament as current after onboarding is done', () => {
+    const progress: UserProgress = {
+      ...base,
+      modules: [{ moduleId: 'onboarding', status: 'completed', startedAt: '', completedAt: '' }],
+    };
+    const phases = getPhaseProgress(progress);
+    expect(phases[0]?.status).toBe('completed');
+    expect(phases[1]?.status).toBe('current');
+  });
+});
+
+describe('countCompletedModules', () => {
+  it('returns 0 for default progress', () => {
+    expect(countCompletedModules(base)).toBe(0);
   });
 });
 

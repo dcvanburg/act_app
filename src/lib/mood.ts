@@ -64,3 +64,72 @@ export function seriesAverage(series: MoodPoint[]): number | null {
 export function hasTodayEntry(logs: MoodLog[], today: string = isoDate()): boolean {
   return logs.some((l) => l.date === today);
 }
+
+export interface CheckInStreak {
+  /** Consecutive check-in days ending today, or yesterday if today is still open. */
+  current: number;
+  /** Unique days with at least one check-in in the loaded window. */
+  totalDays: number;
+}
+
+/** Previous calendar day for an ISO date string. */
+export function dayBefore(date: string): string {
+  const d = new Date(`${date}T12:00:00`);
+  d.setDate(d.getDate() - 1);
+  return isoDate(d);
+}
+
+/** Calendar day n days after an ISO date string. */
+export function daysAfter(date: string, n: number): string {
+  const d = new Date(`${date}T12:00:00`);
+  d.setDate(d.getDate() + n);
+  return isoDate(d);
+}
+
+/** Unique ISO dates that have at least one mood log. */
+export function uniqueCheckInDays(logs: MoodLog[]): Set<string> {
+  return new Set(logs.map((log) => log.date));
+}
+
+/**
+ * Current check-in streak + total unique days.
+ *
+ * Streak counts backward from today when checked in, otherwise from yesterday
+ * so an open day does not break an active streak yet.
+ */
+export function computeCheckInStreak(
+  logs: MoodLog[],
+  today: string = isoDate(),
+): CheckInStreak {
+  return computeCheckInStreakFromDates([...uniqueCheckInDays(logs)], today);
+}
+
+export function computeCheckInStreakFromDates(
+  dates: string[],
+  today: string = isoDate(),
+): CheckInStreak {
+  const days = new Set(dates);
+  const totalDays = days.size;
+
+  if (totalDays === 0) {
+    return { current: 0, totalDays: 0 };
+  }
+
+  let anchor = today;
+  if (!days.has(today)) {
+    const yesterday = dayBefore(today);
+    if (!days.has(yesterday)) {
+      return { current: 0, totalDays };
+    }
+    anchor = yesterday;
+  }
+
+  let current = 0;
+  let cursor = anchor;
+  while (days.has(cursor)) {
+    current += 1;
+    cursor = dayBefore(cursor);
+  }
+
+  return { current, totalDays };
+}

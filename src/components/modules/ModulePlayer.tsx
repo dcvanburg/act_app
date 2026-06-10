@@ -93,7 +93,7 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Sluiten"
-            onPress={() => router.replace('/home')}
+            onPress={() => router.back()}
             className="p-1.5"
           >
             <Text className="text-lg text-text-muted">{'✕'}</Text>

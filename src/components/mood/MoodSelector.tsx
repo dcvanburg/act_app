@@ -3,7 +3,9 @@ import { Pressable, Text, View } from 'react-native';
 import mood from '@/content/nl/mood.json';
 import type { MoodScore } from '@/types/content';
 
-const scores = mood.scores as { value: MoodScore; emoji: string; label: string }[];
+import { MoodFace } from './MoodFace';
+
+const scores = mood.scores as { value: MoodScore; label: string }[];
 
 interface Props {
   value: MoodScore | null;
@@ -12,7 +14,7 @@ interface Props {
 }
 
 /**
- * 5-emoji mood selector. Highest emotional resolution that fits a single row
+ * 5-face mood selector. Highest emotional resolution that fits a single row
  * on a phone screen — bigger scales (PHQ / 7-point Likert) feel clinical and
  * push the user out of the affective moment.
  */
@@ -36,7 +38,12 @@ export function MoodSelector({ value, onChange, disabled }: Props) {
                   : 'border-border bg-surface active:bg-primary-soft')
               }
             >
-              <Text className="text-3xl">{s.emoji}</Text>
+              <MoodFace
+                score={s.value}
+                size={36}
+                color={selected ? '#2D5210' : '#3B6D11'}
+                background={selected ? '#D4E8C0' : 'transparent'}
+              />
             </Pressable>
           );
         })}

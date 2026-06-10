@@ -30,16 +30,28 @@
   "safetyCheck": {
     "title": "Voor we beginnen",
     "description": "Een paar vragen om te zien of dit programma op dit moment geschikt voor je is. We vragen het uit zorg, niet als test.",
-    "draftNotice": "[DRAFT vragen — moeten door een geregistreerde clinicus worden goedgekeurd voordat een pilotgebruiker deze ziet. Zie docs/SAFETY_SCREENING_EXAMPLES.md.]",
+    "draftNotice": "[DRAFT vragen: moeten door een geregistreerde clinicus worden goedgekeurd voordat een pilotgebruiker deze ziet. Zie docs/SAFETY_SCREENING_EXAMPLES.md.]",
     "questions": [
       {
         "id": "suicidal-thoughts",
-        "title": "De afgelopen twee weken — heb je gedachten gehad om jezelf iets aan te doen, of jezelf pijn te doen?",
+        "title": "De afgelopen twee weken, heb je gedachten gehad om jezelf iets aan te doen, of jezelf pijn te doen?",
         "type": "single-choice",
         "options": [
-          { "value": "never", "label": "Nee, helemaal niet", "blocking": "pass" },
-          { "value": "sometimes", "label": "Soms", "blocking": "flag" },
-          { "value": "often", "label": "Regelmatig of vaak", "blocking": "block-strong" }
+          {
+            "value": "never",
+            "label": "Nee, helemaal niet",
+            "blocking": "pass"
+          },
+          {
+            "value": "sometimes",
+            "label": "Soms",
+            "blocking": "flag"
+          },
+          {
+            "value": "often",
+            "label": "Regelmatig of vaak",
+            "blocking": "block-strong"
+          }
         ],
         "helpText": "Je antwoord helpt ons inschatten of dit programma op dit moment passend is."
       },
@@ -48,8 +60,16 @@
         "title": "Heb je op dit moment een concreet plan om jezelf iets aan te doen?",
         "type": "single-choice",
         "options": [
-          { "value": "no", "label": "Nee", "blocking": "pass" },
-          { "value": "yes", "label": "Ja", "blocking": "block-strong" }
+          {
+            "value": "no",
+            "label": "Nee",
+            "blocking": "pass"
+          },
+          {
+            "value": "yes",
+            "label": "Ja",
+            "blocking": "block-strong"
+          }
         ],
         "helpText": "Als je 'ja' antwoordt leiden we je direct naar hulp."
       },
@@ -58,8 +78,16 @@
         "title": "Heb je jezelf de afgelopen zeven dagen opzettelijk pijn gedaan?",
         "type": "single-choice",
         "options": [
-          { "value": "no", "label": "Nee", "blocking": "pass" },
-          { "value": "yes", "label": "Ja", "blocking": "block-strong" }
+          {
+            "value": "no",
+            "label": "Nee",
+            "blocking": "pass"
+          },
+          {
+            "value": "yes",
+            "label": "Ja",
+            "blocking": "block-strong"
+          }
         ],
         "helpText": "Bij 'ja' raden we eerst contact met je huisarts of de crisislijn aan."
       },
@@ -68,20 +96,44 @@
         "title": "Drink je of gebruik je op dit moment zoveel dat stoppen zonder medische begeleiding gevaarlijk zou kunnen zijn?",
         "type": "single-choice",
         "options": [
-          { "value": "no", "label": "Nee", "blocking": "pass" },
-          { "value": "not-sure", "label": "Ik weet het niet", "blocking": "flag" },
-          { "value": "yes", "label": "Ja", "blocking": "block-medical" }
+          {
+            "value": "no",
+            "label": "Nee",
+            "blocking": "pass"
+          },
+          {
+            "value": "not-sure",
+            "label": "Ik weet het niet",
+            "blocking": "flag"
+          },
+          {
+            "value": "yes",
+            "label": "Ja",
+            "blocking": "block-medical"
+          }
         ],
-        "helpText": "Een huisarts of de verslavingszorg kan je veilig helpen afbouwen — dat valt buiten wat deze app kan bieden."
+        "helpText": "Een huisarts of de verslavingszorg kan je veilig helpen afbouwen. Dat valt buiten wat deze app kan bieden."
       },
       {
         "id": "support-network",
         "title": "Heb je iemand in je omgeving (familie, vriend, professional) waar je in moeilijke momenten contact mee kunt opnemen?",
         "type": "single-choice",
         "options": [
-          { "value": "yes", "label": "Ja", "blocking": "pass" },
-          { "value": "sometimes", "label": "Soms", "blocking": "pass" },
-          { "value": "no", "label": "Nee", "blocking": "pass" }
+          {
+            "value": "yes",
+            "label": "Ja",
+            "blocking": "pass"
+          },
+          {
+            "value": "sometimes",
+            "label": "Soms",
+            "blocking": "pass"
+          },
+          {
+            "value": "no",
+            "label": "Nee",
+            "blocking": "pass"
+          }
         ],
         "helpText": "We slaan dit op zodat we je een aangepaste lijst met hulpbronnen kunnen tonen. Het beïnvloedt niet of je het programma kunt starten."
       }

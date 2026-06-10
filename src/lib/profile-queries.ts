@@ -32,11 +32,11 @@ export function useProfile() {
       if (!user) return null;
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, first_name, last_name, phone, subscription_tier, created_at')
+        .select('id, email, first_name, last_name, phone, created_at')
         .eq('id', user.id)
-        .maybeSingle<Profile>();
+        .maybeSingle<Omit<Profile, 'subscription_tier'>>();
       if (error) throw error;
-      return data ?? null;
+      return data ? { ...data, subscription_tier: 'free' } : null;
     },
   });
 }
@@ -73,12 +73,12 @@ export function useUpdateProfile() {
       const { data, error } = await supabase
         .from('profiles')
         .upsert(payload, { onConflict: 'id' })
-        .select('id, email, first_name, last_name, phone, subscription_tier, created_at')
-        .single<Profile>();
+        .select('id, email, first_name, last_name, phone, created_at')
+        .single<Omit<Profile, 'subscription_tier'>>();
 
       if (error) throw error;
       if (!data) throw new Error('Profile not returned from upsert');
-      return data;
+      return { ...data, subscription_tier: 'free' };
     },
     onSuccess: (data) => {
       queryClient.setQueryData(PROFILE_KEY(user?.id), data);

@@ -10,28 +10,34 @@
     {
       "id": "not-the-complaint",
       "title": "Jij bent niet je klacht",
-      "body": "[PLACEHOLDER — niet je pijn, angst of drang]"
+      "body": "Als je lang lijdt, is het makkelijk om te vergeten dat je meer bent dan je klacht. 'Ik ben mijn pijn.' 'Ik ben mijn angst.' 'Ik ben een verslaafde.'\n\nMaar jij bent geen diagnose, geen gevoel, geen gedachte. Je hebt pijn, maar je bent niet je pijn. Je voelt angst, maar je bent niet je angst. Je merkt drang op, maar je bent niet je drang.\n\nDat verschil is niet woordspeling. Het is de basis van vrijheid: als jij groter bent dan je klacht, kun je je klacht dragen zonder erin te verdrinken.",
+      "examples": {
+        "pain": "Op een pijnlijke dag voelt het alsof je alleen maar pijn bent. Maar er is ook iemand die de pijn opmerkt: dat ben jij.",
+        "mental": "Angst kan je hele dag kleuren. Maar er is een deel van je dat de angst ziet: dat deel is stabieler dan de angst zelf.",
+        "alcohol": "Na een terugval denk je: 'Ik ben een verslaafde.' Maar je bent ook iemand die de terugval opmerkt, en die kan kiezen wat de volgende stap is.",
+        "combination": "Al je klachten samen kunnen voelen als je identiteit. Maar jij bent de ruimte waarin al die ervaringen plaatsvinden."
+      }
     },
     {
       "id": "content-container",
       "title": "Inhoud en container",
-      "body": "[PLACEHOLDER — gedachten/gevoelens vs jij]"
+      "body": "Stel je voor dat je bewustzijn een hemel is. Gedachten, gevoelens en lichamelijke sensaties zijn wolken die voorbijtrekken. Sommige zijn licht. Sommige zijn zwaar en donker. Maar de hemel: jij als waarnemer, blijft.\n\nDe inhoud verandert constant. De container niet. Je bent niet de wolk. Je bent de ruimte waarin de wolken komen en gaan.\n\nDat betekent niet dat je klachten onbelangrijk zijn. Het betekent dat ze niet alles van je zijn."
     },
     {
       "id": "observing-core",
       "title": "De observerende kern",
-      "body": "[PLACEHOLDER — stabiel punt]"
+      "body": "Diep vanbinnen is er een stabiel punt. Het deel van je dat altijd aanwezig is, ook als alles om je heen verandert. Het deel dat kijkt, voelt en ervaart.\n\nJe hoeft dit niet te begrijpen met je hoofd. Je kunt het voelen. In stilte. In je lichaam. In de ruimte achter je gedachten.\n\nDe observerende kern is geen perfecte versie van jezelf. Het is gewoon jij, zonder de lagen van oordeel, angst en vermijding. En vanuit dat punt kun je kijken naar wat je werkelijk wilt."
     }
   ],
   "bodyExercise": {
     "title": "Centreren",
     "description": "Voelen wie er kijkt. Aarden in het lichaam vanuit de kern.",
     "audioUrl": null,
-    "transcript": "[PLACEHOLDER]"
+    "transcript": "Ga zitten met een rechte maar zachte rug. Sluit je ogen.\n\n[pauze 3 sec]\n\nStel je voor dat er een plek in je lichaam is waar je het meest 'jij' bent. Voor sommigen is dat het hart. Voor anderen de buik, of het midden van het voorhoofd. Zoek niet lang. Ga naar de plek die het eerst opkomt.\n\n[pauze 5 sec]\n\nBreng je aandacht daarheen. Niet om iets te veranderen, om te voelen wie er kijkt.\n\n[pauze 5 sec]\n\nMerk op: er zijn gedachten. Er zijn gevoelens. Er is misschien pijn of spanning. En er is iets, of iemand, dat dit allemaal opmerkt. Dat ben jij.\n\n[pauze 5 sec]\n\nAdem vanuit die plek. Alsof je ademhaling uit je centrum komt. Niet uit je hoofd, niet uit je schouders.\n\n[pauze 5 sec]\n\nJe bent hier. Niet je klacht. Niet je verleden. Jij in dit moment.\n\n[pauze 3 sec]\n\nOpen je ogen. Neem dit gevoel mee in je dag."
   },
   "practicalTask": {
     "title": "Praktische opdracht",
-    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+    "body": "Drie keer vandaag, op willekeurige momenten, stel jezelf de vraag: 'Wie merkt dit op?'\n\nOf het nu pijn is, een gedachte, een gevoel of een drang, merk op dat er iemand is die het waarneemt. Dat ben jij. Meer dan de inhoud.\n\nSchrijf 's avonds één zin op over wat je opmerkte."
   },
   "backReferences": [
     {
