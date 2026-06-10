@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -25,6 +25,9 @@ interface Props {
   content: ModuleContent;
   initialScreenId: string | null;
   complaintTypes: ComplaintType[];
+  /** When provided, called instead of router.replace('/home') on the last screen.
+   *  Also prevents auto-saving completed:true so the caller handles completion. */
+  onComplete?: () => void;
 }
 
 /**
@@ -34,7 +37,7 @@ interface Props {
  * navigation). On reaching FINAL_SCREEN_ID and tapping "Afronden" we save with
  * completed=true and return to /home.
  */
-export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props) {
+export function ModulePlayer({ content, initialScreenId, complaintTypes, onComplete }: Props) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const screens = buildScreens(content);
@@ -47,6 +50,13 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const saveMutation = useSaveModuleProgress();
 
+  // Keep a ref so the save effect can read the current value without
+  // becoming a dep (which would trigger a re-save on every render).
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  });
+
   const currentScreen = screens[currentIndex];
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === screens.length - 1;
@@ -54,20 +64,24 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props
 
   useEffect(() => {
     if (!currentScreen) return;
-    // Save current position; mark completed only when we land on the last screen
+    // When a parent handles completion (onComplete provided) we only save the
+    // current position; the parent is responsible for marking completed:true.
     saveMutation.mutate({
       moduleId: content.id,
       lastStepId: currentScreen.id,
-      completed: isLast,
+      completed: isLast && !onCompleteRef.current,
     });
-    // We intentionally do not include saveMutation in deps — it is a stable
-    // hook reference, and adding it triggers a save loop.
+    // We intentionally do not include saveMutation or onCompleteRef in deps.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, content.id, isLast]);
 
   function goNext() {
     if (isLast) {
-      router.replace('/home');
+      if (onCompleteRef.current) {
+        onCompleteRef.current();
+      } else {
+        router.replace('/home');
+      }
       return;
     }
     setCurrentIndex((i) => i + 1);

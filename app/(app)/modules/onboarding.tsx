@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ModulePlayer } from '@/components/modules/ModulePlayer';
 import { ModuleReadOnlyView } from '@/components/modules/ModuleReadOnlyView';
 import common from '@/content/nl/common.json';
 import crisis from '@/content/nl/crisis.json';
@@ -15,7 +16,7 @@ import type { ComplaintType, SafetyOutcome, SafetyQuestion } from '@/types/conte
 
 const COMPLAINT_KEYS: ComplaintType[] = ['pain', 'mental', 'alcohol', 'combination'];
 
-type Step = 'welcome' | 'complaint' | 'safety' | 'blocked' | 'complete';
+type Step = 'welcome' | 'complaint' | 'safety' | 'blocked' | 'content' | 'complete';
 
 /**
  * /modules/onboarding — module 0 intake flow (α5), inside the modules stack.
@@ -67,6 +68,18 @@ export default function OnboardingScreen() {
     return <ModuleReadOnlyView content={content} complaintTypes={progress.intake.complaintTypes} />;
   }
 
+  if (step === 'content') {
+    const content = getModuleContent('onboarding');
+    return (
+      <ModulePlayer
+        content={content}
+        initialScreenId={null}
+        complaintTypes={complaint ? [complaint] : []}
+        onComplete={() => setStep('complete')}
+      />
+    );
+  }
+
   function finishSafetyCheck(finalAnswers: Record<string, string>) {
     if (!isComplete(questions, finalAnswers) || !complaint) return;
     const outcome = worstOutcome(questions, finalAnswers);
@@ -79,7 +92,7 @@ export default function OnboardingScreen() {
           safetyOutcome: outcome ?? 'pass',
           safetyPassed: true,
         },
-        { onSuccess: () => setStep('complete') },
+        { onSuccess: () => setStep('content') },
       );
     } else {
       saveIntake.mutate({
