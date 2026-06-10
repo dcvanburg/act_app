@@ -130,11 +130,12 @@ jobs:
         continue-on-error: true
 
   # ── 8. Expo config validation ─────────────────────────────────────────────────
-  # The pre-pivot `next build` step is gone. EAS Build runs separately and is not
-  # part of the per-PR check budget. This job validates the Expo config statically
-  # so PRs that break app.json or break Expo Router's typed routes fail fast.
+  # Named "Build" to satisfy the required status check in branch protection.
+  # EAS Build runs separately and is not part of the per-PR check budget.
+  # This job validates the Expo config statically so PRs that break app.json
+  # or Expo Router typed routes fail fast.
   expo-config:
-    name: Expo config
+    name: Build
     needs: [typecheck, lint, format, test, audit, secrets]
     runs-on: ubuntu-latest
     timeout-minutes: 10
