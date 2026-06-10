@@ -1,5 +1,5 @@
-import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -23,21 +23,12 @@ type Step = 'welcome' | 'complaint' | 'safety' | 'blocked' | 'content' | 'comple
  */
 export default function OnboardingScreen() {
   const router = useRouter();
-  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { data: progress, isLoading } = useUserProgress();
   const saveIntake = useSaveIntake();
   const saveModuleProgress = useSaveModuleProgress();
   const { from } = useLocalSearchParams<{ from?: string }>();
   const inOnboarding = from === 'onboarding';
-
-  useEffect(() => {
-    if (!inOnboarding) return;
-    // Hide the tab bar — this screen is inside a nested stack so we need the parent tab navigator
-    const tabNav = navigation.getParent();
-    tabNav?.setOptions({ tabBarStyle: { display: 'none' } });
-    return () => tabNav?.setOptions({ tabBarStyle: undefined });
-  }, [inOnboarding, navigation]);
 
   const questions = intake.safetyCheck.questions as SafetyQuestion[];
 
@@ -162,8 +153,9 @@ export default function OnboardingScreen() {
             title={blockedCopy.title}
             body={blockedCopy.body}
             action={blockedCopy.action}
+            continueAction={intake.blocked.continueAction}
             onAction={() => router.push('/noodhulp')}
-            onHome={() => router.replace('/home')}
+            onContinue={() => setStep('content')}
           />
         )}
         {step === 'complete' && (
@@ -365,14 +357,16 @@ function BlockedStep({
   title,
   body,
   action,
+  continueAction,
   onAction,
-  onHome,
+  onContinue,
 }: {
   title: string;
   body: string;
   action: string;
+  continueAction: string;
   onAction: () => void;
-  onHome: () => void;
+  onContinue: () => void;
 }) {
   return (
     <View>
@@ -399,10 +393,10 @@ function BlockedStep({
 
       <Pressable
         accessibilityRole="button"
-        onPress={onHome}
+        onPress={onContinue}
         className="mt-3 rounded-lg border border-border px-4 py-3 active:bg-surface-muted"
       >
-        <Text className="text-center text-sm font-medium text-text-muted">Naar startscherm</Text>
+        <Text className="text-center text-sm font-medium text-text-muted">{continueAction}</Text>
       </Pressable>
     </View>
   );

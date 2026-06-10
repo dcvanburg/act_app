@@ -14,6 +14,7 @@ Read `docs/SECURITY.md` first.
 ## Checklist
 
 ### Therapeutic safety
+
 - [ ] Crisis disclaimers present and accurate (Dutch)
 - [ ] 0800-0113 visible on crisis path
 - [ ] Safety check cannot be skipped silently
@@ -21,6 +22,7 @@ Read `docs/SECURITY.md` first.
 - [ ] No guilt-framing on relapse/setback flows
 
 ### Application security
+
 - [ ] No secrets in code or commits
 - [ ] Journal/progress access scoped to current user
 - [ ] XSS: user journal content sanitized on render
@@ -28,6 +30,7 @@ Read `docs/SECURITY.md` first.
 - [ ] Input validation on intake and journal
 
 ### Privacy
+
 - [ ] Minimal data collection
 - [ ] No health data to third-party analytics without consent
 - [ ] Delete/export path considered for user data

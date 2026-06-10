@@ -19,7 +19,9 @@
       "Via internet of social media",
       "Anders"
     ],
-    "saveButton": "Opslaan en verder"
+    "saveButton": "Opslaan en verder",
+    "loggedInAs": "Je bent ingelogd als {email}",
+    "logout": "Uitloggen en ander account gebruiken"
   },
   "step2": {
     "title": "Hoe voel je je vandaag?",

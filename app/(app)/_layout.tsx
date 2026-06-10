@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Redirect, Tabs, useRouter } from 'expo-router';
-import { useEffect } from 'react';
+import { Redirect, Tabs, usePathname, useRouter } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import common from '@/content/nl/common.json';
+import { resolveAppBootstrapTarget } from '@/lib/auth-bootstrap';
 import { useProfile } from '@/lib/profile-queries';
+import { defaultTabBarStyle } from '@/lib/tab-bar';
 import { useAuth } from '@/providers/AuthProvider';
 import {
   UnsavedChangesGuardProvider,
@@ -16,14 +17,24 @@ import { WaardenProvider } from '@/providers/WaardenProvider';
 /**
  * Auth-required route group with bottom tabs: Home + Modules.
  *
- * Module detail, onboarding, account, and mood screens are hidden from the tab bar.
- * `/noodhulp` lives outside this group — crisis access never depends on auth.
+ * Bootstrap gate (session + profile) runs here before tabs render so users with
+ * an expired session see login, and new users see /wizard without a home flash.
  */
 export default function AppLayout() {
-  const { session, loading } = useAuth();
+  const { session, loading: authLoading } = useAuth();
+  const { data: profile, isLoading: profileLoading } = useProfile();
+  const pathname = usePathname();
   const insets = useSafeAreaInsets();
 
-  if (loading) {
+  const target = resolveAppBootstrapTarget({
+    authLoading,
+    hasSession: Boolean(session),
+    profileLoading,
+    profileFirstName: profile?.first_name,
+    pathname,
+  });
+
+  if (target === 'loading') {
     return (
       <View
         className="flex-1 items-center justify-center bg-background"
@@ -34,53 +45,24 @@ export default function AppLayout() {
     );
   }
 
-  if (!session) {
+  if (target === 'login') {
     return <Redirect href="/login" />;
   }
 
   return (
     <WaardenProvider>
       <UnsavedChangesGuardProvider>
-        <OnboardingGuard />
+        {target === 'wizard' ? <Redirect href="/wizard" /> : null}
+        {profile?.first_name?.trim() && pathname === '/wizard' ? <Redirect href="/home" /> : null}
         <AppTabs insets={insets} />
       </UnsavedChangesGuardProvider>
     </WaardenProvider>
   );
 }
 
-/**
- * Redirect new users to /onboarding before they can access tabs.
- * A user is "new" when their profile has no first_name yet.
- * Runs once on mount; after onboarding completes the profile has a name
- * so this guard never fires again.
- */
-function OnboardingGuard() {
-  const { data: profile, isLoading } = useProfile();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && !profile?.first_name) {
-      router.replace('/onboarding');
-    }
-  }, [isLoading, profile?.first_name, router]);
-
-  return null;
-}
-
 function AppTabs({ insets }: { insets: { bottom: number } }) {
+  const router = useRouter();
   const { handleTabPress } = useUnsavedChangesGuard();
-
-  const tabPressListener = ({
-    navigation,
-    route,
-  }: {
-    navigation: { navigate: (name: string) => void };
-    route: { name: string };
-  }) => ({
-    tabPress: (event: { preventDefault: () => void }) => {
-      handleTabPress(event, () => navigation.navigate(route.name));
-    },
-  });
 
   return (
     <Tabs
@@ -88,13 +70,7 @@ function AppTabs({ insets }: { insets: { bottom: number } }) {
         headerShown: false,
         tabBarActiveTintColor: '#3B6D11',
         tabBarInactiveTintColor: '#888780',
-        tabBarStyle: {
-          backgroundColor: '#F5F0E8',
-          borderTopColor: '#D3D1C7',
-          height: 56 + insets.bottom,
-          paddingBottom: insets.bottom,
-          paddingTop: 8,
-        },
+        tabBarStyle: defaultTabBarStyle(insets.bottom),
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '600',
@@ -103,7 +79,12 @@ function AppTabs({ insets }: { insets: { bottom: number } }) {
     >
       <Tabs.Screen
         name="home/index"
-        listeners={tabPressListener}
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+            handleTabPress(() => router.navigate('/home'));
+          },
+        }}
         options={{
           title: common.nav.home,
           tabBarIcon: ({ color, size }) => (
@@ -113,7 +94,12 @@ function AppTabs({ insets }: { insets: { bottom: number } }) {
       />
       <Tabs.Screen
         name="modules"
-        listeners={tabPressListener}
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+            handleTabPress(() => router.navigate('/modules'));
+          },
+        }}
         options={{
           title: common.nav.modules,
           tabBarIcon: ({ color, size }) => (
@@ -121,7 +107,8 @@ function AppTabs({ insets }: { insets: { bottom: number } }) {
           ),
         }}
       />
-      <Tabs.Screen name="onboarding" options={{ href: null, tabBarStyle: { display: 'none' } }} />
+      <Tabs.Screen name="wizard" options={{ href: null, tabBarStyle: { display: 'none' } }} />
+      <Tabs.Screen name="onboarding/index" options={{ href: null }} />
       <Tabs.Screen name="account/index" options={{ href: null }} />
       <Tabs.Screen name="mood/index" options={{ href: null }} />
       <Tabs.Screen name="mood/history" options={{ href: null }} />

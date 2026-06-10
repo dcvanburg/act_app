@@ -1,9 +1,11 @@
 import { Redirect, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppTextInput } from '@/components/AppTextInput';
+import { BackButton } from '@/components/BackButton';
 import { CheckboxIcon } from '@/components/icons/CheckboxIcon';
 import { CrossIcon } from '@/components/icons/CrossIcon';
 import { NeutralIcon } from '@/components/icons/NeutralIcon';
@@ -187,14 +189,10 @@ export default function WaardenCheckinScreen() {
       }}
     >
       <View className="mx-auto w-full max-w-md">
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => router.back()}
-          className="mb-4 flex-row items-center gap-3"
-        >
-          <Text className="text-lg text-text-muted">‹</Text>
+        <View className="mb-4 flex-row items-center gap-1">
+          <BackButton onPress={() => router.back()} />
           <Text className="text-sm text-text-muted">{waarden.detail.back}</Text>
-        </Pressable>
+        </View>
 
         {current ? (
           <View className="rounded-2xl bg-surface p-5 shadow-sm">
@@ -261,15 +259,14 @@ export default function WaardenCheckinScreen() {
                     <Text className="mb-2 text-sm font-medium text-text">
                       {waarden.checkin.deadlineDescriptionLabel}
                     </Text>
-                    <TextInput
+                    <AppTextInput
                       value={deadlineBeschrijving}
                       onChangeText={setDeadlineBeschrijving}
                       placeholder={waarden.checkin.deadlineDescriptionPlaceholder}
                       multiline
                       numberOfLines={3}
-                      className="mb-4 min-h-[88px] rounded-xl border border-border bg-surface-muted px-3.5 py-3 text-base text-text"
-                      placeholderTextColor="#888780"
-                      textAlignVertical="top"
+                      className="mb-4 rounded-xl bg-surface-muted px-3.5"
+                      style={{ minHeight: 88 }}
                     />
 
                     <Text className="mb-3 font-semibold text-text">
@@ -294,15 +291,14 @@ export default function WaardenCheckinScreen() {
                     </View>
 
                     {wantsNewAction === true ? (
-                      <TextInput
+                      <AppTextInput
                         value={nieuweActie}
                         onChangeText={setNieuweActie}
                         placeholder={waarden.checkin.deadlineNewActionPlaceholder.replace(
                           '{termijn}',
                           termijnLabel,
                         )}
-                        className="mb-4 rounded-xl border border-border bg-surface-muted px-3.5 py-3 text-base text-text"
-                        placeholderTextColor="#888780"
+                        className="mb-4 rounded-xl bg-surface-muted px-3.5"
                       />
                     ) : null}
 
@@ -371,15 +367,14 @@ export default function WaardenCheckinScreen() {
 
                 {keuze !== null ? (
                   <View>
-                    <TextInput
+                    <AppTextInput
                       value={notitie}
                       onChangeText={setNotitie}
                       placeholder={notePlaceholder}
                       multiline
                       numberOfLines={3}
-                      className="mb-4 min-h-[88px] rounded-xl border border-border bg-surface-muted px-3.5 py-3 text-base text-text"
-                      placeholderTextColor="#888780"
-                      textAlignVertical="top"
+                      className="mb-4 rounded-xl bg-surface-muted px-3.5"
+                      style={{ minHeight: 88 }}
                     />
                     <Pressable
                       accessibilityRole="button"

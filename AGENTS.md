@@ -13,21 +13,21 @@ Self-guided ACT therapeutic mobile app. **UI: Dutch. Code: English.**
 
 ## Docs (read before implementing)
 
-| Doc | Use |
-|-----|-----|
-| `ARCHIVE_NOTICE.md` | What survives the pivot and what is being replaced |
-| `docs/PRODUCT.md` | Vision, philosophy, scope |
-| `docs/MODULES.md` | Per-module specification |
-| `docs/TECHNICAL_SPEC.md` | Features, progress model, safety |
-| `docs/NAVIGATION.md` | Routes, unlock rules, emergency button |
-| `docs/SECURITY.md` | GDPR, crisis flows, boundaries |
-| `docs/WORKFLOW.md` | Branching, definition of done |
-| `docs/ADR/001-stack.md` | Stack (now: Expo, TypeScript, NativeWind) |
-| `docs/ADR/002-i18n.md` | Dutch content in `src/content/nl/` |
-| `docs/ADR/003-auth.md` | **Accepted:** account required, Supabase magic-link via deep link |
-| `docs/CONTENT_PLACEHOLDERS.md` | Therapist content still needed |
-| `docs/THERAPEUT_KB/` | Therapist agent knowledge base (concept + ACT reference) |
-| `docs/OPEN_QUESTIONS.md` | Unresolved decisions |
+| Doc                            | Use                                                               |
+| ------------------------------ | ----------------------------------------------------------------- |
+| `ARCHIVE_NOTICE.md`            | What survives the pivot and what is being replaced                |
+| `docs/PRODUCT.md`              | Vision, philosophy, scope                                         |
+| `docs/MODULES.md`              | Per-module specification                                          |
+| `docs/TECHNICAL_SPEC.md`       | Features, progress model, safety                                  |
+| `docs/NAVIGATION.md`           | Routes, unlock rules, emergency button                            |
+| `docs/SECURITY.md`             | GDPR, crisis flows, boundaries                                    |
+| `docs/WORKFLOW.md`             | Branching, definition of done                                     |
+| `docs/ADR/001-stack.md`        | Stack (now: Expo, TypeScript, NativeWind)                         |
+| `docs/ADR/002-i18n.md`         | Dutch content in `src/content/nl/`                                |
+| `docs/ADR/003-auth.md`         | **Accepted:** account required, Supabase magic-link via deep link |
+| `docs/CONTENT_PLACEHOLDERS.md` | Therapist content still needed                                    |
+| `docs/THERAPEUT_KB/`           | Therapist agent knowledge base (concept + ACT reference)          |
+| `docs/OPEN_QUESTIONS.md`       | Unresolved decisions                                              |
 
 ## Stack (post-pivot)
 
@@ -104,14 +104,14 @@ act_app/
 
 ## Agent delegation
 
-| Situation | Agent |
-|-----------|-------|
-| Module copy, exercises, placeholders, therapeutic review | `therapeut` |
-| 3+ files or architecture change | `planner` |
-| Code complete, before PR | `code-reviewer` |
-| Auth, intake, journal, crisis | `security-reviewer` |
-| Build/types/lint broken | `build-fixer` |
-| Explore codebase | `explorer` |
+| Situation                                                | Agent               |
+| -------------------------------------------------------- | ------------------- |
+| Module copy, exercises, placeholders, therapeutic review | `therapeut`         |
+| 3+ files or architecture change                          | `planner`           |
+| Code complete, before PR                                 | `code-reviewer`     |
+| Auth, intake, journal, crisis                            | `security-reviewer` |
+| Build/types/lint broken                                  | `build-fixer`       |
+| Explore codebase                                         | `explorer`          |
 
 ## Safety non-negotiables
 

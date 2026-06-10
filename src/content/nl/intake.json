@@ -140,6 +140,7 @@
     ]
   },
   "blocked": {
+    "continueAction": "Toch doorgaan",
     "strong": {
       "title": "We maken ons zorgen om je",
       "body": "Op basis van je antwoorden raden we aan om eerst contact op te nemen met professionele hulp voordat je verder gaat met dit programma. Deze app is geen vervanging voor de juiste zorg op dit moment.",

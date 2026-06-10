@@ -34,15 +34,15 @@ export default function HomeScreen() {
       <View className="mx-auto w-full max-w-md">
         <View className="mb-8">
           <View className="mb-2 flex-row items-center justify-between">
-            <View className="w-10" />
+            <View className="w-12" />
             <AppLogo size={40} />
             <Link href="/account" asChild>
               <Pressable
                 accessibilityRole="link"
                 accessibilityLabel="Mijn account"
-                className="h-10 w-10 items-center justify-center rounded-full bg-primary-soft active:opacity-80"
+                className="h-12 w-12 items-center justify-center rounded-full bg-primary-soft active:opacity-80"
               >
-                <AccountIcon size={22} />
+                <AccountIcon size={30} />
               </Pressable>
             </Link>
           </View>

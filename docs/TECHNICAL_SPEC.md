@@ -4,18 +4,18 @@
 
 ## Core features (v1)
 
-| Feature | Priority | Notes |
-|---------|----------|-------|
-| User profile with progress persistence | P0 | Which modules completed; resume state |
-| Linear module path with back-navigation | P0 | See [NAVIGATION.md](./NAVIGATION.md) |
-| Onboarding intake with complaint selection | P0 | pain / mental / alcohol / combination |
-| Contextual back-references within modules | P1 | Links to prior modules |
-| Audio for body-oriented exercises | Out of v1 | Text-only in v1; `audioUrl` stays `null`; transcripts displayed as body text |
-| Journal with simple input | P1 | Available after program completion |
-| Push notifications for daily check-in | Out of v1 | Skip entirely; revisit after pilot |
-| Emergency button | P0 | Fixed UI position; always reachable |
-| Subscription tier placeholder | P0-infra | `subscriptionTier` field on profile (value: `'free'`); no paywall logic in v1 |
-| Account deletion (GDPR) | P1 | In-app "Verwijder mijn account" + documented email fallback |
+| Feature                                    | Priority  | Notes                                                                         |
+| ------------------------------------------ | --------- | ----------------------------------------------------------------------------- |
+| User profile with progress persistence     | P0        | Which modules completed; resume state                                         |
+| Linear module path with back-navigation    | P0        | See [NAVIGATION.md](./NAVIGATION.md)                                          |
+| Onboarding intake with complaint selection | P0        | pain / mental / alcohol / combination                                         |
+| Contextual back-references within modules  | P1        | Links to prior modules                                                        |
+| Audio for body-oriented exercises          | Out of v1 | Text-only in v1; `audioUrl` stays `null`; transcripts displayed as body text  |
+| Journal with simple input                  | P1        | Available after program completion                                            |
+| Push notifications for daily check-in      | Out of v1 | Skip entirely; revisit after pilot                                            |
+| Emergency button                           | P0        | Fixed UI position; always reachable                                           |
+| Subscription tier placeholder              | P0-infra  | `subscriptionTier` field on profile (value: `'free'`); no paywall logic in v1 |
+| Account deletion (GDPR)                    | P1        | In-app "Verwijder mijn account" + documented email fallback                   |
 
 ## Navigation logic
 
@@ -87,11 +87,11 @@ The app is **not** a replacement for professional help in:
 
 When intake or in-app signals indicate crisis, show:
 
-| Resource | Contact |
-|----------|---------|
-| Huisarts | User's own GP |
-| GGZ | Regional mental health services |
-| Crisislijn | 0800-0113 |
+| Resource   | Contact                         |
+| ---------- | ------------------------------- |
+| Huisarts   | User's own GP                   |
+| GGZ        | Regional mental health services |
+| Crisislijn | 0800-0113                       |
 
 Implement as a dedicated **crisis screen** (`/noodhulp` or modal) — never hide behind paywall or login.
 
@@ -116,13 +116,13 @@ Implement as a dedicated **crisis screen** (`/noodhulp` or modal) — never hide
 
 ## Non-functional requirements
 
-| Area | Requirement |
-|------|-------------|
-| Language | UI: Dutch (`nl-NL`). Code: English |
-| Accessibility | WCAG 2.1 AA target; screen reader for exercises |
-| Privacy | GDPR; minimal data collection; EU hosting preferred |
-| Offline | PWA offline for emergency button + completed module text (stretch) |
-| URL access | Public URL; no app store required for v1 |
+| Area          | Requirement                                                        |
+| ------------- | ------------------------------------------------------------------ |
+| Language      | UI: Dutch (`nl-NL`). Code: English                                 |
+| Accessibility | WCAG 2.1 AA target; screen reader for exercises                    |
+| Privacy       | GDPR; minimal data collection; EU hosting preferred                |
+| Offline       | PWA offline for emergency button + completed module text (stretch) |
+| URL access    | Public URL; no app store required for v1                           |
 
 ## Completed module revisit
 
@@ -138,6 +138,7 @@ When a user navigates back to a module with status `completed`:
 No audio player is built in v1. `audioUrl` in all content JSON files is `null`.
 
 Body exercise screens render:
+
 1. Exercise title and description
 2. Transcript text (Dutch) as the full exercise content
 3. When `audioUrl` is `null`, transcript is shown directly — no player UI, no placeholder

@@ -16,7 +16,7 @@ type UnsavedChangesGuard = {
 
 interface UnsavedChangesGuardContextValue {
   registerGuard: (guard: UnsavedChangesGuard | null) => void;
-  handleTabPress: (event: { preventDefault: () => void }, navigate: () => void) => void;
+  handleTabPress: (navigate: () => void) => void;
 }
 
 const UnsavedChangesGuardContext = createContext<UnsavedChangesGuardContextValue | undefined>(
@@ -30,19 +30,18 @@ export function UnsavedChangesGuardProvider({ children }: { children: ReactNode 
     guardRef.current = guard;
   }, []);
 
-  const handleTabPress = useCallback(
-    (event: { preventDefault: () => void }, navigate: () => void) => {
-      const guard = guardRef.current;
-      if (!guard?.hasUnsavedChanges || guard.allowLeaveRef.current) return;
+  const handleTabPress = useCallback((navigate: () => void) => {
+    const guard = guardRef.current;
+    if (!guard?.hasUnsavedChanges || guard.allowLeaveRef.current) {
+      navigate();
+      return;
+    }
 
-      event.preventDefault();
-      guard.confirmLeave(() => {
-        guard.allowLeaveRef.current = true;
-        navigate();
-      });
-    },
-    [],
-  );
+    guard.confirmLeave(() => {
+      guard.allowLeaveRef.current = true;
+      navigate();
+    });
+  }, []);
 
   return (
     <UnsavedChangesGuardContext.Provider value={{ registerGuard, handleTabPress }}>

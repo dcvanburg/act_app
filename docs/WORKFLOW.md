@@ -2,13 +2,13 @@
 
 ## Language convention
 
-| Layer | Language |
-|-------|----------|
-| Source code (variables, functions, comments) | English |
-| User-facing UI strings | Dutch (`nl-NL`) |
-| Dev documentation | English |
-| Therapeutic content (modules, exercises) | Dutch |
-| Git commits & PR descriptions | English |
+| Layer                                        | Language        |
+| -------------------------------------------- | --------------- |
+| Source code (variables, functions, comments) | English         |
+| User-facing UI strings                       | Dutch (`nl-NL`) |
+| Dev documentation                            | English         |
+| Therapeutic content (modules, exercises)     | Dutch           |
+| Git commits & PR descriptions                | English         |
 
 All Dutch UI strings live in `src/content/nl/` or i18n files — never hardcoded in components without going through the content layer.
 

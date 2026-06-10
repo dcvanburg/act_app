@@ -7,25 +7,26 @@ import {
   Pressable,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppTextInput } from '@/components/AppTextInput';
 import content from '@/content/nl/onboarding.json';
 import { useUpdateProfile } from '@/lib/profile-queries';
-
-type Step = 1 | 2 | 3 | 4;
+import { useAuth } from '@/providers/AuthProvider';
 
 const ANDERS = 'Anders';
 
-const inputClass =
-  'rounded-lg border border-border bg-background px-3 py-3 text-base text-text mb-4';
-
-export default function OnboardingScreen() {
+/**
+ * /wizard — first-login profile setup (step 1 of onboarding).
+ *
+ * After saving personal data the user goes straight to the mood check-in with
+ * the onboarding intro modal (`/mood?from=onboarding`), then Welkom & Intake
+ * (`/modules/onboarding?from=onboarding`).
+ */
+export default function WizardScreen() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
-  const [step, setStep] = useState<Step>(1);
 
   return (
     <KeyboardAvoidingView
@@ -42,59 +43,16 @@ export default function OnboardingScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View className="mx-auto w-full max-w-md">
-          <StepIndicator current={step} />
-
-          {step === 1 && <PersonalDataForm onDone={() => setStep(2)} />}
-          {step === 2 && (
-            <PromptCard
-              title={content.step2.title}
-              description={content.step2.description}
-              startLabel={content.step2.startButton}
-              skipLabel={content.step2.skipButton}
-              onStart={() => router.replace('/mood')}
-              onSkip={() => setStep(3)}
-            />
-          )}
-          {step === 3 && (
-            <PromptCard
-              title={content.step3.title}
-              description={content.step3.description}
-              startLabel={content.step3.startButton}
-              skipLabel={content.step3.skipButton}
-              onStart={() => router.replace('/waarden')}
-              onSkip={() => setStep(4)}
-            />
-          )}
-          {step === 4 && (
-            <PromptCard
-              title={content.step4.title}
-              description={content.step4.description}
-              startLabel={content.step4.startButton}
-              skipLabel={content.step4.skipButton}
-              onStart={() => router.replace('/modules/onboarding')}
-              onSkip={() => router.replace('/home')}
-            />
-          )}
+          <PersonalDataForm />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-function StepIndicator({ current }: { current: Step }) {
-  return (
-    <View className="mb-8 flex-row items-center gap-2">
-      {([1, 2, 3, 4] as Step[]).map((s) => (
-        <View
-          key={s}
-          className={`h-1.5 flex-1 rounded-full ${s <= current ? 'bg-primary' : 'bg-border'}`}
-        />
-      ))}
-    </View>
-  );
-}
-
-function PersonalDataForm({ onDone }: { onDone: () => void }) {
+function PersonalDataForm() {
+  const router = useRouter();
+  const { user, signOut } = useAuth();
   const updateProfile = useUpdateProfile();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -120,7 +78,7 @@ function PersonalDataForm({ onDone }: { onDone: () => void }) {
     updateProfile.mutate(
       { first_name: firstName, last_name: lastName, phone, referral_source: effectiveReferral },
       {
-        onSuccess: onDone,
+        onSuccess: () => router.replace('/mood?from=onboarding'),
         onError: () => setError('Opslaan mislukt. Controleer je verbinding en probeer opnieuw.'),
       },
     );
@@ -128,45 +86,59 @@ function PersonalDataForm({ onDone }: { onDone: () => void }) {
 
   return (
     <View>
+      {user?.email ? (
+        <View className="mb-6 rounded-xl border border-border bg-surface-muted px-4 py-3">
+          <Text className="text-sm text-text-subtle">
+            {content.step1.loggedInAs.replace('{email}', user.email)}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={async () => {
+              await signOut();
+              router.replace('/login');
+            }}
+            className="mt-2 self-start"
+          >
+            <Text className="text-sm font-medium text-primary">{content.step1.logout}</Text>
+          </Pressable>
+        </View>
+      ) : null}
+
       <Text className="mb-1 font-serif text-2xl font-bold text-text">{content.step1.title}</Text>
       <Text className="mb-6 text-sm text-text-subtle">{content.step1.subtitle}</Text>
 
       <Text className="mb-1 text-sm font-medium text-text">{content.step1.fields.firstName}</Text>
-      <TextInput
+      <AppTextInput
         value={firstName}
         onChangeText={setFirstName}
         autoComplete="given-name"
         autoCapitalize="words"
         placeholder={content.step1.fields.firstNamePlaceholder}
-        placeholderTextColor="#888780"
         editable={!updateProfile.isPending}
-        className={inputClass}
+        className="mb-4"
       />
 
       <Text className="mb-1 text-sm font-medium text-text">{content.step1.fields.lastName}</Text>
-      <TextInput
+      <AppTextInput
         value={lastName}
         onChangeText={setLastName}
         autoComplete="family-name"
         autoCapitalize="words"
         placeholder={content.step1.fields.lastNamePlaceholder}
-        placeholderTextColor="#888780"
         editable={!updateProfile.isPending}
-        className={inputClass}
+        className="mb-4"
       />
 
       <Text className="mb-1 text-sm font-medium text-text">{content.step1.fields.phone}</Text>
-      <TextInput
+      <AppTextInput
         value={phone}
         onChangeText={setPhone}
         autoComplete="tel"
         keyboardType="phone-pad"
         placeholder={content.step1.fields.phonePlaceholder}
-        placeholderTextColor="#888780"
         editable={!updateProfile.isPending}
-        className={`rounded-lg border px-3 py-3 text-base text-text mb-1 ${
-          phoneInvalid ? 'border-crisis bg-background' : 'border-border bg-background'
-        }`}
+        invalid={phoneInvalid}
+        className="mb-1"
       />
       {phoneInvalid ? (
         <Text className="mb-4 text-xs text-crisis">{content.step1.fields.phoneError}</Text>
@@ -203,15 +175,14 @@ function PersonalDataForm({ onDone }: { onDone: () => void }) {
       </View>
 
       {andersSelected && (
-        <TextInput
+        <AppTextInput
           value={customReferral}
           onChangeText={setCustomReferral}
           autoFocus
           autoCapitalize="sentences"
           placeholder="Vertel het ons..."
-          placeholderTextColor="#888780"
           editable={!updateProfile.isPending}
-          className={`${inputClass} mb-6`}
+          className="mb-6"
         />
       )}
       {!andersSelected && <View className="mb-3" />}
@@ -231,34 +202,6 @@ function PersonalDataForm({ onDone }: { onDone: () => void }) {
             {content.step1.saveButton}
           </Text>
         )}
-      </Pressable>
-    </View>
-  );
-}
-
-function PromptCard(props: {
-  title: string;
-  description: string;
-  startLabel: string;
-  skipLabel: string;
-  onStart: () => void;
-  onSkip: () => void;
-}) {
-  return (
-    <View>
-      <Text className="mb-2 font-serif text-2xl font-bold text-text">{props.title}</Text>
-      <Text className="mb-8 text-base text-text-subtle">{props.description}</Text>
-
-      <Pressable
-        accessibilityRole="button"
-        onPress={props.onStart}
-        className="mb-4 rounded-lg bg-primary px-4 py-3 active:bg-primary-dark"
-      >
-        <Text className="text-center text-base font-semibold text-white">{props.startLabel}</Text>
-      </Pressable>
-
-      <Pressable accessibilityRole="button" onPress={props.onSkip} className="items-center py-2">
-        <Text className="text-sm text-text-muted">{props.skipLabel}</Text>
       </Pressable>
     </View>
   );
