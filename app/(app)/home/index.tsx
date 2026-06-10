@@ -1,9 +1,12 @@
 import { Link } from 'expo-router';
-import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FeatureErrorBoundary } from '@/components/FeatureErrorBoundary';
+import { AccountIcon } from '@/components/icons/AccountIcon';
 import { MoodHomeCard } from '@/components/mood/MoodHomeCard';
-import { ProgramOverview } from '@/components/modules/ProgramOverview';
+import { ProgramHomeCard } from '@/components/modules/ProgramHomeCard';
+import { WaardenHomeCard } from '@/components/waarden/WaardenHomeCard';
 import common from '@/content/nl/common.json';
 import { useUserProgress } from '@/lib/progress-queries';
 
@@ -11,16 +14,15 @@ import { useUserProgress } from '@/lib/progress-queries';
  * /home — program overview.
  *
  * Loads UserProgress from Supabase via TanStack Query and renders the 8-module
- * list with unlock state. Tapping any unlocked module routes to
- * /onboarding (module 0) or /modules/<id>.
+ * mood check-in card and a link to the Modules tab for the full program.
  */
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { data: progress, isLoading } = useUserProgress();
-
   return (
     <ScrollView
       className="flex-1 bg-background"
+      style={{ flex: 1, backgroundColor: '#F5F0E8' }}
       contentContainerStyle={{
         paddingTop: insets.top + 24,
         paddingBottom: insets.bottom + 112, // room for Noodknop
@@ -34,24 +36,29 @@ export default function HomeScreen() {
             <Text className="mt-1 text-sm text-text-subtle">{common.app.tagline}</Text>
           </View>
           <Link href="/account" asChild>
-            <Text
+            <Pressable
               accessibilityRole="link"
               accessibilityLabel="Mijn account"
-              className="h-10 w-10 rounded-full bg-primary-soft text-center text-base leading-10 text-primary"
+              className="h-10 w-10 items-center justify-center rounded-full bg-primary-soft active:opacity-80"
             >
-              {'\u{1F464}'}
-            </Text>
+              <AccountIcon size={22} />
+            </Pressable>
           </Link>
         </View>
 
-        <MoodHomeCard />
+        <FeatureErrorBoundary>
+          <MoodHomeCard />
+        </FeatureErrorBoundary>
+        <FeatureErrorBoundary>
+          <WaardenHomeCard />
+        </FeatureErrorBoundary>
 
         {isLoading || !progress ? (
           <View className="items-center py-12">
             <ActivityIndicator color="#3B6D11" />
           </View>
         ) : (
-          <ProgramOverview progress={progress} />
+          <ProgramHomeCard progress={progress} />
         )}
       </View>
     </ScrollView>

@@ -3,35 +3,41 @@
   "moduleNumber": 2,
   "title": "Acceptatie",
   "phase": "Fundament",
-  "actProcess": "Acceptatie — ruimte maken voor wat is",
+  "actProcess": "Acceptatie: ruimte maken voor wat is",
   "bodyWork": "Ademruimte",
   "goal": "Je ervaart het verschil tussen acceptatie en berusting.",
   "sections": [
     {
       "id": "not-giving-up",
       "title": "Acceptatie is niet opgeven",
-      "body": "[PLACEHOLDER — stoppen met oorlog voeren]"
+      "body": "Acceptatie klinkt voor veel mensen als opgeven. Alsof je zegt: 'het is zo en het blijft zo.' Dat is berusting, en dat is niet wat we bedoelen.\n\nAcceptatie is stoppen met oorlog voeren tegen wat er al is. Je hoeft je pijn niet leuk te vinden. Je hoeft je angst niet te omarmen. Je erkent alleen: dit is er nu. En terwijl het er is, kun je nog steeds kiezen hoe je verder gaat.\n\nAcceptatie opent deuren die vermijding dichtsloot."
     },
     {
       "id": "paradox",
       "title": "De paradox van controle",
-      "body": "[PLACEHOLDER — hoe meer je vecht, hoe sterker het wordt]"
+      "body": "Hoe harder je vecht tegen een gevoel, een gedachte of een lichamelijke sensatie, hoe harder het terugvecht. Druk je angst weg, en hij komt dubbel terug. Vermijd je pijn, en je wereld wordt kleiner.\n\nDit is de paradox van controle: wat je probeert te beheersen, beheerst jou. Niet omdat je zwak bent, maar omdat vechten energie kost die je nodig hebt om te leven.\n\nAcceptatie is geen overgave. Het is de keuze om je energie te gebruiken voor wat telt, in plaats van voor de strijd.",
+      "examples": {
+        "pain": "Je probeert de pijn weg te denken terwijl je 's ochtends opstaat. Hoe meer je er tegen vecht, hoe groter de pijn lijkt te worden, en hoe langer je blijft liggen.",
+        "mental": "Je probeert angstige gedachten weg te duwen. Ze komen terug, harder en luider. Alsof je tegen een deuropening duwt die van de andere kant ook wordt opengeduwd.",
+        "alcohol": "Je zegt tegen jezelf: 'Ik mag niet drinken.' De drang wordt sterker. De strijd tegen de drang voedt de drang.",
+        "combination": "Je probeert alles tegelijk onder controle te houden: pijn, stemming, drang. Het kost zoveel energie dat er niets overblijft om te leven."
+      }
     },
     {
       "id": "making-space",
       "title": "Ruimte maken",
-      "body": "[PLACEHOLDER — ruimte maken als vaardigheid]"
+      "body": "Ruimte maken is een vaardigheid. Je leert om ongemak naast je te laten bestaan, zonder dat het je hele aandacht opslokt.\n\nStel je voor dat je een gast ontvangt die je niet uitnodigde: een gevoel van verdriet, een golf van angst, een steek van pijn. Je hoeft de gast niet weg te sturen. Je hoeft hem ook niet op de beste stoel te zetten. Je laat hem er zijn, terwijl jij doorgaat met wat je aan het doen was.\n\nDat kost oefening. En het begint in je lichaam, met je adem."
     }
   ],
   "bodyExercise": {
     "title": "Ademruimte",
     "description": "Iets toelaten zonder weg te gaan. Ademen naar het ongemak toe.",
     "audioUrl": null,
-    "transcript": "[PLACEHOLDER]"
+    "transcript": "Ga zitten met je voeten plat op de grond. Laat je rug recht maar niet stijf zijn.\n\n[pauze 3 sec]\n\nMerk op waar je nu ongemak voelt in je lichaam, in je gedachten, of in je stemming. Je hoeft het niet te benoemen. Voel het gewoon.\n\n[pauze 5 sec]\n\nIn plaats van weg te gaan van het ongemak, adem je er langzaam naartoe. Alsof je adem een zachte hand is die ruimte maakt.\n\n[pauze 5 sec]\n\nAdem in door je neus. Voel waar de adem naartoe gaat. Misschien naar je buik, misschien naar je borst. Laat de adem het ongemak omringen, niet wegduwen, omringen.\n\n[pauze 5 sec]\n\nAdem uit, langzaam. Het ongemak mag er nog zijn. Jij ademt gewoon.\n\n[pauze 5 sec]\n\nHerhaal dit drie keer. Bij elke ademhaling: iets meer ruimte. Niet minder pijn. Meer ruimte om de pijn te dragen.\n\n[pauze 5 sec]\n\nMerk op: je bent hier nog steeds. Het ongemak is er nog, en jij ook. Dat is acceptatie.\n\n[pauze 3 sec]\n\nAls je klaar bent, beweeg je vingers en tenen. Kom rustig terug."
   },
   "practicalTask": {
     "title": "Praktische opdracht",
-    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+    "body": "Kies één moment vandaag waarop je normaal iets zou vermijden vanwege ongemak. In plaats van weg te gaan, blijf je er drie ademhalingen bij.\n\nAdem langzaam. Maak ruimte. Doe daarna wat je van plan was, of niet. Het gaat om het oefenen, niet om het resultaat.\n\nSchrijf achteraf kort op: wat voelde je? Wat veranderde er in je lichaam, in je gedachten?"
   },
   "backReferences": [
     {

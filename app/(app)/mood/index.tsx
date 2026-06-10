@@ -63,7 +63,7 @@ export default function MoodCheckinScreen() {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Terug"
-              onPress={() => (router.canGoBack() ? router.back() : router.replace('/home'))}
+              onPress={() => router.back()}
               className="p-1"
             >
               <Text className="text-lg text-text-muted">‹</Text>

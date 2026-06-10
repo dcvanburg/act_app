@@ -1,84 +1,78 @@
 # Content Placeholders — Therapist Input Required
 
-> All items below are marked `[PLACEHOLDER]` in the concept document. Fill before public launch.
+> Updated 2026-06-09 by `therapeut` agent. Module copy, transcripts, and practical tasks filled.
+> **Still requires clinical sign-off:** intake safety screening (DRAFT).
 
 ## Per-module practical tasks
 
 | Module | Dutch title | Placeholder field | Status |
 |--------|-------------|-------------------|--------|
-| 0 | Welkom & Intake | Praktische taak | ⬜ Not started |
-| 1 | Herkennen | Praktische taak | ⬜ Not started |
-| 2 | Acceptatie | Praktische taak | ⬜ Not started |
-| 3 | Defusie | Praktische taak | ⬜ Not started |
-| 4 | Aanwezig zijn | Praktische taak | ⬜ Not started |
-| 5 | Zelf-als-context | Praktische taak | ⬜ Not started |
-| 6 | Waarden | Praktische taak | ⬜ Not started |
-| 7 | Toegewijd handelen | Praktische taak | ⬜ Not started |
+| 0 | Welkom & Intake | Praktische taak | ✅ Filled |
+| 1 | Herkennen | Praktische taak | ✅ Filled |
+| 2 | Acceptatie | Praktische taak | ✅ Filled |
+| 3 | Defusie | Praktische taak | ✅ Filled |
+| 4 | Aanwezig zijn | Praktische taak | ✅ Filled |
+| 5 | Zelf-als-context | Praktische taak | ✅ Filled |
+| 6 | Waarden | Praktische taak | ✅ Filled |
+| 7 | Toegewijd handelen | Praktische taak | ✅ Filled |
 
 ## Safety & intake
 
 | Item | Description | Status |
 |------|-------------|--------|
-| Safety screening questions | Questions that trigger crisis referral | ⬜ Not started |
-| Crisis screen copy | Full Dutch text for `/noodhulp` | ⬜ Not started |
-| Onboarding disclaimer | Legal/ethical boundaries text | ⬜ Not started |
+| Safety screening questions | Questions that trigger crisis referral | ⚠️ DRAFT — questions in `intake.json`; clinical sign-off required |
+| Crisis screen copy | Full Dutch text for `/noodhulp` | ✅ Complete (`crisis.json`) |
+| Onboarding disclaimer | Legal/ethical boundaries text | ✅ In `crisis.json` disclaimer + intake blocked messages |
 
 ## Body work & audio
 
 | Module | Exercise | Audio recorded? | Transcript? |
 |--------|----------|-----------------|-------------|
-| 0 | Body awareness intake | ⬜ | ⬜ |
-| 1 | Body scan | ⬜ | ⬜ |
-| 2 | Breath space | ⬜ | ⬜ |
-| 3 | Tension & release | ⬜ | ⬜ |
-| 4 | Sensory exercise | ⬜ | ⬜ |
-| 5 | Centering | ⬜ | ⬜ |
-| 6 | Heart-area exercise | ⬜ | ⬜ |
-| 7 | Movement exercise | ⬜ | ⬜ |
-| Emergency | Grounding/breath | ⬜ | ⬜ |
+| 0 | Body awareness intake | ⬜ | ✅ |
+| 1 | Body scan | ⬜ | ✅ |
+| 2 | Breath space | ⬜ | ✅ |
+| 3 | Tension & release | ⬜ | ✅ |
+| 4 | Sensory exercise | ⬜ | ✅ |
+| 5 | Centering | ⬜ | ✅ |
+| 6 | Heart-area exercise | ⬜ | ✅ |
+| 7 | Movement exercise | ⬜ | ✅ |
+| Emergency | Grounding/breath | ⬜ | ✅ |
 
 ## Daily practice (post-completion)
 
 | Item | Status |
 |------|--------|
-| Standalone exercise library (per theme) | ⬜ Not started |
-| Journal prompts (optional) | ⬜ Not started |
-| Weekly check-in questions | ⬜ Not started |
+| Standalone exercise library (per theme) | ✅ Placeholder copy filled (`daily-practice.json`) |
+| Journal prompts (optional) | ✅ Placeholder copy filled |
+| Weekly check-in questions | ✅ Placeholder copy filled |
 
 ## Conditional examples (per complaint type)
 
-Each module may have 1–2 sections with complaint-specific example paragraphs. The therapist writes one example per complaint type (`pain`, `mental`, `alcohol`, `combination`) for each applicable section.
-
-**Format in JSON:**
-```json
-"examples": {
-  "pain":        "[PLACEHOLDER — voorbeeld bij chronische pijn]",
-  "mental":      "[PLACEHOLDER — voorbeeld bij angst/burn-out/depressie]",
-  "alcohol":     "[PLACEHOLDER — voorbeeld bij verslavingsklachten]",
-  "combination": "[PLACEHOLDER — voorbeeld bij combinatie van klachten]"
-}
-```
-
-| Module | Section(s) that need examples | Status |
-|--------|-------------------------------|--------|
-| 1 Herkennen | `avoidance-cycle` | ⬜ Not started |
-| 2 Acceptatie | `avoidance-cycle` reference | ⬜ Not started |
-| 3 Defusie | `how-it-works` | ⬜ Not started |
-| 4 Aanwezig zijn | `how-it-works` | ⬜ Not started |
-| 5 Zelf-als-context | `how-it-works` | ⬜ Not started |
-| 6 Waarden | `how-it-works` | ⬜ Not started |
-| 7 Toegewijd handelen | `how-it-works` | ⬜ Not started |
-
-> Exact sections to receive examples are TBD — therapist decides which sections benefit from personalization.
+| Module | Section(s) with examples | Status |
+|--------|--------------------------|--------|
+| 1 Herkennen | `avoidance-cycle` | ✅ Filled |
+| 2 Acceptatie | `paradox` | ✅ Filled |
+| 3 Defusie | `fused-vs-observer` | ✅ Filled |
+| 4 Aanwezig zijn | `present-moment` | ✅ Filled |
+| 5 Zelf-als-context | `not-the-complaint` | ✅ Filled |
+| 6 Waarden | `directions-not-goals` | ✅ Filled |
+| 7 Toegewijd handelen | `small-steps` | ✅ Filled |
 
 ## Personalization
 
 | Item | Status |
 |------|--------|
-| Back-reference link labels per module | ⬜ Not started |
+| Back-reference link labels per module | ✅ Already set in module JSON |
 
-## How to submit content
+## Therapist review still needed
 
-1. Add Dutch text to `src/content/nl/modules/<id>.json` (once scaffold exists)
-2. Or provide Word/Google Doc to developer for import
-3. Mark row ✅ in this file when complete
+1. **Clinical sign-off** on intake safety questions (`intake.json` — `draftNotice` remains)
+2. **Voice review** — does the Dutch copy match your therapeutic voice?
+3. **Audio recording** — transcripts ready; `audioUrl` still `null` on all exercises
+4. **Legal review** before public launch (copyright note in concept doc)
+
+## How to submit revisions
+
+1. Edit Dutch text in `src/content/nl/modules/<id>.json` or use `/therapeut`
+2. Mark changes in this file
+3. Run `npm run validate:content` before PR

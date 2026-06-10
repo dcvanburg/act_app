@@ -31,7 +31,7 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Terug naar overzicht"
-            onPress={() => router.replace('/home')}
+            onPress={() => router.back()}
             className="p-1.5"
           >
             <Text className="text-lg text-text-muted">{'‹'}</Text>

@@ -1,18 +1,15 @@
 import { usePathname, useRouter } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AlarmBellIcon } from '@/components/icons/AlarmBellIcon';
 import common from '@/content/nl/common.json';
 
 /**
  * Noodknop — emergency overlay, mounted in the root layout.
  *
- * Non-negotiable: visible on every screen, min 44pt touch target,
- * routes to /noodhulp without any auth check. See CLAUDE.md.
- *
- * When the user is already on /noodhulp tapping the Noodknop is a no-op —
- * we don't stack another /noodhulp on top of itself. The pill stays visible
- * so the affordance is consistent across screens.
+ * Always a compact circle with an alarm bell icon (min 44pt touch target).
+ * Routes to /noodhulp without any auth check. See CLAUDE.md.
  */
 export function Noodknop() {
   const router = useRouter();
@@ -41,11 +38,10 @@ export function Noodknop() {
           if (isOnNoodhulp) return;
           router.push('/noodhulp');
         }}
-        className="flex-row items-center gap-2 rounded-full bg-crisis px-4 py-3 shadow-lg active:bg-crisis-dark"
-        style={{ minHeight: 44 }}
+        className="h-11 w-11 items-center justify-center rounded-full bg-crisis shadow-lg active:bg-crisis-dark"
+        style={{ minHeight: 44, minWidth: 44 }}
       >
-        <View className="h-2 w-2 rounded-full bg-white" />
-        <Text className="text-sm font-semibold text-white">{common.emergency.buttonLabel}</Text>
+        <AlarmBellIcon size={22} color="#FFFFFF" />
       </Pressable>
     </View>
   );

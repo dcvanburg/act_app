@@ -143,10 +143,17 @@ export type EmotionTag =
   | 'verdriet'
   | 'boos'
   | 'stress'
-  | 'rustig'
-  | 'hoopvol'
   | 'pijn'
-  | 'vermoeid';
+  | 'vermoeid'
+  | 'rustig'
+  | 'ontspannen'
+  | 'hoopvol'
+  | 'blij'
+  | 'dankbaar'
+  | 'tevreden'
+  | 'energiek'
+  | 'trots'
+  | 'verbonden';
 
 /** Stored row from the `mood_logs` table. */
 export interface MoodLog {

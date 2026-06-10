@@ -10,28 +10,34 @@
     {
       "id": "directions-not-goals",
       "title": "Waarden zijn richtingen",
-      "body": "[PLACEHOLDER — geen doelen]"
+      "body": "Een doel is iets dat je kunt bereiken en afvinken. 'Tien kilo afvallen.' 'Nooit meer drinken.' 'Pijnvrij zijn.' Doelen hebben een eindpunt.\n\nEen waarde is een richting. 'Zorgen voor mijn lichaam.' 'Eerlijk zijn.' 'Verbinding met anderen.' Je loopt nooit 'klaar' met een waarde, je beweegt er steeds verder in.\n\nDat maakt waarden krachtiger dan doelen. Een doel dat je mist, voelt als falen. Een waarde die je volgt, blijft beschikbaar, ook op moeilijke dagen.",
+      "examples": {
+        "pain": "Het doel 'pijnvrij zijn' kan onbereikbaar voelen. De waarde 'actief blijven in mijn leven' is een richting die je vandaag al kunt volgen, ook met pijn.",
+        "mental": "Het doel 'nooit meer angstig zijn' zet je in een strijd. De waarde 'aanwezig zijn bij de mensen die ik liefheb' geeft je een richting, ook als angst meereist.",
+        "alcohol": "Het doel 'voor altijd stoppen' kan overweldigend zijn. De waarde 'zorgen voor mijn gezondheid' is een kompas dat ook werkt na een terugval.",
+        "combination": "Doelen voor elke klacht apart zijn uitputtend. Eén waarde: bijvoorbeeld 'eerlijk leven', kan al je keuzes richten."
+      }
     },
     {
       "id": "worth-living",
       "title": "Wat maakt het de moeite waard",
-      "body": "[PLACEHOLDER — ook als de pijn blijft]"
+      "body": "Stel jezelf de vraag: wat maakt je leven de moeite waard, ook als de pijn blijft, ook als de angst soms terugkomt, ook als de drang niet volledig verdwijnt?\n\nDit is geen vrolijke vraag. Het is een eerlijke. En hij vraagt om stilte om te beantwoorden.\n\nMisschien is het verbinding met iemand. Creativiteit. Eerlijkheid. Zorg. Humor. De natuur. Iets kleins dat toch telt. Waarden hoeven niet groots te zijn. Ze hoeven alleen echt te zijn voor jou."
     },
     {
       "id": "compass",
       "title": "Waarden als kompas",
-      "body": "[PLACEHOLDER — bij moeilijke keuzes]"
+      "body": "Op moeilijke momenten weten we vaak wat we níét willen, maar niet wat we wél willen. Waarden geven richting bij keuzes:\n\n• Wil ik dit doen omdat het mijn ongemak wegneemt, of omdat het past bij wat voor mij telt?\n• Brengt deze keuze me dichter bij mijn waarden, of verder weg?\n• Wat zou ik doen als ik wist dat de pijn niet verdwijnt, maar ik wel mag kiezen hoe ik leef?\n\nJe waarden zijn je kompas. Niet je symptomen."
     }
   ],
   "bodyExercise": {
     "title": "Hartgebied-oefening",
     "description": "Wat beweegt je werkelijk? Voelen vanuit het lichaam.",
     "audioUrl": null,
-    "transcript": "[PLACEHOLDER]"
+    "transcript": "Ga zitten. Leg een hand op je hart, of op je borst, als dat prettiger voelt.\n\n[pauze 3 sec]\n\nSluit je ogen. Voel de warmte van je hand. De beweging van je adem onder je palm.\n\n[pauze 5 sec]\n\nStel jezelf zacht de vraag: wat maakt mijn leven de moeite waard? Je hoeft geen antwoord te forceren. Wacht. Voel.\n\n[pauze 5 sec]\n\nMerk op wat er in je lichaam gebeurt als je denkt aan wat je liefhebt, wat je belangrijk vindt, wat je zou missen als het weg was. Misschien warmte. Misschien een zachte spanning. Misschien tranen. Alles mag.\n\n[pauze 5 sec]\n\nNoem in je hoofd één waarde die opkomt. Niet wat je zou moeten willen: wat je werkelijk voelt. Verbinding. Vrijheid. Zorg. Eerlijkheid. Humor. Rust.\n\n[pauze 5 sec]\n\nVoel die waarde in je lichaam. Waar leeft hij? In je borst, je buik, je keel?\n\n[pauze 5 sec]\n\nDit is je kompas. Het was er al. Je hoefde het alleen te voelen.\n\n[pauze 3 sec]\n\nOpen je ogen. Neem één waarde mee in je dag."
   },
   "practicalTask": {
     "title": "Praktische opdracht",
-    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+    "body": "Schrijf drie waarden op die voor jou belangrijk zijn. Niet wat je zou moeten willen, maar wat je werkelijk raakt.\n\nBij elke waarde: schrijf één kleine actie die je deze week kunt doen in de richting van die waarde. Niet groot. Niet perfect. Klein en echt.\n\nVoorbeeld: Waarde 'verbinding' → één bericht sturen aan iemand waar je om geeft."
   },
   "backReferences": [
     {

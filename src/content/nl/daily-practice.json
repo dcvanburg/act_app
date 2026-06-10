@@ -4,18 +4,18 @@
   "features": {
     "exercises": {
       "title": "Losse oefeningen",
-      "description": "Oefeningen per thema — te gebruiken wanneer je ze nodig hebt.",
-      "placeholder": "[PLACEHOLDER — oefeningenbibliotheek]"
+      "description": "Oefeningen per thema, te gebruiken wanneer je ze nodig hebt.",
+      "placeholder": "Kies een oefening: ademruimte, bodyscan, defusie, zintuigen, centreren, gronding of beweging. Elke oefening duurt vijf tot tien minuten."
     },
     "journal": {
       "title": "Dagboek",
       "description": "Reflecties bijhouden.",
-      "promptPlaceholder": "[PLACEHOLDER — optionele schrijfprompts]"
+      "promptPlaceholder": "Wat viel je vandaag op? Welk ongemak was er, en hoe ging je ermee om? Welke kleine stap zette je in de richting van je waarden?"
     },
     "checkIn": {
       "title": "Wekelijkse check-in",
       "description": "Hoe staat het met je waarden?",
-      "questionsPlaceholder": "[PLACEHOLDER — check-in vragen]"
+      "questionsPlaceholder": "Welke waarde was deze week het meest aanwezig? Waar liep je vast? Wat is één kleine stap voor de komende week?"
     }
   }
 }

@@ -3,21 +3,23 @@ import { useMemo, useState } from 'react';
 import { ActivityIndicator, Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { MoodFace } from '@/components/mood/MoodFace';
+import { MoodStreakSummary } from '@/components/mood/MoodStreakSummary';
 import { MoodTrendChart } from '@/components/mood/MoodTrendChart';
 import mood from '@/content/nl/mood.json';
 import { buildSeries, seriesAverage } from '@/lib/mood';
-import { useMoodLogs } from '@/lib/mood-queries';
+import { useCheckInStreak, useMoodLogs } from '@/lib/mood-queries';
 import type { EmotionTag, MoodLog, MoodScore } from '@/types/content';
 
 type Range = '7d' | '30d';
 
-const scoreMeta = mood.scores as { value: MoodScore; emoji: string; label: string }[];
+const scoreMeta = mood.scores as { value: MoodScore; label: string }[];
 
 /**
  * /mood/history — 7d / 30d trend + recent entries.
  *
  * Chart is hand-rolled SVG (no chart lib dep). The "average" stat is a simple
- * mean over the entries in the range; we display it alongside the emoji of
+ * mean over the entries in the range; we display it alongside the face of
  * the rounded mood to keep the affective signal intact.
  */
 export default function MoodHistoryScreen() {
@@ -25,6 +27,7 @@ export default function MoodHistoryScreen() {
   const insets = useSafeAreaInsets();
   const [range, setRange] = useState<Range>('7d');
   const { data: logs, isLoading } = useMoodLogs(range);
+  const { data: streak, isLoading: streakLoading } = useCheckInStreak();
 
   const series = useMemo(() => buildSeries(logs ?? [], range === '7d' ? 7 : 30), [logs, range]);
   const average = useMemo(() => seriesAverage(series), [series]);
@@ -46,7 +49,7 @@ export default function MoodHistoryScreen() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Terug"
-            onPress={() => (router.canGoBack() ? router.back() : router.replace('/home'))}
+            onPress={() => router.back()}
             className="p-1"
           >
             <Text className="text-lg text-text-muted">‹</Text>
@@ -89,6 +92,8 @@ export default function MoodHistoryScreen() {
           </View>
         ) : (
           <>
+            <MoodStreakSummary streak={streak} isLoading={streakLoading} />
+
             <View className="rounded-2xl bg-surface p-5 shadow-sm">
               <View className="mb-3 flex-row items-baseline justify-between">
                 <Text className="text-xs font-semibold uppercase tracking-wide text-text-muted">
@@ -101,9 +106,7 @@ export default function MoodHistoryScreen() {
               <View className="flex-row items-end gap-2">
                 {average !== null ? (
                   <>
-                    <Text className="text-3xl">
-                      {scoreMeta[Math.round(average) - 1]?.emoji ?? '·'}
-                    </Text>
+                    <MoodFace score={Math.round(average) as MoodScore} size={36} color="#3B6D11" />
                     <Text className="font-serif text-2xl font-bold text-text">
                       {average.toFixed(1)}
                     </Text>
@@ -126,7 +129,7 @@ export default function MoodHistoryScreen() {
                   <View key={log.id}>
                     {i > 0 ? <View className="h-px bg-border" /> : null}
                     <View className="flex-row items-start gap-3 p-4">
-                      <Text className="text-2xl">{meta?.emoji ?? '·'}</Text>
+                      <MoodFace score={log.mood_score} size={32} color="#3B6D11" />
                       <View className="flex-1">
                         <Text className="text-sm font-semibold text-text">
                           {formatDate(log.date)} · {meta?.label}

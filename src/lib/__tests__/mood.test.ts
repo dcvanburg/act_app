@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildSeries, hasTodayEntry, isoDate, lastPerDay, seriesAverage } from '../mood';
+import {
+  buildSeries,
+  computeCheckInStreak,
+  computeCheckInStreakFromDates,
+  dayBefore,
+  hasTodayEntry,
+  isoDate,
+  lastPerDay,
+  seriesAverage,
+} from '../mood';
 import type { MoodLog } from '@/types/content';
 
 function makeLog(overrides: Partial<MoodLog>): MoodLog {
@@ -74,6 +83,46 @@ describe('seriesAverage', () => {
         { date: 'd2', score: null },
       ]),
     ).toBeNull();
+  });
+});
+
+describe('computeCheckInStreak', () => {
+  it('returns zero when there are no logs', () => {
+    expect(computeCheckInStreak([], '2026-06-09')).toEqual({ current: 0, totalDays: 0 });
+  });
+
+  it('counts consecutive days ending today', () => {
+    const logs = [
+      makeLog({ date: '2026-06-09' }),
+      makeLog({ date: '2026-06-08' }),
+      makeLog({ date: '2026-06-07' }),
+      makeLog({ date: '2026-06-05' }),
+    ];
+    expect(computeCheckInStreak(logs, '2026-06-09')).toEqual({ current: 3, totalDays: 4 });
+  });
+
+  it('keeps streak alive from yesterday when today is still open', () => {
+    const logs = [makeLog({ date: '2026-06-08' }), makeLog({ date: '2026-06-07' })];
+    expect(computeCheckInStreak(logs, '2026-06-09')).toEqual({ current: 2, totalDays: 2 });
+  });
+
+  it('returns zero current streak when the latest check-in is older than yesterday', () => {
+    const logs = [makeLog({ date: '2026-06-06' }), makeLog({ date: '2026-06-05' })];
+    expect(computeCheckInStreak(logs, '2026-06-09')).toEqual({ current: 0, totalDays: 2 });
+  });
+});
+
+describe('dayBefore', () => {
+  it('steps back one calendar day', () => {
+    expect(dayBefore('2026-06-09')).toBe('2026-06-08');
+  });
+});
+
+describe('computeCheckInStreakFromDates', () => {
+  it('deduplicates multiple entries on the same day', () => {
+    expect(
+      computeCheckInStreakFromDates(['2026-06-09', '2026-06-09', '2026-06-08'], '2026-06-09'),
+    ).toEqual({ current: 2, totalDays: 2 });
   });
 });
 

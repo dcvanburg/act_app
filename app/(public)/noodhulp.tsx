@@ -40,7 +40,7 @@ export default function NoodhulpScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Terug"
-          onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
+          onPress={() => router.back()}
           className="mb-4 self-start"
         >
           <Text className="text-sm text-text-muted">← Terug</Text>

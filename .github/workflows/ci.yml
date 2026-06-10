@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: '20'
+          node-version: '20.19.4'
           cache: 'npm'
       - run: npm install --prefer-offline --no-audit --no-fund
       - run: npm run typecheck
@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: '20'
+          node-version: '20.19.4'
           cache: 'npm'
       - run: npm install --prefer-offline --no-audit --no-fund
       - run: npm run lint
@@ -53,7 +53,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: '20'
+          node-version: '20.19.4'
           cache: 'npm'
       - run: npm install --prefer-offline --no-audit --no-fund
       - run: npm run format:check
@@ -67,7 +67,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: '20'
+          node-version: '20.19.4'
           cache: 'npm'
       - run: npm install --prefer-offline --no-audit --no-fund
       - run: npx vitest run --coverage
@@ -92,7 +92,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: '20'
+          node-version: '20.19.4'
           cache: 'npm'
       - run: npm install --prefer-offline --no-audit --no-fund
       - run: npm audit --audit-level=critical --omit=dev
@@ -122,7 +122,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: '20'
+          node-version: '20.19.4'
           cache: 'npm'
       - run: npm install --prefer-offline --no-audit --no-fund
       - name: Validate safety-critical content
@@ -142,7 +142,7 @@ jobs:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: '20'
+          node-version: '20.19.4'
           cache: 'npm'
       - run: npm install --prefer-offline --no-audit --no-fund
       - name: Validate app.json

@@ -3,35 +3,41 @@
   "moduleNumber": 3,
   "title": "Defusie",
   "phase": "Kern",
-  "actProcess": "Cognitieve defusie — afstand nemen van gedachten",
+  "actProcess": "Cognitieve defusie: afstand nemen van gedachten",
   "bodyWork": "Spanning & loslaten",
   "goal": "Je ervaart dat gedachten gedachten zijn, geen feiten.",
   "sections": [
     {
       "id": "fused-vs-observer",
       "title": "Gefuseerd of observerend",
-      "body": "[PLACEHOLDER — verschil tussen gefuseerd zijn en observeren]"
+      "body": "Soms voelt een gedachte als een feit. 'Ik red het niet.' 'De pijn wordt nooit beter.' 'Ik ben een zwakke.' Als je zo dicht op een gedachte zit dat je hem niet meer van jezelf kunt scheiden, noemen we dat fusie.\n\nDefusie is het tegenovergestelde: je merkt op dat er een gedachte is, zonder erin te zitten. Niet: 'ik red het niet', maar: 'ik merk de gedachte op dat ik het niet red.'\n\nDat kleine verschil verandert alles. Een gedachte die je observeert, heeft minder macht over je handelen.",
+      "examples": {
+        "pain": "De gedachte 'dit wordt nooit beter' voelt als waarheid. Maar het is een gedachte. Niet een voorspelling. Je kunt de gedachte opmerken terwijl je toch je dag verder gaat.",
+        "mental": "'Ik kan dit niet aan' klinkt als feit. Probeer: 'Ik merk op dat ik de gedachte heb dat ik dit niet aankan.' De gedachte is er. Jij bent er ook.",
+        "alcohol": "'Één keer kan geen kwaad' is een oude zin in je hoofd, geen plan. Herken hem als gedachte, niet als instructie.",
+        "combination": "'Ik ben kapot' vat al je klachten samen in één harde gedachte. Maar jij bent niet je gedachten. Je hebt ze."
+      }
     },
     {
       "id": "inner-critic",
       "title": "De innerlijke criticus",
-      "body": "[PLACEHOLDER — luidspreker, niet waarheid]"
+      "body": "De meeste mensen hebben een innerlijke stem die hard kan zijn. 'Je had dit nooit moeten laten gebeuren.' 'Anderen kunnen dit wel.' 'Je maakt het alleen maar erger.'\n\nDie stem voelt als de waarheid, maar het is een luidspreker in je hoofd, niet een rechter. Hij heeft een functie: je beschermen tegen teleurstelling of schaamte. Maar hij is niet altijd behulpzaam.\n\nJe hoeft de innerlijke criticus niet weg te werken. Je kunt leren om hem te horen zonder te geloven wat hij zegt."
     },
     {
       "id": "techniques",
       "title": "Defusietechnieken",
-      "body": "[PLACEHOLDER — eigen versie therapeut]"
+      "body": "Hier zijn drie manieren om afstand te nemen van gedachten. Kies wat bij je past:\n\n1. **Bedank je brein.** 'Dank je voor deze gedachte. Je probeert me te beschermen.' Je hoeft de gedachte niet te volgen.\n\n2. **Zing je gedachte.** Neem een hardnekkige gedachte en zing hem op de melodie van 'Happy Birthday.' Het geluid verandert, en de macht van de gedachte ook.\n\n3. **Ik merk op dat…** Voor elke harde gedachte: herformuleer met 'Ik merk op dat ik de gedachte heb dat…' Het maakt de afstand zichtbaar.\n\nOefen met één techniek deze week. Het hoeft niet perfect. Het gaat om het proberen."
     }
   ],
   "bodyExercise": {
     "title": "Spanning en loslaten",
     "description": "Wat houdt je lichaam vast als je gelooft in een gedachte?",
     "audioUrl": null,
-    "transcript": "[PLACEHOLDER]"
+    "transcript": "Ga zitten. Sluit je ogen.\n\n[pauze 3 sec]\n\nDenk aan een gedachte die je vaak hebt: een die hard aankomt. Je hoeft hem niet hardop te zeggen. Laat hem er gewoon zijn.\n\n[pauze 5 sec]\n\nMerk op wat er in je lichaam gebeurt terwijl je in die gedachte zit. Waar voel je spanning? Je kaak, je schouders, je buik, je handen?\n\n[pauze 5 sec]\n\nSpan die plek bewust nog iets aan. Houd vast. Merk hoe het voelt om te geloven.\n\n[pauze 5 sec]\n\nNu: laat los. Adem uit. Ontspan je schouders, je kaak, je handen. De gedachte mag er nog zijn, maar je hoeft haar niet vast te houden.\n\n[pauze 5 sec]\n\nMerk het verschil. Geloofde je lichaam de gedachte? En wat verandert er als je loslaat?\n\n[pauze 3 sec]\n\nOpen je ogen. Je gedachten zijn niet je lichaam, en je lichaam hoeft ze niet vast te houden."
   },
   "practicalTask": {
     "title": "Praktische opdracht",
-    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+    "body": "Kies vandaag één hardnekkige gedachte. Pas er één defusietechniek op toe:\n\n• Bedank je brein, of\n• Zing de gedachte op een simpele melodie, of\n• Herformuleer: 'Ik merk op dat ik de gedachte heb dat…'\n\nSchrijf op: wat veranderde er in je lichaam? Ging de gedachte weg? (Dat hoeft niet: defusie gaat niet om wegnemen, maar om afstand.)"
   },
   "backReferences": [
     {

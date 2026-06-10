@@ -18,19 +18,7 @@ const COMPLAINT_KEYS: ComplaintType[] = ['pain', 'mental', 'alcohol', 'combinati
 type Step = 'welcome' | 'complaint' | 'safety' | 'blocked' | 'complete';
 
 /**
- * /onboarding — intake flow (α5).
- *
- * Step machine:
- *   welcome  → "Beginnen" tap
- *   complaint → pick one complaint type → "Verder"
- *   safety   → answer N safety questions, one at a time
- *              on the last question: compute worstOutcome → blocked or complete
- *   blocked  → show /noodhulp resources, leave module 0 in-progress
- *   complete → save intake + mark module 0 complete → home
- *
- * If the user has already completed onboarding, render the
- * read-only revisit (the module 0 JSON content). This matches every other
- * module's revisit behaviour.
+ * /modules/onboarding — module 0 intake flow (α5), inside the modules stack.
  */
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -105,10 +93,7 @@ export default function OnboardingScreen() {
     >
       <View className="mx-auto w-full max-w-md">
         {step === 'welcome' && (
-          <WelcomeStep
-            onContinue={() => setStep('complaint')}
-            onClose={() => router.replace('/home')}
-          />
+          <WelcomeStep onContinue={() => setStep('complaint')} onClose={() => router.back()} />
         )}
         {step === 'complaint' && (
           <ComplaintStep
@@ -159,7 +144,7 @@ function WelcomeStep({ onContinue, onClose }: { onContinue: () => void; onClose:
   return (
     <View>
       <Pressable accessibilityRole="button" onPress={onClose} className="mb-4 self-start">
-        <Text className="text-sm text-text-muted">← Later</Text>
+        <Text className="text-sm text-text-muted">‹ {common.actions.back}</Text>
       </Pressable>
       <Text className="mb-2 font-serif text-3xl font-bold text-text">{intake.welcome.title}</Text>
       <Text className="mb-8 text-base leading-relaxed text-text-subtle">{intake.welcome.body}</Text>
@@ -190,7 +175,7 @@ function ComplaintStep({
   return (
     <View>
       <Pressable accessibilityRole="button" onPress={onBack} className="mb-4 self-start">
-        <Text className="text-sm text-text-muted">{`← ${common.actions.back}`}</Text>
+        <Text className="text-sm text-text-muted">{`‹ ${common.actions.back}`}</Text>
       </Pressable>
       <Text className="mb-1 font-serif text-2xl font-bold text-text">
         {intake.complaintTypes.title}
@@ -262,7 +247,7 @@ function SafetyStep({
         disabled={isSaving}
         className="mb-4 self-start"
       >
-        <Text className="text-sm text-text-muted">{`← ${common.actions.back}`}</Text>
+        <Text className="text-sm text-text-muted">{`‹ ${common.actions.back}`}</Text>
       </Pressable>
       <Text className="mb-1 text-xs font-medium uppercase tracking-wide text-text-muted">
         {intake.safetyCheck.title} · {index + 1} / {total}

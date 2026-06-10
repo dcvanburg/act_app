@@ -3,35 +3,41 @@
   "moduleNumber": 7,
   "title": "Toegewijd handelen",
   "phase": "Leven",
-  "actProcess": "Committed action — leven in de richting van waarden",
+  "actProcess": "Committed action: leven in de richting van waarden",
   "bodyWork": "Bewegingsoefening",
   "goal": "Je zet concrete, kleine stappen ondanks klachten.",
   "sections": [
     {
       "id": "small-steps",
       "title": "Kleine stappen",
-      "body": "[PLACEHOLDER — kleine stappen zijn echte stappen]"
+      "body": "Grote veranderingen beginnen met kleine stappen. Niet morgen alles anders. Niet wachten tot je je beter voelt. Vandaag, één stap in de richting van wat telt.\n\nEen kleine stap is geen kleine overwinning. Het is een echte stap. Vijf minuten wandelen ondanks pijn. Eén bericht sturen ondanks angst. Eén avond thuis blijven ondanks drang.\n\nJe hoeft niet te weten waar de reis eindigt. Je hoeft alleen de volgende stap te zien, en die te zetten.",
+      "examples": {
+        "pain": "Vijf minuten buiten lopen, ook als je lichaam protesteert. Niet om de pijn weg te krijgen, omdat bewegen bij 'zorg voor mijn lichaam' hoort.",
+        "mental": "Eén telefoontje naar een vriend, ook als je angst zegt dat je moet blijven. Verbinding telt meer dan comfort.",
+        "alcohol": "Eén avond kiezen voor iets anders dan drinken. Niet als straf, maar als stap richting gezondheid.",
+        "combination": "Eén kleine actie die één waarde raakt. Niet alles tegelijk oplossen. één richting kiezen en bewegen."
+      }
     },
     {
       "id": "relapse-info",
       "title": "Terugval als informatie",
-      "body": "[PLACEHOLDER — wat zegt dit over wat ik echt wil]"
+      "body": "Terugval hoort bij verandering. Een dag waarop je vermijdt. Een avond waarop je drinkt. Een week waarin de pijn je klein houdt. Dat is geen mislukking. Het is informatie.\n\nWat zegt deze terugval over wat je werkelijk wilt? Waar was je moe? Wat had je nodig? Welke waarde was even uit beeld?\n\nTerugval vertelt je niet dat je het niet kunt. Het vertelt je waar je kompas naartoe moet wijzen, opnieuw, vandaag."
     },
     {
       "id": "flexible-persistence",
       "title": "Flexibel persisteren",
-      "body": "[PLACEHOLDER — aanpassen zonder opgeven]"
+      "body": "Toegewijd handelen is niet koppig doorgaan ondanks alles. Het is flexibel blijven bewegen in de richting van je waarden, ook als het plan verandert.\n\nSoms is de stap kleiner dan gepland. Soms is de richting hetzelfde maar de route anders. Soms moet je pauzeren, en later verder.\n\nAanpassen is geen opgeven. Opgeven is stoppen met bewegen. Jij leert bewegen, met je klachten, niet ondanks ze."
     }
   ],
   "bodyExercise": {
     "title": "Bewegingsoefening",
     "description": "Het lichaam meenemen in een nieuwe richting.",
     "audioUrl": null,
-    "transcript": "[PLACEHOLDER]"
+    "transcript": "Sta op. Voel je voeten op de grond. Je hoeft nergens heen. Je bent al aangekomen.\n\n[pauze 3 sec]\n\nDenk aan één waarde die je deze week hebt gekozen. Voel hem in je lichaam.\n\n[pauze 5 sec]\n\nBeweeg langzaam. Een stap vooruit. Merk op hoe je lichaam reageert: spanning, weerstand, of juist ruimte.\n\n[pauze 5 sec]\n\nNog een stap. Je neemt je lichaam mee in een nieuwe richting. Niet door je klachten heen te duwen, door ze mee te nemen.\n\n[pauze 5 sec]\n\nSta stil. Voel je voeten. Je bent in beweging. Niet omdat alles beter is, maar omdat je koos om te bewegen.\n\n[pauze 5 sec]\n\nAdem in. Adem uit. Dit is toegewijd handelen: klein, lichamelijk, echt.\n\n[pauze 3 sec]\n\nGa verder met je dag, vanuit deze stap."
   },
   "practicalTask": {
     "title": "Praktische opdracht",
-    "body": "[PLACEHOLDER — in te vullen door therapeut]"
+    "body": "Kies één waarde uit Module 6. Zet vandaag één concrete, kleine stap in die richting, ondanks wat er ook meereist (pijn, angst, drang, vermoeidheid).\n\nSchrijf op:\n• Welke waarde koos je?\n• Welke stap zette je?\n• Wat reisde mee (ongemak, gedachten, gevoelens)?\n• Wat leerde je, ook als de stap niet perfect was?"
   },
   "backReferences": [
     {
