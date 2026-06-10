@@ -1,7 +1,10 @@
-import { Link, useRouter } from 'expo-router';
+import { Link, useRouter, type Href } from 'expo-router';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { MODULE_META } from '@/lib/content';
+import { getModuleStatus, MODULE_ORDER } from '@/lib/progress';
+import { useUserProgress } from '@/lib/progress-queries';
 import type { ComplaintType, ModuleContent } from '@/types/content';
 
 interface Props {
@@ -20,6 +23,23 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const primaryComplaint = complaintTypes[0] ?? null;
+  const { data: progress } = useUserProgress();
+
+  const currentIndex = MODULE_ORDER.indexOf(content.id);
+  const nextModuleId =
+    currentIndex >= 0 && currentIndex < MODULE_ORDER.length - 1
+      ? MODULE_ORDER[currentIndex + 1]
+      : null;
+  const nextAccessible =
+    nextModuleId && progress
+      ? getModuleStatus(nextModuleId, progress) !== 'locked'
+      : false;
+  const nextMeta = nextModuleId ? MODULE_META[nextModuleId] : null;
+  const nextHref: Href | null = nextModuleId
+    ? nextModuleId === 'onboarding'
+      ? '/modules/onboarding'
+      : { pathname: '/modules/[id]', params: { id: nextModuleId } }
+    : null;
 
   return (
     <View className="flex-1 bg-background">
@@ -134,6 +154,18 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
                   </Link>
                 ))}
               </View>
+            </View>
+          ) : null}
+
+          {nextModuleId && nextAccessible && nextMeta && nextHref ? (
+            <View>
+              <Text className="mb-3 text-sm font-semibold text-text-muted">Volgende module</Text>
+              <Link href={nextHref} asChild>
+                <Pressable className="flex-row items-center justify-between rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft">
+                  <Text className="text-sm text-text">{nextMeta.title}</Text>
+                  <Text className="text-text-muted">›</Text>
+                </Pressable>
+              </Link>
             </View>
           ) : null}
         </View>
