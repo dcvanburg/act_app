@@ -106,11 +106,14 @@ function PersonalDataForm({ onDone }: { onDone: () => void }) {
   const andersSelected = referralSource === ANDERS;
   const effectiveReferral = andersSelected ? customReferral.trim() : referralSource;
 
+  const phoneInvalid = phone.length > 0 && !/^06\d{8}$/.test(phone.replace(/\s/g, ''));
+
   const canSave =
     firstName.trim().length > 0 &&
     lastName.trim().length > 0 &&
     referralSource.length > 0 &&
-    (!andersSelected || customReferral.trim().length > 0);
+    (!andersSelected || customReferral.trim().length > 0) &&
+    !phoneInvalid;
 
   function handleSave() {
     if (!canSave) return;
@@ -162,8 +165,15 @@ function PersonalDataForm({ onDone }: { onDone: () => void }) {
         placeholder={content.step1.fields.phonePlaceholder}
         placeholderTextColor="#888780"
         editable={!updateProfile.isPending}
-        className={inputClass}
+        className={`rounded-lg border px-3 py-3 text-base text-text mb-1 ${
+          phoneInvalid ? 'border-crisis bg-background' : 'border-border bg-background'
+        }`}
       />
+      {phoneInvalid ? (
+        <Text className="mb-4 text-xs text-crisis">{content.step1.fields.phoneError}</Text>
+      ) : (
+        <View className="mb-4" />
+      )}
 
       <Text className="mb-3 text-sm font-medium text-text">
         {content.step1.fields.referralSource}
