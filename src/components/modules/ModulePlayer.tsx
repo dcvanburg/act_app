@@ -82,10 +82,13 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes, onCompl
         // Parent owns completion (e.g. onboarding → CompleteStep).
         onCompleteRef.current();
       } else {
-        // Regular module: save as completed then go home.
+        // Regular module: save as completed then show the read-only view.
         saveMutation.mutate(
           { moduleId: content.id, lastStepId: currentScreen!.id, completed: true },
-          { onSuccess: () => router.replace('/home') },
+          {
+            onSuccess: () =>
+              router.replace({ pathname: '/modules/[id]', params: { id: content.id } }),
+          },
         );
       }
       return;

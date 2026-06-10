@@ -2,6 +2,7 @@ import { Link, useRouter, type Href } from 'expo-router';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import common from '@/content/nl/common.json';
 import { MODULE_META } from '@/lib/content';
 import { getModuleStatus, MODULE_ORDER } from '@/lib/progress';
 import { useUserProgress } from '@/lib/progress-queries';
@@ -26,6 +27,15 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
   const { data: progress } = useUserProgress();
 
   const currentIndex = MODULE_ORDER.indexOf(content.id);
+
+  const prevModuleId = currentIndex > 0 ? (MODULE_ORDER[currentIndex - 1] ?? null) : null;
+  const prevMeta = prevModuleId ? MODULE_META[prevModuleId] : null;
+  const prevHref: Href | null = prevModuleId
+    ? prevModuleId === 'onboarding'
+      ? '/modules/onboarding'
+      : { pathname: '/modules/[id]', params: { id: prevModuleId } }
+    : null;
+
   const nextModuleId =
     currentIndex >= 0 && currentIndex < MODULE_ORDER.length - 1
       ? MODULE_ORDER[currentIndex + 1]
@@ -157,9 +167,44 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
             </View>
           ) : null}
 
+          <View className="flex-row gap-3">
+            <Link href="/home" asChild>
+              <Pressable
+                accessibilityRole="link"
+                className="flex-1 items-center rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft"
+              >
+                <Text className="text-sm font-medium text-text">{common.nav.home}</Text>
+              </Pressable>
+            </Link>
+            <Link href="/modules" asChild>
+              <Pressable
+                accessibilityRole="link"
+                className="flex-1 items-center rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft"
+              >
+                <Text className="text-sm font-medium text-text">{common.nav.modules}</Text>
+              </Pressable>
+            </Link>
+          </View>
+
+          {prevModuleId && prevMeta && prevHref ? (
+            <View>
+              <Text className="mb-3 text-sm font-semibold text-text-muted">
+                {common.module.prevModule}
+              </Text>
+              <Link href={prevHref} asChild>
+                <Pressable className="flex-row items-center gap-2 rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft">
+                  <Text className="text-text-muted">‹</Text>
+                  <Text className="flex-1 text-sm text-text">{prevMeta.title}</Text>
+                </Pressable>
+              </Link>
+            </View>
+          ) : null}
+
           {nextModuleId && nextAccessible && nextMeta && nextHref ? (
             <View>
-              <Text className="mb-3 text-sm font-semibold text-text-muted">Volgende module</Text>
+              <Text className="mb-3 text-sm font-semibold text-text-muted">
+                {common.module.nextModule}
+              </Text>
               <Link href={nextHref} asChild>
                 <Pressable className="flex-row items-center justify-between rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft">
                   <Text className="text-sm text-text">Doorgaan naar: {nextMeta.title}</Text>

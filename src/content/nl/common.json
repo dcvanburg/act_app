@@ -42,6 +42,8 @@
   "module": {
     "notesTitle": "Jouw notities",
     "notesPlaceholder": "Schrijf hier gedachten, vragen of aandachtspunten...",
-    "completeButton": "Module afronden"
+    "completeButton": "Module afronden",
+    "prevModule": "Vorige module",
+    "nextModule": "Volgende module"
   }
 }
