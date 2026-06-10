@@ -18,7 +18,7 @@ Answer these before or during Phase 1 implementation. Mark resolved items with d
 |---|----------|--------|--------|
 | 6 | **Database:** Confirm Supabase (EU) or alternative? | ADR-001 | _TBD_ |
 | 7 | **Push notifications:** Web push, email, or skip for v1? | P2 scope | **Resolved 2026-06-08:** Skip entirely for v1. Revisit after pilot. |
-| 8 | **Offline:** Required for emergency button only, or full modules? | PWA scope | **Resolved 2026-06-08:** Skip PWA for v1. Full connectivity required. |
+| 8 | **Offline:** Required for emergency button only, or full modules? | PWA scope | **Resolved 2026-06-09:** Connection required. App will NOT function without network. Crisis page, modules, journal — all require connectivity. Decision reaffirmed after brief reversal. |
 | 9 | **Analytics:** Any usage analytics (privacy-preserving)? | GDPR, consent UI | **Resolved 2026-06-08:** Decide after pilot. Env var placeholder kept in `.env.example`. No wiring in v1. |
 | 10 | **Domain:** Production URL? (e.g. `vanoverlevennaarleven.nl`) | Deploy config | _TBD_ |
 
@@ -27,9 +27,25 @@ Answer these before or during Phase 1 implementation. Mark resolved items with d
 | # | Question | Impact | Answer |
 |---|----------|--------|--------|
 | 11 | **Safety screening:** Exact questions for crisis detection? | Onboarding block logic | _TBD_ |
-| 12 | **Privacy policy & terms:** Who drafts Dutch legal pages? | Launch blocker | _TBD_ |
+| 12 | **Privacy policy & terms:** Who drafts Dutch legal pages? | Launch blocker (Apple requires privacy URL before submission) | _TBD_ |
 | 13 | **Audio:** Therapist records all, or text-only for v1? | Audio component scope | **Resolved 2026-06-08:** No audio in v1. Body exercises are text-only (transcript displayed directly). Audio player added in a future sprint. |
 | 14 | **Pilot:** Timeline and group size for user testing? | Step 4 from concept doc | _TBD_ |
+| 15 | **Public crisis URL after Expo pivot:** Keep `act-app-xi.vercel.app/noodhulp` reachable in a browser, or in-app only? | Crisis safety net for people without the app installed | **Resolved 2026-06-09 (provisional):** In-app only. Therapist to confirm before pilot — standard practice for AVG Article 9 mental-health apps is a public crisis page fallback. |
+| 16 | **Apple/Google developer accounts:** Who owns them and pays? | EAS Build, TestFlight, Play Internal Testing | _TBD_ |
+| 17 | **App name (store listing):** Final name for App Store / Play Store? | Store submission | _TBD_ — working title "Van Overleven naar Leven" |
+| 18 | **App icons + splash + screenshots:** Asset source? | Required for store submission | _TBD_ |
+
+## Pivot to Expo (2026-06-09)
+
+Decisions made for the Next.js → Expo pivot:
+
+| Decision | Choice |
+|---|---|
+| Pivot scope | Replace Next.js entirely with Expo (no monorepo, no web companion) |
+| Router | Expo Router (file-based) |
+| Supabase project | Reuse existing `atscybinltwlaaucthsl` (subject to EU region confirmation, #6) |
+| Crisis URL | In-app only (provisional — see #15) |
+| Pilot urgency | Months out — rebuild has time |
 
 ## Resolved
 
@@ -42,6 +58,6 @@ Answer these before or during Phase 1 implementation. Mark resolved items with d
 | 3 | Completed module revisit | Read-only single scrollable page. No pagination, status stays `completed`. | 2026-06-08 |
 | 4 | Monetization | Free pilot. `subscriptionTier: 'free'` on profile. No paywall logic in v1. | 2026-06-08 |
 | 7 | Push notifications | Skip for v1. Revisit after pilot. | 2026-06-08 |
-| 8 | Offline / PWA | Skip for v1. Full connectivity required. | 2026-06-08 |
+| 8 | Offline / PWA | Connection required. Briefly reversed to "works offline" on 2026-06-09, then re-reversed same day. App will not function without network. | 2026-06-09 |
 | 9 | Analytics | Decide after pilot. Env var placeholder kept. No wiring in v1. | 2026-06-08 |
 | 13 | Audio | No audio in v1. Body exercises are text-only. Audio player added in a future sprint. | 2026-06-08 |

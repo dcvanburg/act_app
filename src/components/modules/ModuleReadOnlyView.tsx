@@ -1,121 +1,143 @@
-import Link from 'next/link';
-import type { ModuleContent, ComplaintType } from '@/types/content';
+import { Link, useRouter } from 'expo-router';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import type { ComplaintType, ModuleContent } from '@/types/content';
 
 interface Props {
   content: ModuleContent;
   complaintTypes: ComplaintType[];
 }
 
-// Completed module revisit — single scrollable page, no pagination.
-// See docs/NAVIGATION.md: revisit behavior.
+/**
+ * ModuleReadOnlyView — completed-module revisit.
+ *
+ * Single scrollable page (no pagination, no progress saving). Per
+ * docs/NAVIGATION.md: a completed module stays completed and is browsable
+ * in full at any time.
+ */
 export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
   const primaryComplaint = complaintTypes[0] ?? null;
 
   return (
-    <div className="min-h-screen bg-background pb-28">
-      {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-border bg-surface/80 backdrop-blur-sm px-4 py-3">
-        <div className="mx-auto flex max-w-lg items-center gap-3">
-          <Link
-            href="/home"
-            aria-label="Terug naar overzicht"
-            className="rounded-lg p-1.5 text-text-muted hover:bg-background hover:text-text"
+    <View className="flex-1 bg-background">
+      <View
+        style={{ paddingTop: insets.top + 12 }}
+        className="border-b border-border bg-surface/80 px-4 pb-3"
+      >
+        <View className="mx-auto w-full max-w-md flex-row items-center gap-3">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Terug naar overzicht"
+            onPress={() => router.replace('/home')}
+            className="p-1.5"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
-          </Link>
-          <div className="flex-1">
-            <p className="text-xs font-medium text-text-muted">{content.phase} · Afgerond</p>
-            <h1 className="text-sm font-semibold text-text">{content.title}</h1>
-          </div>
-          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-            ✓ Afgerond
-          </span>
-        </div>
-      </header>
+            <Text className="text-lg text-text-muted">{'‹'}</Text>
+          </Pressable>
+          <View className="flex-1">
+            <Text className="text-xs font-medium text-text-muted">{content.phase} · Afgerond</Text>
+            <Text className="text-sm font-semibold text-text" numberOfLines={1}>
+              {content.title}
+            </Text>
+          </View>
+          <View className="rounded-full bg-primary-soft px-2 py-1">
+            <Text className="text-xs font-medium text-primary">✓ Afgerond</Text>
+          </View>
+        </View>
+      </View>
 
-      <main className="mx-auto max-w-lg px-4 py-6 space-y-8">
-        {/* Sections */}
-        {content.sections.map((section) => {
-          const example = section.examples
-            ? ((primaryComplaint && section.examples[primaryComplaint]) ?? null)
-            : null;
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          padding: 16,
+          paddingBottom: insets.bottom + 96,
+          gap: 24,
+        }}
+      >
+        <View className="mx-auto w-full max-w-md gap-6">
+          {content.sections.map((section) => {
+            const example = section.examples
+              ? ((primaryComplaint && section.examples[primaryComplaint]) ?? null)
+              : null;
+            return (
+              <View key={section.id}>
+                <Text className="mb-3 font-serif text-lg font-bold text-text">{section.title}</Text>
+                {'body' in section && section.body ? (
+                  <Text className="text-base leading-relaxed text-text-subtle">{section.body}</Text>
+                ) : null}
+                {'points' in section && section.points ? (
+                  <View className="mt-2 gap-2">
+                    {section.points.map((point, i) => (
+                      <View key={i} className="flex-row gap-3">
+                        <View className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary" />
+                        <Text className="flex-1 text-base text-text-subtle">{point}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : null}
+                {example ? (
+                  <View className="mt-4 rounded-xl border-l-4 border-primary bg-primary-soft p-4">
+                    <Text className="mb-1 text-sm font-medium text-primary">
+                      Herkenbaar voor jou
+                    </Text>
+                    <Text className="text-sm text-text-subtle">{example}</Text>
+                  </View>
+                ) : null}
+              </View>
+            );
+          })}
 
-          return (
-            <section key={section.id}>
-              <h2 className="mb-3 text-lg font-bold text-text">{section.title}</h2>
-              {'body' in section && section.body && (
-                <p className="leading-relaxed text-text-muted">{section.body}</p>
-              )}
-              {'points' in section && section.points && (
-                <ul className="space-y-2 mt-2">
-                  {section.points.map((point, i) => (
-                    <li key={i} className="flex gap-3">
-                      <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-primary" />
-                      <span className="text-text-muted">{point}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {example && (
-                <div className="mt-4 rounded-xl border-l-4 border-primary bg-primary/5 p-4">
-                  <p className="text-sm font-medium text-primary mb-1">Herkenbaar voor jou</p>
-                  <p className="text-sm text-text-muted">{example}</p>
-                </div>
-              )}
-            </section>
-          );
-        })}
+          <View>
+            <Text className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
+              {content.bodyWork}
+            </Text>
+            <Text className="mb-2 font-serif text-lg font-bold text-text">
+              {content.bodyExercise.title}
+            </Text>
+            <Text className="mb-4 text-base text-text-subtle">
+              {content.bodyExercise.description}
+            </Text>
+            <View className="rounded-2xl bg-surface p-5 shadow-sm">
+              <Text className="text-base leading-relaxed text-text-subtle">
+                {content.bodyExercise.transcript}
+              </Text>
+            </View>
+          </View>
 
-        {/* Body exercise */}
-        <section>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
-            {content.bodyWork}
-          </p>
-          <h2 className="mb-2 text-lg font-bold text-text">{content.bodyExercise.title}</h2>
-          <p className="mb-4 text-text-muted">{content.bodyExercise.description}</p>
-          <div className="rounded-xl bg-surface p-5 shadow-sm">
-            <p className="leading-relaxed text-text-muted whitespace-pre-line">
-              {content.bodyExercise.transcript}
-            </p>
-          </div>
-        </section>
+          <View>
+            <Text className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
+              Praktische opdracht
+            </Text>
+            <Text className="mb-2 font-serif text-lg font-bold text-text">
+              {content.practicalTask.title}
+            </Text>
+            <Text className="text-base leading-relaxed text-text-subtle">
+              {content.practicalTask.body}
+            </Text>
+          </View>
 
-        {/* Practical task */}
-        <section>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
-            Praktische opdracht
-          </p>
-          <h2 className="mb-2 text-lg font-bold text-text">{content.practicalTask.title}</h2>
-          <p className="leading-relaxed text-text-muted">{content.practicalTask.body}</p>
-        </section>
-
-        {/* Back-references */}
-        {content.backReferences.length > 0 && (
-          <section>
-            <h3 className="mb-3 text-sm font-semibold text-text-muted">Eerdere modules</h3>
-            <div className="space-y-2">
-              {content.backReferences.map((ref) => (
-                <Link
-                  key={ref.moduleId}
-                  href={`/modules/${ref.moduleId}`}
-                  className="block rounded-xl bg-surface p-3 text-sm text-text hover:bg-primary/5 transition-colors shadow-sm"
-                >
-                  → {ref.label}
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-      </main>
-    </div>
+          {content.backReferences.length > 0 ? (
+            <View>
+              <Text className="mb-3 text-sm font-semibold text-text-muted">Eerdere modules</Text>
+              <View className="gap-2">
+                {content.backReferences.map((ref) => (
+                  <Link
+                    key={ref.moduleId}
+                    href={{ pathname: '/modules/[id]', params: { id: ref.moduleId } }}
+                    asChild
+                  >
+                    <Pressable className="rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft">
+                      <Text className="text-sm text-text">→ {ref.label}</Text>
+                    </Pressable>
+                  </Link>
+                ))}
+              </View>
+            </View>
+          ) : null}
+        </View>
+      </ScrollView>
+    </View>
   );
 }

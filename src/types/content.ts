@@ -107,12 +107,54 @@ export type ModuleProgress = {
   lastStepId?: string;
 };
 
+export type SafetyOutcome = 'pass' | 'flag' | 'block-strong' | 'block-medical';
+
+export type SafetyAnswerOption = {
+  value: string;
+  label: string;
+  blocking: SafetyOutcome;
+};
+
+export type SafetyQuestion = {
+  id: string;
+  title: string;
+  type: 'single-choice';
+  options: SafetyAnswerOption[];
+  helpText?: string;
+};
+
 export type UserProgress = {
   intake: {
     complaintTypes: ComplaintType[];
+    safetyOutcome?: SafetyOutcome;
     completedAt?: string;
   };
   safetyCheckPassed: boolean;
   modules: ModuleProgress[];
   dailyPracticeUnlocked: boolean;
 };
+
+// ── γ-1 mood tracker ─────────────────────────────────────────────────────────
+
+export type MoodScore = 1 | 2 | 3 | 4 | 5;
+
+export type EmotionTag =
+  | 'angst'
+  | 'verdriet'
+  | 'boos'
+  | 'stress'
+  | 'rustig'
+  | 'hoopvol'
+  | 'pijn'
+  | 'vermoeid';
+
+/** Stored row from the `mood_logs` table. */
+export interface MoodLog {
+  id: string;
+  user_id: string;
+  date: string; // ISO date YYYY-MM-DD
+  mood_score: MoodScore;
+  emotion_tags: EmotionTag[];
+  note: string | null;
+  created_at: string;
+}

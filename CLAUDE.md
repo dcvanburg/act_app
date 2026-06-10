@@ -1,18 +1,20 @@
 # Van Overleven naar Leven (act_app)
 
-Self-guided ACT therapeutic web app. Dutch UI, English codebase.
+Self-guided ACT therapeutic mobile app. Dutch UI, English codebase.
+
+**Pivoting from Next.js web to Expo (React Native) as of 2026-06-09.** Pre-pivot state lives at `git tag pre-expo-pivot-v0`. See ARCHIVE_NOTICE.md.
 
 @AGENTS.md
 
-## Commands
+## Commands (apply once the Expo scaffold lands)
 
-- `npm run dev` — local development server
-- `npm run build` — production build
+- `npx expo start` — local development (Expo Go / iOS simulator / Android emulator)
 - `npm run lint` — ESLint
 - `npm run typecheck` — TypeScript check
 - `npm test` — Vitest unit tests
-- `npm run test:e2e` — Playwright E2E tests
+- `npm run test:e2e` — Maestro E2E tests
 - `npm run validate:content` — check for [PLACEHOLDER] in safety-critical content
+- `eas build` — production build via EAS
 
 ## Key paths
 
@@ -24,7 +26,8 @@ Self-guided ACT therapeutic web app. Dutch UI, English codebase.
 ## Non-negotiables
 
 - User-facing text: Dutch from content JSON only
-- Emergency button visible on all screens after first load
+- Emergency Noodknop visible on every screen — top-level RN overlay, min 44pt touch target
+- `/noodhulp` crisis screen accessible without auth — first-class top-level route
 - Crisis flow and disclaimers must not be weakened
 - Never commit secrets or `.env`
 - Never push to `main`; use feature branches and PRs
