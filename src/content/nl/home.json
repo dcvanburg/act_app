@@ -7,7 +7,7 @@
     "moodItem": "Doe je dagelijkse stemming check-in",
     "waardenCheckinItem": "Hoe ging het vandaag met je waarden?",
     "waardenAanmakenItem": "Stel je persoonlijke waarden in",
-    "moduleStartItem": "Start met: {title}",
-    "moduleContinueItem": "Ga verder met: {title}"
+    "moduleStartItem": "Start met de module: {title}",
+    "moduleContinueItem": "Ga verder met de module: {title}"
   }
 }

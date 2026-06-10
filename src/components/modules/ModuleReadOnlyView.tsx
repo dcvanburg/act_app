@@ -26,6 +26,9 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
   const primaryComplaint = complaintTypes[0] ?? null;
   const { data: progress } = useUserProgress();
 
+  const savedNotes =
+    progress?.modules.find((m) => m.moduleId === content.id)?.notes ?? null;
+
   const currentIndex = MODULE_ORDER.indexOf(content.id);
 
   const prevModuleId = currentIndex > 0 ? (MODULE_ORDER[currentIndex - 1] ?? null) : null;
@@ -82,7 +85,7 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
         className="flex-1"
         contentContainerStyle={{
           padding: 16,
-          paddingBottom: insets.bottom + 96,
+          paddingBottom: insets.bottom + 32,
           gap: 24,
         }}
       >
@@ -147,6 +150,15 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
               {content.practicalTask.body}
             </Text>
           </View>
+
+          {savedNotes ? (
+            <View>
+              <Text className="mb-2 font-semibold text-text">{common.module.notesTitle}</Text>
+              <View className="rounded-2xl bg-surface p-5 shadow-sm">
+                <Text className="text-base leading-relaxed text-text-subtle">{savedNotes}</Text>
+              </View>
+            </View>
+          ) : null}
 
           {prevModuleId && prevMeta && prevHref ? (
             <View>
