@@ -79,7 +79,7 @@ export default function LoginScreen() {
     setLoading(false);
 
     if (signInError) {
-      // Log the real error so it shows in the Expo terminal during development.
+      // eslint-disable-next-line no-console
       console.error('[Login] signInWithOtp failed:', signInError.message, signInError.status);
       setError('Er is iets misgegaan. Controleer het e-mailadres en probeer opnieuw.');
       return;
