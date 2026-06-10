@@ -1,5 +1,6 @@
 import { Link, type Href } from 'expo-router';
 import type { ComponentType } from 'react';
+import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { AccountIcon } from '@/components/icons/AccountIcon';
@@ -11,7 +12,7 @@ import { StarIcon } from '@/components/icons/StarIcon';
 import { TargetIcon } from '@/components/icons/TargetIcon';
 import { ThoughtIcon } from '@/components/icons/ThoughtIcon';
 import { MODULE_META } from '@/lib/content';
-import { getModuleStatus, MODULE_ORDER, PROGRAM_PHASES } from '@/lib/progress';
+import { getModuleStatus, getPhaseProgress, MODULE_ORDER, PROGRAM_PHASES, type ProgramPhaseId } from '@/lib/progress';
 import common from '@/content/nl/common.json';
 import type { ModuleId, ModuleStatus, UserProgress } from '@/types/content';
 
@@ -41,6 +42,21 @@ interface Props {
  * Locked modules render as disabled cards with a lock icon.
  */
 export function ProgramOverview({ progress, groupByPhase = false }: Props) {
+  const phaseProgress = getPhaseProgress(progress);
+
+  const [expandedPhases, setExpandedPhases] = useState<Set<ProgramPhaseId>>(
+    () => new Set(phaseProgress.filter((p) => p.status !== 'completed').map((p) => p.id)),
+  );
+
+  const togglePhase = (phaseId: ProgramPhaseId) => {
+    setExpandedPhases((prev) => {
+      const next = new Set(prev);
+      if (next.has(phaseId)) next.delete(phaseId);
+      else next.add(phaseId);
+      return next;
+    });
+  };
+
   if (!groupByPhase) {
     return (
       <View accessibilityLabel="Programma overzicht" className="gap-2">
@@ -52,22 +68,54 @@ export function ProgramOverview({ progress, groupByPhase = false }: Props) {
   }
 
   return (
-    <View accessibilityLabel="Programma overzicht" className="gap-6">
-      {PROGRAM_PHASES.map((phase) => (
-        <View key={phase.id}>
-          <Text className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
-            {phase.label}
-          </Text>
-          <View className="gap-2">
-            {phase.moduleIds.map((moduleId) => {
-              const index = MODULE_ORDER.indexOf(moduleId);
-              return (
-                <ModuleRow key={moduleId} moduleId={moduleId} index={index} progress={progress} />
-              );
-            })}
+    <View accessibilityLabel="Programma overzicht" className="gap-4">
+      {PROGRAM_PHASES.map((phase) => {
+        const pp = phaseProgress.find((p) => p.id === phase.id)!;
+        const isCompleted = pp.status === 'completed';
+        const isExpanded = expandedPhases.has(phase.id);
+
+        return (
+          <View key={phase.id}>
+            {isCompleted ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`${phase.label}, ${pp.completedCount} van ${pp.totalCount} modules afgerond, tik om ${isExpanded ? 'in te klappen' : 'uit te klappen'}`}
+                onPress={() => togglePhase(phase.id)}
+                className="mb-2 flex-row items-center justify-between rounded-xl bg-primary-soft px-3 py-2 active:opacity-70"
+              >
+                <Text className="text-xs font-semibold uppercase tracking-wide text-primary-dark">
+                  {phase.label}
+                </Text>
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-xs text-primary">
+                    {pp.completedCount}/{pp.totalCount} afgerond
+                  </Text>
+                  <Text className="text-xs font-bold text-primary">{isExpanded ? '∧' : '∨'}</Text>
+                </View>
+              </Pressable>
+            ) : (
+              <Text className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
+                {phase.label}
+              </Text>
+            )}
+            {(!isCompleted || isExpanded) && (
+              <View className="gap-2">
+                {phase.moduleIds.map((moduleId) => {
+                  const index = MODULE_ORDER.indexOf(moduleId);
+                  return (
+                    <ModuleRow
+                      key={moduleId}
+                      moduleId={moduleId}
+                      index={index}
+                      progress={progress}
+                    />
+                  );
+                })}
+              </View>
+            )}
           </View>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 }
