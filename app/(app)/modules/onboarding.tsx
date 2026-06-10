@@ -97,8 +97,6 @@ export default function OnboardingScreen() {
         paddingTop: insets.top + 24,
         paddingBottom: insets.bottom + 112,
         paddingHorizontal: 16,
-        flexGrow: 1,
-        justifyContent: 'center',
       }}
       keyboardShouldPersistTaps="handled"
     >
@@ -172,9 +170,13 @@ function WelcomeStep({
   return (
     <View>
       <View className="mb-4 flex-row items-center justify-between">
-        <Pressable accessibilityRole="button" onPress={onBack} className="self-start">
-          <Text className="text-sm text-text-muted">{`‹ ${common.actions.back}`}</Text>
-        </Pressable>
+        {!inOnboarding ? (
+          <Pressable accessibilityRole="button" onPress={onBack} className="self-start">
+            <Text className="text-sm text-text-muted">{`‹ ${common.actions.back}`}</Text>
+          </Pressable>
+        ) : (
+          <View />
+        )}
         {inOnboarding && (
           <Pressable accessibilityRole="button" onPress={onSkip}>
             <Text className="text-sm text-text-muted">Overslaan</Text>
