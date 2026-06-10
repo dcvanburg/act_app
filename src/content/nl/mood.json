@@ -1,4 +1,9 @@
 {
+  "onboardingIntro": {
+    "title": "Stemming bijhouden",
+    "body": "Elke dag kun je hier in een minuut bijhouden hoe je je voelt. Je kiest een score van 1 tot 5, voegt eventueel gevoelens toe en schrijft een korte notitie. Zo leer je patronen herkennen in je welzijn. Je kunt deze check-in altijd overslaan en later doen.",
+    "closeButton": "Aan de slag"
+  },
   "checkIn": {
     "title": "Hoe voel je je vandaag?",
     "subtitle": "Een korte check-in. Geen goed of fout antwoord.",

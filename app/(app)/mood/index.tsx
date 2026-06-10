@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -34,6 +35,7 @@ export default function MoodCheckinScreen() {
   const { from } = useLocalSearchParams<{ from?: string }>();
   const inOnboarding = from === 'onboarding';
 
+  const [showIntro, setShowIntro] = useState(inOnboarding);
   const [score, setScore] = useState<MoodScore | null>(null);
   const [tags, setTags] = useState<EmotionTag[]>([]);
   const [note, setNote] = useState('');
@@ -59,6 +61,35 @@ export default function MoodCheckinScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="flex-1 bg-background"
     >
+      <Modal
+        visible={showIntro}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowIntro(false)}
+      >
+        <View
+          className="flex-1 items-center justify-center px-6"
+          style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+        >
+          <View className="w-full max-w-sm rounded-2xl bg-surface p-6 shadow-lg">
+            <Text className="mb-3 font-serif text-xl font-bold text-text">
+              {mood.onboardingIntro.title}
+            </Text>
+            <Text className="mb-6 text-base leading-relaxed text-text-subtle">
+              {mood.onboardingIntro.body}
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setShowIntro(false)}
+              className="rounded-lg bg-primary px-4 py-3 active:bg-primary-dark"
+            >
+              <Text className="text-center text-base font-semibold text-white">
+                {mood.onboardingIntro.closeButton}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
       <ScrollView
         contentContainerStyle={{
           paddingTop: insets.top + 12,
@@ -85,7 +116,7 @@ export default function MoodCheckinScreen() {
             {inOnboarding && (
               <Pressable
                 accessibilityRole="button"
-                onPress={() => router.replace('/waarden?from=onboarding')}
+                onPress={() => router.replace('/modules/onboarding?from=onboarding')}
               >
                 <Text className="text-sm text-text-muted">Overslaan</Text>
               </Pressable>
