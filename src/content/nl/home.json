@@ -1,0 +1,13 @@
+{
+  "todo": {
+    "title": "Jouw actiepunten",
+    "intro": "Neem even de tijd voor deze onderdelen. Tik op een item om te beginnen.",
+    "emptyTitle": "Alles gedaan voor vandaag!",
+    "emptyBody": "Super gedaan. Kom morgen terug voor je dagelijkse check-in.",
+    "moodItem": "Doe je dagelijkse stemming check-in",
+    "waardenCheckinItem": "Hoe ging het vandaag met je waarden?",
+    "waardenAanmakenItem": "Stel je persoonlijke waarden in",
+    "moduleStartItem": "Start met de module: {title}",
+    "moduleContinueItem": "Ga verder met de module: {title}"
+  }
+}

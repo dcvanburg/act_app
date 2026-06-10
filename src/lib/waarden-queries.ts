@@ -350,21 +350,16 @@ export async function upsertCheckinRemote(
   checkin: WaardeCheckin,
 ): Promise<void> {
   await ensureProfile(userId, email);
-  const { error: deleteError } = await supabase
-    .from('waarde_checkins')
-    .delete()
-    .eq('user_id', userId)
-    .eq('waarde_id', checkin.waarde_id)
-    .eq('datum', checkin.datum);
-  if (deleteError) throw deleteError;
-
-  const { error } = await supabase.from('waarde_checkins').insert({
-    id: checkin.id,
-    user_id: userId,
-    waarde_id: checkin.waarde_id,
-    datum: checkin.datum,
-    antwoord: checkin.antwoord,
-    notitie: checkin.notitie,
-  });
+  const { error } = await supabase.from('waarde_checkins').upsert(
+    {
+      id: checkin.id,
+      user_id: userId,
+      waarde_id: checkin.waarde_id,
+      datum: checkin.datum,
+      antwoord: checkin.antwoord,
+      notitie: checkin.notitie,
+    },
+    { onConflict: 'user_id,waarde_id,datum' },
+  );
   if (error) throw error;
 }

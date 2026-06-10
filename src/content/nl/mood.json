@@ -1,4 +1,15 @@
 {
+  "onboardingIntro": {
+    "title": "Wat gaan we doen?",
+    "intro": "Je account is klaar. We lopen nu twee korte stappen door voordat je naar het startscherm gaat.",
+    "step1Label": "Stap 1 · Nu",
+    "step1Title": "Stemming check-in",
+    "step1Body": "Je geeft aan hoe je je vandaag voelt: een score, eventueel gevoelens en een korte notitie. Duurt minder dan een minuut. Je kunt deze stap ook overslaan.",
+    "step2Label": "Stap 2 · Daarna",
+    "step2Title": "Welkom & Intake",
+    "step2Body": "Een korte introductie van het programma en een paar vragen om te bekijken of het programma goed bij je past. Je kunt ook dit later doen.",
+    "closeButton": "Aan de slag"
+  },
   "checkIn": {
     "title": "Hoe voel je je vandaag?",
     "subtitle": "Een korte check-in. Geen goed of fout antwoord.",

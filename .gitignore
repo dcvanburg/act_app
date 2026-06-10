@@ -58,6 +58,9 @@ coverage/
 # TypeScript
 *.tsbuildinfo
 
+# Supabase CLI cache
+supabase/.temp/
+
 # Vercel (legacy — from pre-pivot Next.js deployment)
 .vercel
 

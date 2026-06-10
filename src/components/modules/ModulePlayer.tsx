@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import common from '@/content/nl/common.json';
@@ -25,6 +25,10 @@ interface Props {
   content: ModuleContent;
   initialScreenId: string | null;
   complaintTypes: ComplaintType[];
+  /** When provided, called instead of router.replace('/home') on the last screen.
+   *  Also prevents auto-saving completed:true so the caller handles completion.
+   *  Receives the notes the user typed (undefined if empty). */
+  onComplete?: (notes?: string) => void;
 }
 
 /**
@@ -34,7 +38,7 @@ interface Props {
  * navigation). On reaching FINAL_SCREEN_ID and tapping "Afronden" we save with
  * completed=true and return to /home.
  */
-export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props) {
+export function ModulePlayer({ content, initialScreenId, complaintTypes, onComplete }: Props) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const screens = buildScreens(content);
@@ -45,7 +49,15 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props
       )
     : 0;
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [notes, setNotes] = useState('');
   const saveMutation = useSaveModuleProgress();
+
+  // Keep a ref so the save effect can read the current value without
+  // becoming a dep (which would trigger a re-save on every render).
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  });
 
   const currentScreen = screens[currentIndex];
   const isFirst = currentIndex === 0;
@@ -54,20 +66,37 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props
 
   useEffect(() => {
     if (!currentScreen) return;
-    // Save current position; mark completed only when we land on the last screen
+    // Completion is always explicit (button press); the effect only saves
+    // the current position so the user can resume where they left off.
     saveMutation.mutate({
       moduleId: content.id,
       lastStepId: currentScreen.id,
-      completed: isLast,
+      completed: false,
     });
-    // We intentionally do not include saveMutation in deps — it is a stable
-    // hook reference, and adding it triggers a save loop.
+    // We intentionally do not include saveMutation in deps — stable ref.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, content.id, isLast]);
+  }, [currentIndex, content.id]);
 
   function goNext() {
     if (isLast) {
-      router.replace('/home');
+      if (onCompleteRef.current) {
+        // Parent owns completion (e.g. onboarding → CompleteStep).
+        onCompleteRef.current(notes.trim() || undefined);
+      } else {
+        // Regular module: save as completed then show the read-only view.
+        saveMutation.mutate(
+          {
+            moduleId: content.id,
+            lastStepId: currentScreen!.id,
+            completed: true,
+            notes: notes.trim() || undefined,
+          },
+          {
+            onSuccess: () =>
+              router.replace({ pathname: '/modules/[id]', params: { id: content.id } }),
+          },
+        );
+      }
       return;
     }
     setCurrentIndex((i) => i + 1);
@@ -124,6 +153,20 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props
       >
         <View className="mx-auto w-full max-w-md">
           <ScreenContent screen={currentScreen} content={content} complaintTypes={complaintTypes} />
+          {isLast && (
+            <View className="mt-6 rounded-2xl bg-surface p-5 shadow-sm">
+              <Text className="mb-3 font-semibold text-text">{common.module.notesTitle}</Text>
+              <TextInput
+                value={notes}
+                onChangeText={setNotes}
+                placeholder={common.module.notesPlaceholder}
+                placeholderTextColor="#888780"
+                multiline
+                textAlignVertical="top"
+                className="min-h-[120px] rounded-lg border border-border bg-background px-3 py-3 text-base text-text"
+              />
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -146,11 +189,16 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props
           <Pressable
             accessibilityRole="button"
             onPress={goNext}
-            className="flex-1 rounded-xl bg-primary py-3 active:bg-primary-dark"
+            disabled={isLast && !onComplete && saveMutation.isPending}
+            className="flex-1 rounded-xl bg-primary py-3 active:bg-primary-dark disabled:opacity-60"
           >
-            <Text className="text-center text-sm font-semibold text-white">
-              {isLast ? common.actions.complete : common.actions.continue}
-            </Text>
+            {isLast && !onComplete && saveMutation.isPending ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text className="text-center text-sm font-semibold text-white">
+                {isLast && !onComplete ? common.module.completeButton : common.actions.continue}
+              </Text>
+            )}
           </Pressable>
         </View>
       </View>

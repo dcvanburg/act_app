@@ -1,30 +1,43 @@
-import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
+import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ModulePlayer } from '@/components/modules/ModulePlayer';
 import { ModuleReadOnlyView } from '@/components/modules/ModuleReadOnlyView';
 import common from '@/content/nl/common.json';
 import crisis from '@/content/nl/crisis.json';
 import intake from '@/content/nl/intake.json';
 import { getModuleContent } from '@/lib/content';
 import { getModuleStatus } from '@/lib/progress';
-import { useSaveIntake, useUserProgress } from '@/lib/progress-queries';
+import { useSaveIntake, useSaveModuleProgress, useUserProgress } from '@/lib/progress-queries';
 import { isComplete, isProgramAllowed, worstOutcome } from '@/lib/safety';
 import type { ComplaintType, SafetyOutcome, SafetyQuestion } from '@/types/content';
 
 const COMPLAINT_KEYS: ComplaintType[] = ['pain', 'mental', 'alcohol', 'combination'];
 
-type Step = 'welcome' | 'complaint' | 'safety' | 'blocked' | 'complete';
+type Step = 'welcome' | 'complaint' | 'safety' | 'blocked' | 'content' | 'complete';
 
 /**
  * /modules/onboarding — module 0 intake flow (α5), inside the modules stack.
  */
 export default function OnboardingScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { data: progress, isLoading } = useUserProgress();
   const saveIntake = useSaveIntake();
+  const saveModuleProgress = useSaveModuleProgress();
+  const { from } = useLocalSearchParams<{ from?: string }>();
+  const inOnboarding = from === 'onboarding';
+
+  useEffect(() => {
+    if (!inOnboarding) return;
+    // Hide the tab bar — this screen is inside a nested stack so we need the parent tab navigator
+    const tabNav = navigation.getParent();
+    tabNav?.setOptions({ tabBarStyle: { display: 'none' } });
+    return () => tabNav?.setOptions({ tabBarStyle: undefined });
+  }, [inOnboarding, navigation]);
 
   const questions = intake.safetyCheck.questions as SafetyQuestion[];
 
@@ -33,6 +46,7 @@ export default function OnboardingScreen() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [questionIndex, setQuestionIndex] = useState(0);
   const [resolvedOutcome, setResolvedOutcome] = useState<SafetyOutcome | null>(null);
+  const [moduleNotes, setModuleNotes] = useState<string | undefined>(undefined);
 
   const currentQuestion = questions[questionIndex];
 
@@ -55,6 +69,21 @@ export default function OnboardingScreen() {
     return <ModuleReadOnlyView content={content} complaintTypes={progress.intake.complaintTypes} />;
   }
 
+  if (step === 'content') {
+    const content = getModuleContent('onboarding');
+    return (
+      <ModulePlayer
+        content={content}
+        initialScreenId={null}
+        complaintTypes={complaint ? [complaint] : []}
+        onComplete={(notes) => {
+          setModuleNotes(notes);
+          setStep('complete');
+        }}
+      />
+    );
+  }
+
   function finishSafetyCheck(finalAnswers: Record<string, string>) {
     if (!isComplete(questions, finalAnswers) || !complaint) return;
     const outcome = worstOutcome(questions, finalAnswers);
@@ -67,7 +96,7 @@ export default function OnboardingScreen() {
           safetyOutcome: outcome ?? 'pass',
           safetyPassed: true,
         },
-        { onSuccess: () => setStep('complete') },
+        { onSuccess: () => setStep('content') },
       );
     } else {
       saveIntake.mutate({
@@ -86,14 +115,17 @@ export default function OnboardingScreen() {
         paddingTop: insets.top + 24,
         paddingBottom: insets.bottom + 112,
         paddingHorizontal: 16,
-        flexGrow: 1,
-        justifyContent: 'center',
       }}
       keyboardShouldPersistTaps="handled"
     >
       <View className="mx-auto w-full max-w-md">
         {step === 'welcome' && (
-          <WelcomeStep onContinue={() => setStep('complaint')} onClose={() => router.back()} />
+          <WelcomeStep
+            onContinue={() => setStep('complaint')}
+            onBack={() => (inOnboarding ? router.replace('/mood?from=onboarding') : router.back())}
+            onSkip={() => router.replace('/home')}
+            inOnboarding={inOnboarding}
+          />
         )}
         {step === 'complaint' && (
           <ComplaintStep
@@ -134,18 +166,54 @@ export default function OnboardingScreen() {
             onHome={() => router.replace('/home')}
           />
         )}
-        {step === 'complete' && <CompleteStep onContinue={() => router.replace('/home')} />}
+        {step === 'complete' && (
+          <CompleteStep
+            onComplete={() =>
+              saveModuleProgress.mutate(
+                {
+                  moduleId: 'onboarding',
+                  lastStepId: 'practical-task',
+                  completed: true,
+                  notes: moduleNotes,
+                },
+                { onSuccess: () => router.replace('/home') },
+              )
+            }
+            isSaving={saveModuleProgress.isPending}
+          />
+        )}
       </View>
     </ScrollView>
   );
 }
 
-function WelcomeStep({ onContinue, onClose }: { onContinue: () => void; onClose: () => void }) {
+function WelcomeStep({
+  onContinue,
+  onBack,
+  onSkip,
+  inOnboarding,
+}: {
+  onContinue: () => void;
+  onBack: () => void;
+  onSkip: () => void;
+  inOnboarding: boolean;
+}) {
   return (
     <View>
-      <Pressable accessibilityRole="button" onPress={onClose} className="mb-4 self-start">
-        <Text className="text-sm text-text-muted">‹ {common.actions.back}</Text>
-      </Pressable>
+      <View className="mb-4 flex-row items-center justify-between">
+        {!inOnboarding ? (
+          <Pressable accessibilityRole="button" onPress={onBack} className="self-start">
+            <Text className="text-sm text-text-muted">{`‹ ${common.actions.back}`}</Text>
+          </Pressable>
+        ) : (
+          <View />
+        )}
+        {inOnboarding && (
+          <Pressable accessibilityRole="button" onPress={onSkip}>
+            <Text className="text-sm text-text-muted">Overslaan</Text>
+          </Pressable>
+        )}
+      </View>
       <Text className="mb-2 font-serif text-3xl font-bold text-text">{intake.welcome.title}</Text>
       <Text className="mb-8 text-base leading-relaxed text-text-subtle">{intake.welcome.body}</Text>
       <Pressable
@@ -340,7 +408,7 @@ function BlockedStep({
   );
 }
 
-function CompleteStep({ onContinue }: { onContinue: () => void }) {
+function CompleteStep({ onComplete, isSaving }: { onComplete: () => void; isSaving: boolean }) {
   return (
     <View>
       <Text className="mb-2 font-serif text-3xl font-bold text-text">{intake.complete.title}</Text>
@@ -349,12 +417,17 @@ function CompleteStep({ onContinue }: { onContinue: () => void }) {
       </Text>
       <Pressable
         accessibilityRole="button"
-        onPress={onContinue}
-        className="rounded-lg bg-primary px-4 py-3 active:bg-primary-dark"
+        onPress={onComplete}
+        disabled={isSaving}
+        className="rounded-lg bg-primary px-4 py-3 active:bg-primary-dark disabled:opacity-60"
       >
-        <Text className="text-center text-base font-semibold text-white">
-          {common.actions.continue}
-        </Text>
+        {isSaving ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text className="text-center text-base font-semibold text-white">
+            {intake.complete.completeButton}
+          </Text>
+        )}
       </Pressable>
     </View>
   );

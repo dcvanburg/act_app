@@ -2,7 +2,9 @@ import { Link } from 'expo-router';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppLogo } from '@/components/AppLogo';
 import { FeatureErrorBoundary } from '@/components/FeatureErrorBoundary';
+import { TodoBlock } from '@/components/home/TodoBlock';
 import { AccountIcon } from '@/components/icons/AccountIcon';
 import { MoodHomeCard } from '@/components/mood/MoodHomeCard';
 import { ProgramHomeCard } from '@/components/modules/ProgramHomeCard';
@@ -30,22 +32,29 @@ export default function HomeScreen() {
       }}
     >
       <View className="mx-auto w-full max-w-md">
-        <View className="mb-8 flex-row items-start justify-between gap-3">
-          <View className="flex-1">
-            <Text className="font-serif text-2xl font-bold text-text">{common.app.name}</Text>
-            <Text className="mt-1 text-sm text-text-subtle">{common.app.tagline}</Text>
+        <View className="mb-8">
+          <View className="mb-2 flex-row items-center justify-between">
+            <View className="w-10" />
+            <AppLogo size={40} />
+            <Link href="/account" asChild>
+              <Pressable
+                accessibilityRole="link"
+                accessibilityLabel="Mijn account"
+                className="h-10 w-10 items-center justify-center rounded-full bg-primary-soft active:opacity-80"
+              >
+                <AccountIcon size={22} />
+              </Pressable>
+            </Link>
           </View>
-          <Link href="/account" asChild>
-            <Pressable
-              accessibilityRole="link"
-              accessibilityLabel="Mijn account"
-              className="h-10 w-10 items-center justify-center rounded-full bg-primary-soft active:opacity-80"
-            >
-              <AccountIcon size={22} />
-            </Pressable>
-          </Link>
+          <Text className="text-center font-serif text-2xl font-bold text-text">
+            {common.app.name}
+          </Text>
+          <Text className="mt-1 text-center text-sm text-text-subtle">{common.app.tagline}</Text>
         </View>
 
+        <FeatureErrorBoundary>
+          <TodoBlock />
+        </FeatureErrorBoundary>
         <FeatureErrorBoundary>
           <MoodHomeCard />
         </FeatureErrorBoundary>

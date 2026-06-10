@@ -8,7 +8,8 @@
       "lastName": "Achternaam",
       "lastNamePlaceholder": "Jouw achternaam",
       "phone": "Telefoonnummer (optioneel)",
-      "phonePlaceholder": "+31 6 12345678",
+      "phonePlaceholder": "0612345678",
+      "phoneError": "Vul een geldig mobiel nummer in (06 + 8 cijfers).",
       "referralSource": "Hoe ken je deze app?"
     },
     "referralOptions": [
