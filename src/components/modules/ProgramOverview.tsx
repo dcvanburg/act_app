@@ -48,8 +48,21 @@ export function ProgramOverview({ progress, groupByPhase = false }: Props) {
     () => new Set(phaseProgress.filter((p) => p.status === 'current').map((p) => p.id)),
   );
 
+  const [expandedCompletedSubs, setExpandedCompletedSubs] = useState<Set<ProgramPhaseId>>(
+    () => new Set(),
+  );
+
   const togglePhase = (phaseId: ProgramPhaseId) => {
     setExpandedPhases((prev) => {
+      const next = new Set(prev);
+      if (next.has(phaseId)) next.delete(phaseId);
+      else next.add(phaseId);
+      return next;
+    });
+  };
+
+  const toggleCompletedSub = (phaseId: ProgramPhaseId) => {
+    setExpandedCompletedSubs((prev) => {
       const next = new Set(prev);
       if (next.has(phaseId)) next.delete(phaseId);
       else next.add(phaseId);
@@ -113,21 +126,69 @@ export function ProgramOverview({ progress, groupByPhase = false }: Props) {
                 </Text>
               </Pressable>
             )}
-            {isExpanded && (
-              <View className="gap-2">
-                {phase.moduleIds.map((moduleId) => {
-                  const index = MODULE_ORDER.indexOf(moduleId);
-                  return (
+            {isExpanded && (() => {
+              const completedIds = phase.moduleIds.filter(
+                (id) => getModuleStatus(id, progress) === 'completed',
+              );
+              const otherIds = phase.moduleIds.filter(
+                (id) => getModuleStatus(id, progress) !== 'completed',
+              );
+              const hasCompletedSub = completedIds.length > 0 && otherIds.length > 0;
+              const subExpanded = expandedCompletedSubs.has(phase.id);
+
+              return (
+                <View className="gap-2">
+                  {otherIds.map((moduleId) => (
                     <ModuleRow
                       key={moduleId}
                       moduleId={moduleId}
-                      index={index}
+                      index={MODULE_ORDER.indexOf(moduleId)}
                       progress={progress}
                     />
-                  );
-                })}
-              </View>
-            )}
+                  ))}
+
+                  {hasCompletedSub && (
+                    <View className="mt-1">
+                      <Pressable
+                        accessibilityRole="button"
+                        onPress={() => toggleCompletedSub(phase.id)}
+                        className="flex-row items-center justify-between rounded-lg px-3 py-2 active:bg-primary-soft"
+                      >
+                        <View className="flex-row items-center gap-2">
+                          <Text className="text-xs font-bold text-primary">{'✓'}</Text>
+                          <Text className="text-xs font-semibold text-text-muted">
+                            Afgeronde modules
+                          </Text>
+                        </View>
+                        <Text className="text-xs text-text-muted">{subExpanded ? '∧' : '∨'}</Text>
+                      </Pressable>
+                      {subExpanded && (
+                        <View className="mt-2 gap-2">
+                          {completedIds.map((moduleId) => (
+                            <ModuleRow
+                              key={moduleId}
+                              moduleId={moduleId}
+                              index={MODULE_ORDER.indexOf(moduleId)}
+                              progress={progress}
+                            />
+                          ))}
+                        </View>
+                      )}
+                    </View>
+                  )}
+
+                  {!hasCompletedSub &&
+                    completedIds.map((moduleId) => (
+                      <ModuleRow
+                        key={moduleId}
+                        moduleId={moduleId}
+                        index={MODULE_ORDER.indexOf(moduleId)}
+                        progress={progress}
+                      />
+                    ))}
+                </View>
+              );
+            })()}
           </View>
         );
       })}
