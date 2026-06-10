@@ -66,15 +66,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async function handleDeepLink(url: string | null) {
       if (!url) return;
 
-      // Magic-link callbacks arrive as actapp://auth/callback#access_token=...&refresh_token=...
-      // The tokens live in the URL fragment (after the `#`).
+      // PKCE flow (Supabase v2 default): actapp://auth/callback?code=xxxx
+      const { queryParams } = Linking.parse(url);
+      if (queryParams?.code && typeof queryParams.code === 'string') {
+        await supabase.auth.exchangeCodeForSession(url);
+        return;
+      }
+
+      // Implicit flow fallback: actapp://auth/callback#access_token=...&refresh_token=...
       const fragment = url.includes('#') ? url.slice(url.indexOf('#') + 1) : '';
       if (!fragment) return;
-
       const params = new URLSearchParams(fragment);
       const access_token = params.get('access_token');
       const refresh_token = params.get('refresh_token');
-
       if (access_token && refresh_token) {
         await supabase.auth.setSession({ access_token, refresh_token });
       }
