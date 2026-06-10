@@ -10,6 +10,7 @@ export interface Profile {
   first_name: string | null;
   last_name: string | null;
   phone: string | null;
+  referral_source: string | null;
   subscription_tier: string | null;
   created_at: string;
 }
@@ -33,7 +34,7 @@ export function useProfile() {
       if (!user) return null;
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, first_name, last_name, phone, created_at')
+        .select('id, email, first_name, last_name, phone, referral_source, created_at')
         .eq('id', user.id)
         .maybeSingle<Omit<Profile, 'subscription_tier'>>();
       if (error) throw error;
@@ -46,6 +47,7 @@ export interface ProfileUpdate {
   first_name: string | null;
   last_name: string | null;
   phone: string | null;
+  referral_source?: string | null;
 }
 
 /**
@@ -69,12 +71,13 @@ export function useUpdateProfile() {
         first_name: update.first_name?.trim() || null,
         last_name: update.last_name?.trim() || null,
         phone: update.phone?.trim() || null,
+        referral_source: update.referral_source ?? null,
       };
 
       const { data, error } = await supabase
         .from('profiles')
         .upsert(payload, { onConflict: 'id' })
-        .select('id, email, first_name, last_name, phone, created_at')
+        .select('id, email, first_name, last_name, phone, referral_source, created_at')
         .single<Omit<Profile, 'subscription_tier'>>();
 
       if (error) throw error;

@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Redirect, Tabs } from 'expo-router';
+import { Redirect, Tabs, useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import common from '@/content/nl/common.json';
+import { useProfile } from '@/lib/profile-queries';
 import { useAuth } from '@/providers/AuthProvider';
 import {
   UnsavedChangesGuardProvider,
@@ -39,10 +41,30 @@ export default function AppLayout() {
   return (
     <WaardenProvider>
       <UnsavedChangesGuardProvider>
+        <OnboardingGuard />
         <AppTabs insets={insets} />
       </UnsavedChangesGuardProvider>
     </WaardenProvider>
   );
+}
+
+/**
+ * Redirect new users to /onboarding before they can access tabs.
+ * A user is "new" when their profile has no first_name yet.
+ * Runs once on mount; after onboarding completes the profile has a name
+ * so this guard never fires again.
+ */
+function OnboardingGuard() {
+  const { data: profile, isLoading } = useProfile();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !profile?.first_name) {
+      router.replace('/onboarding');
+    }
+  }, [isLoading, profile?.first_name, router]);
+
+  return null;
 }
 
 function AppTabs({ insets }: { insets: { bottom: number } }) {
