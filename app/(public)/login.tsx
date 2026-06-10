@@ -1,4 +1,3 @@
-import * as Linking from 'expo-linking';
 import { Redirect, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -22,31 +21,15 @@ import { useAuth } from '@/providers/AuthProvider';
 // Regenerate the PNG via assets/src/EXPORT_INSTRUCTIONS.md.
 const logo = require('../../assets/icon.png');
 
-/**
- * Where Supabase redirects the browser after verifying the magic link.
- *
- * `Linking.createURL` resolves to the right scheme automatically:
- *   - In Expo Go dev: `exp://<lan-ip>:8081/--/auth/callback`
- *   - In a standalone or dev-client build: `actapp://auth/callback`
- *
- * Both must be in Supabase → Authentication → URL Configuration → Redirect URLs.
- * Easiest is to allowlist with wildcards: `actapp://**` and `exp://**`.
- */
-const REDIRECT_URL = Linking.createURL('/auth/callback');
-
 type Step = 'email' | 'code';
 
 /**
- * Login screen — email magic-link + 6-digit OTP fallback.
+ * Login screen — 6-digit OTP code only.
  *
- * Supabase sends both a clickable magic link AND a 6-digit code in the same
- * email. The link uses the `actapp://auth/callback` deep link, but if the user
- * opens their email on a different device (or in a desktop browser that
- * doesn't know the `actapp://` scheme), the deep link never reaches the app.
- *
- * To handle that, we show a code input on the same screen. The user can either
- * click the link OR type the code from the email — whichever path works first
- * sets the session via Supabase auth and AuthProvider redirects to /home.
+ * Supabase is called without `emailRedirectTo`, which puts it in token-only
+ * mode: the email contains a 6-digit code and no clickable magic link.
+ * The user enters the code here; on success AuthProvider's onAuthStateChange
+ * fires and the Redirect above sends them to /home.
  */
 export default function LoginScreen() {
   const { session } = useAuth();
@@ -74,7 +57,6 @@ export default function LoginScreen() {
 
     const { error: signInError } = await supabase.auth.signInWithOtp({
       email: email.trim(),
-      options: { emailRedirectTo: REDIRECT_URL },
     });
 
     setLoading(false);
@@ -116,7 +98,6 @@ export default function LoginScreen() {
 
     const { error: resendError } = await supabase.auth.signInWithOtp({
       email: email.trim(),
-      options: { emailRedirectTo: REDIRECT_URL },
     });
 
     setLoading(false);
@@ -247,9 +228,9 @@ function CodeForm(props: {
     <View className="rounded-2xl bg-surface p-6 shadow-sm">
       <Text className="mb-2 font-serif text-xl font-semibold text-text">Controleer je e-mail</Text>
       <Text className="mb-5 text-sm text-text-subtle">
-        We hebben een inlogcode gestuurd naar{' '}
-        <Text className="font-semibold text-text">{props.email}</Text>. Klik op de link in de
-        e-mail, of voer hieronder de 6-cijferige code in.
+        We hebben een 6-cijferige code gestuurd naar{' '}
+        <Text className="font-semibold text-text">{props.email}</Text>. Voer de code hieronder in om
+        in te loggen.
       </Text>
 
       <Text className="mb-1 text-sm font-medium text-text">Code</Text>
