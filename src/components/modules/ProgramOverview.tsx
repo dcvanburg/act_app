@@ -45,7 +45,7 @@ export function ProgramOverview({ progress, groupByPhase = false }: Props) {
   const phaseProgress = getPhaseProgress(progress);
 
   const [expandedPhases, setExpandedPhases] = useState<Set<ProgramPhaseId>>(
-    () => new Set(phaseProgress.filter((p) => p.status !== 'completed').map((p) => p.id)),
+    () => new Set(phaseProgress.filter((p) => p.status === 'current').map((p) => p.id)),
   );
 
   const togglePhase = (phaseId: ProgramPhaseId) => {
@@ -74,6 +74,8 @@ export function ProgramOverview({ progress, groupByPhase = false }: Props) {
         const isCompleted = pp.status === 'completed';
         const isExpanded = expandedPhases.has(phase.id);
 
+        const isLocked = pp.status === 'locked';
+
         return (
           <View key={phase.id}>
             {isCompleted ? (
@@ -95,11 +97,23 @@ export function ProgramOverview({ progress, groupByPhase = false }: Props) {
                 <Text className="text-xs text-primary">{isExpanded ? '∧' : '∨'}</Text>
               </Pressable>
             ) : (
-              <Text className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
-                {phase.label}
-              </Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`${phase.label}, tik om ${isExpanded ? 'in te klappen' : 'uit te klappen'}`}
+                onPress={() => togglePhase(phase.id)}
+                className="mb-2 flex-row items-center justify-between rounded-lg px-3 py-2 active:bg-surface-muted"
+              >
+                <Text
+                  className={`text-xs font-semibold uppercase tracking-wide ${isLocked ? 'text-locked' : 'text-text-muted'}`}
+                >
+                  {phase.label}
+                </Text>
+                <Text className={`text-xs ${isLocked ? 'text-locked' : 'text-text-muted'}`}>
+                  {isExpanded ? '∧' : '∨'}
+                </Text>
+              </Pressable>
             )}
-            {(!isCompleted || isExpanded) && (
+            {isExpanded && (
               <View className="gap-2">
                 {phase.moduleIds.map((moduleId) => {
                   const index = MODULE_ORDER.indexOf(moduleId);
