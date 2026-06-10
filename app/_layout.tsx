@@ -1,0 +1,43 @@
+import '../global.css';
+
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import { Noodknop } from '@/components/emergency/Noodknop';
+import { AuthProvider } from '@/providers/AuthProvider';
+import { QueryProvider } from '@/providers/QueryProvider';
+
+/**
+ * Root layout — wraps the entire app.
+ *
+ * Provider order matters:
+ *   - QueryProvider outermost so AuthProvider can use queries if it ever needs to.
+ *   - AuthProvider next so any screen / Noodknop can read the session.
+ *   - Stack inside so screens can navigate via expo-router.
+ *
+ * Non-negotiables enforced here (CLAUDE.md):
+ *   - Noodknop is mounted at root → visible on every screen, no auth check.
+ *   - `actapp://` deep links are handled inside AuthProvider for magic-link auth.
+ */
+export default function RootLayout() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="(public)" />
+              <Stack.Screen name="(app)" />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <Noodknop />
+            <StatusBar style="dark" backgroundColor="#F5F0E8" />
+          </AuthProvider>
+        </QueryProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
+}

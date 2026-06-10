@@ -1,14 +1,12 @@
-'use client';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useState, useEffect, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
-import { saveModuleProgress } from '@/app/actions/progress';
-import { FINAL_SCREEN_ID } from '@/lib/progress';
-import { cn } from '@/lib/utils';
-import type { ModuleContent, ComplaintType, ContentSection } from '@/types/content';
 import common from '@/content/nl/common.json';
-
-// ── Screen type ───────────────────────────────────────────────────────────────
+import { FINAL_SCREEN_ID } from '@/lib/progress';
+import { useSaveModuleProgress } from '@/lib/progress-queries';
+import type { ComplaintType, ContentSection, ModuleContent } from '@/types/content';
 
 type Screen =
   | { id: string; type: 'section'; data: ContentSection }
@@ -23,17 +21,22 @@ function buildScreens(content: ModuleContent): Screen[] {
   ];
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
-
 interface Props {
   content: ModuleContent;
   initialScreenId: string | null;
   complaintTypes: ComplaintType[];
 }
 
+/**
+ * ModulePlayer — paginated active flow.
+ *
+ * On every screen advance we save progress (best-effort; failures do not block
+ * navigation). On reaching FINAL_SCREEN_ID and tapping "Afronden" we save with
+ * completed=true and return to /home.
+ */
 export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const insets = useSafeAreaInsets();
   const screens = buildScreens(content);
   const initialIndex = initialScreenId
     ? Math.max(
@@ -41,116 +44,119 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes }: Props
         screens.findIndex((s) => s.id === initialScreenId),
       )
     : 0;
-
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const saveMutation = useSaveModuleProgress();
+
   const currentScreen = screens[currentIndex];
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === screens.length - 1;
+  const progressPct = ((currentIndex + 1) / screens.length) * 100;
 
-  // Save progress whenever the screen changes
   useEffect(() => {
     if (!currentScreen) return;
-    const completed = isLast;
-    saveModuleProgress(content.id, currentScreen.id, completed).catch(() => {
-      // Progress save is best-effort — don't block the user
+    // Save current position; mark completed only when we land on the last screen
+    saveMutation.mutate({
+      moduleId: content.id,
+      lastStepId: currentScreen.id,
+      completed: isLast,
     });
-  }, [currentIndex, content.id, currentScreen, isLast]);
+    // We intentionally do not include saveMutation in deps — it is a stable
+    // hook reference, and adding it triggers a save loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, content.id, isLast]);
 
   function goNext() {
     if (isLast) {
-      // Final screen reached → completion saved in effect above → navigate home
-      startTransition(() => {
-        router.push('/home');
-        router.refresh();
-      });
+      router.replace('/home');
       return;
     }
     setCurrentIndex((i) => i + 1);
   }
 
   function goBack() {
-    if (!isFirst) setCurrentIndex((i) => i - 1);
+    if (isFirst) {
+      router.back();
+      return;
+    }
+    setCurrentIndex((i) => i - 1);
   }
 
   if (!currentScreen) return null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-border bg-surface/80 backdrop-blur-sm px-4 py-3">
-        <div className="mx-auto flex max-w-lg items-center gap-3">
-          <button
-            onClick={() => router.push('/home')}
-            aria-label="Terug naar overzicht"
-            className="rounded-lg p-1.5 text-text-muted hover:bg-background hover:text-text"
+    <View className="flex-1 bg-background">
+      <View
+        style={{ paddingTop: insets.top + 12 }}
+        className="border-b border-border bg-surface/80 px-4 pb-3"
+      >
+        <View className="mx-auto w-full max-w-md flex-row items-center gap-3">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Sluiten"
+            onPress={() => router.replace('/home')}
+            className="p-1.5"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          <div className="flex-1">
-            <p className="text-xs font-medium text-text-muted">{content.phase}</p>
-            <h1 className="text-sm font-semibold text-text leading-tight">{content.title}</h1>
-          </div>
-          <span className="text-xs text-text-muted">
+            <Text className="text-lg text-text-muted">{'✕'}</Text>
+          </Pressable>
+          <View className="flex-1">
+            <Text className="text-xs font-medium text-text-muted">{content.phase}</Text>
+            <Text className="text-sm font-semibold text-text" numberOfLines={1}>
+              {content.title}
+            </Text>
+          </View>
+          <Text className="text-xs text-text-muted">
             {currentIndex + 1} / {screens.length}
-          </span>
-        </div>
-        {/* Progress bar */}
-        <div className="mx-auto mt-2 max-w-lg">
-          <div className="h-1 overflow-hidden rounded-full bg-border">
-            <div
-              className="h-full bg-primary transition-all duration-300"
-              style={{ width: `${((currentIndex + 1) / screens.length) * 100}%` }}
-            />
-          </div>
-        </div>
-      </header>
+          </Text>
+        </View>
+        <View className="mx-auto mt-2 w-full max-w-md">
+          <View className="h-1 overflow-hidden rounded-full bg-border">
+            <View className="h-full bg-primary" style={{ width: `${progressPct}%` }} />
+          </View>
+        </View>
+      </View>
 
-      {/* Screen content */}
-      <main className="flex-1 overflow-y-auto px-4 py-6 pb-32">
-        <div className="mx-auto max-w-lg">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          padding: 16,
+          paddingBottom: insets.bottom + 120,
+        }}
+      >
+        <View className="mx-auto w-full max-w-md">
           <ScreenContent screen={currentScreen} content={content} complaintTypes={complaintTypes} />
-        </div>
-      </main>
+        </View>
+      </ScrollView>
 
-      {/* Navigation */}
-      <footer className="fixed bottom-0 left-0 right-0 border-t border-border bg-surface/90 backdrop-blur-sm px-4 py-4">
-        <div className="mx-auto flex max-w-lg gap-3">
+      <View
+        style={{ paddingBottom: insets.bottom + 16 }}
+        className="absolute bottom-0 left-0 right-0 border-t border-border bg-surface/95 px-4 pt-4"
+      >
+        <View className="mx-auto w-full max-w-md flex-row gap-3">
           {!isFirst && (
-            <button
-              onClick={goBack}
-              className="flex-1 rounded-xl border border-border py-3 text-sm font-medium text-text hover:bg-background transition-colors"
+            <Pressable
+              accessibilityRole="button"
+              onPress={goBack}
+              className="flex-1 rounded-xl border border-border py-3"
             >
-              {common.actions.back}
-            </button>
+              <Text className="text-center text-sm font-medium text-text">
+                {common.actions.back}
+              </Text>
+            </Pressable>
           )}
-          <button
-            onClick={goNext}
-            disabled={isPending}
-            className={cn(
-              'flex-1 rounded-xl bg-primary py-3 text-sm font-semibold text-white',
-              'hover:bg-primary-dark transition-colors',
-              'disabled:opacity-60',
-              isFirst && 'w-full',
-            )}
+          <Pressable
+            accessibilityRole="button"
+            onPress={goNext}
+            className="flex-1 rounded-xl bg-primary py-3 active:bg-primary-dark"
           >
-            {isLast ? common.actions.complete : common.actions.continue}
-          </button>
-        </div>
-      </footer>
-    </div>
+            <Text className="text-center text-sm font-semibold text-white">
+              {isLast ? common.actions.complete : common.actions.continue}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    </View>
   );
 }
-
-// ── Screen content renderer ───────────────────────────────────────────────────
 
 function ScreenContent({
   screen,
@@ -162,62 +168,62 @@ function ScreenContent({
   complaintTypes: ComplaintType[];
 }) {
   if (screen.type === 'section') {
-    const { data: section } = screen;
+    const section = screen.data;
+    const primaryComplaint = complaintTypes[0];
     const example = section.examples
-      ? ((complaintTypes[0] && section.examples[complaintTypes[0]]) ?? null)
+      ? ((primaryComplaint && section.examples[primaryComplaint]) ?? null)
       : null;
 
     return (
-      <div>
-        <h2 className="mb-4 text-xl font-bold text-text">{section.title}</h2>
-        {'body' in section && section.body && (
-          <p className="mb-4 leading-relaxed text-text-muted">{section.body}</p>
-        )}
-        {'points' in section && section.points && (
-          <ul className="space-y-2">
+      <View>
+        <Text className="mb-4 font-serif text-xl font-bold text-text">{section.title}</Text>
+        {'body' in section && section.body ? (
+          <Text className="mb-4 text-base leading-relaxed text-text-subtle">{section.body}</Text>
+        ) : null}
+        {'points' in section && section.points ? (
+          <View className="gap-2">
             {section.points.map((point, i) => (
-              <li key={i} className="flex gap-3">
-                <span className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-primary" />
-                <span className="text-text-muted">{point}</span>
-              </li>
+              <View key={i} className="flex-row gap-3">
+                <View className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary" />
+                <Text className="flex-1 text-base text-text-subtle">{point}</Text>
+              </View>
             ))}
-          </ul>
-        )}
-        {example && (
-          <div className="mt-6 rounded-xl border-l-4 border-primary bg-primary/5 p-4">
-            <p className="text-sm font-medium text-primary mb-1">Herkenbaar voor jou</p>
-            <p className="text-sm text-text-muted">{example}</p>
-          </div>
-        )}
-      </div>
+          </View>
+        ) : null}
+        {example ? (
+          <View className="mt-6 rounded-xl border-l-4 border-primary bg-primary-soft p-4">
+            <Text className="mb-1 text-sm font-medium text-primary">Herkenbaar voor jou</Text>
+            <Text className="text-sm text-text-subtle">{example}</Text>
+          </View>
+        ) : null}
+      </View>
     );
   }
 
   if (screen.type === 'exercise') {
     const ex = content.bodyExercise;
     return (
-      <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
+      <View>
+        <Text className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
           {content.bodyWork}
-        </p>
-        <h2 className="mb-3 text-xl font-bold text-text">{ex.title}</h2>
-        <p className="mb-6 text-text-muted">{ex.description}</p>
-        <div className="rounded-xl bg-surface p-5 shadow-sm">
-          <p className="leading-relaxed text-text-muted whitespace-pre-line">{ex.transcript}</p>
-        </div>
-      </div>
+        </Text>
+        <Text className="mb-3 font-serif text-xl font-bold text-text">{ex.title}</Text>
+        <Text className="mb-6 text-base text-text-subtle">{ex.description}</Text>
+        <View className="rounded-2xl bg-surface p-5 shadow-sm">
+          <Text className="text-base leading-relaxed text-text-subtle">{ex.transcript}</Text>
+        </View>
+      </View>
     );
   }
 
-  // task — final screen
   const task = content.practicalTask;
   return (
-    <div>
-      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
+    <View>
+      <Text className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary">
         Praktische opdracht
-      </p>
-      <h2 className="mb-3 text-xl font-bold text-text">{task.title}</h2>
-      <p className="leading-relaxed text-text-muted">{task.body}</p>
-    </div>
+      </Text>
+      <Text className="mb-3 font-serif text-xl font-bold text-text">{task.title}</Text>
+      <Text className="text-base leading-relaxed text-text-subtle">{task.body}</Text>
+    </View>
   );
 }

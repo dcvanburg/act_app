@@ -1,0 +1,59 @@
+import { Link } from 'expo-router';
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { MoodHomeCard } from '@/components/mood/MoodHomeCard';
+import { ProgramOverview } from '@/components/modules/ProgramOverview';
+import common from '@/content/nl/common.json';
+import { useUserProgress } from '@/lib/progress-queries';
+
+/**
+ * /home — program overview.
+ *
+ * Loads UserProgress from Supabase via TanStack Query and renders the 8-module
+ * list with unlock state. Tapping any unlocked module routes to
+ * /onboarding (module 0) or /modules/<id>.
+ */
+export default function HomeScreen() {
+  const insets = useSafeAreaInsets();
+  const { data: progress, isLoading } = useUserProgress();
+
+  return (
+    <ScrollView
+      className="flex-1 bg-background"
+      contentContainerStyle={{
+        paddingTop: insets.top + 24,
+        paddingBottom: insets.bottom + 112, // room for Noodknop
+        paddingHorizontal: 16,
+      }}
+    >
+      <View className="mx-auto w-full max-w-md">
+        <View className="mb-8 flex-row items-start justify-between gap-3">
+          <View className="flex-1">
+            <Text className="font-serif text-2xl font-bold text-text">{common.app.name}</Text>
+            <Text className="mt-1 text-sm text-text-subtle">{common.app.tagline}</Text>
+          </View>
+          <Link href="/account" asChild>
+            <Text
+              accessibilityRole="link"
+              accessibilityLabel="Mijn account"
+              className="h-10 w-10 rounded-full bg-primary-soft text-center text-base leading-10 text-primary"
+            >
+              {'\u{1F464}'}
+            </Text>
+          </Link>
+        </View>
+
+        <MoodHomeCard />
+
+        {isLoading || !progress ? (
+          <View className="items-center py-12">
+            <ActivityIndicator color="#3B6D11" />
+          </View>
+        ) : (
+          <ProgramOverview progress={progress} />
+        )}
+      </View>
+    </ScrollView>
+  );
+}

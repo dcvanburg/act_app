@@ -1,6 +1,7 @@
 {
   "app": {
     "name": "Van Overleven naar Leven",
+    "nameDisplay": "Van Overleven\nnaar Leven",
     "tagline": "Een zelfgeleid therapeutisch programma"
   },
   "nav": {
