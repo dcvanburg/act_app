@@ -106,7 +106,10 @@ export default function OnboardingScreen() {
         {step === 'welcome' && (
           <WelcomeStep
             onContinue={() => setStep('complaint')}
-            onClose={() => (inOnboarding ? router.replace('/home') : router.back())}
+            onBack={() =>
+              inOnboarding ? router.replace('/mood?from=onboarding') : router.back()
+            }
+            onSkip={() => router.replace('/home')}
             inOnboarding={inOnboarding}
           />
         )}
@@ -157,23 +160,23 @@ export default function OnboardingScreen() {
 
 function WelcomeStep({
   onContinue,
-  onClose,
+  onBack,
+  onSkip,
   inOnboarding,
 }: {
   onContinue: () => void;
-  onClose: () => void;
+  onBack: () => void;
+  onSkip: () => void;
   inOnboarding: boolean;
 }) {
   return (
     <View>
       <View className="mb-4 flex-row items-center justify-between">
-        <Pressable accessibilityRole="button" onPress={onClose} className="self-start">
-          <Text className="text-sm text-text-muted">
-            {inOnboarding ? `‹ ${common.actions.back}` : `‹ ${common.actions.back}`}
-          </Text>
+        <Pressable accessibilityRole="button" onPress={onBack} className="self-start">
+          <Text className="text-sm text-text-muted">{`‹ ${common.actions.back}`}</Text>
         </Pressable>
         {inOnboarding && (
-          <Pressable accessibilityRole="button" onPress={onClose}>
+          <Pressable accessibilityRole="button" onPress={onSkip}>
             <Text className="text-sm text-text-muted">Overslaan</Text>
           </Pressable>
         )}

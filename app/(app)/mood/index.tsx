@@ -121,16 +121,14 @@ export default function MoodCheckinScreen() {
       >
         <View className="mx-auto w-full max-w-md">
           <View className="mb-2 flex-row items-center gap-3">
-            {!inOnboarding && (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Terug"
-                onPress={() => router.back()}
-                className="p-1"
-              >
-                <Text className="text-lg text-text-muted">‹</Text>
-              </Pressable>
-            )}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Terug"
+              onPress={() => (inOnboarding ? router.replace('/onboarding') : router.back())}
+              className="p-1"
+            >
+              <Text className="text-lg text-text-muted">‹</Text>
+            </Pressable>
             <Text className="flex-1 font-serif text-xl font-bold text-text">
               {mood.checkIn.title}
             </Text>
