@@ -148,44 +148,6 @@ export function ModuleReadOnlyView({ content, complaintTypes }: Props) {
             </Text>
           </View>
 
-          {content.backReferences.length > 0 ? (
-            <View>
-              <Text className="mb-3 text-sm font-semibold text-text-muted">Eerdere modules</Text>
-              <View className="gap-2">
-                {content.backReferences.map((ref) => (
-                  <Link
-                    key={ref.moduleId}
-                    href={{ pathname: '/modules/[id]', params: { id: ref.moduleId } }}
-                    asChild
-                  >
-                    <Pressable className="rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft">
-                      <Text className="text-sm text-text">← {ref.label}</Text>
-                    </Pressable>
-                  </Link>
-                ))}
-              </View>
-            </View>
-          ) : null}
-
-          <View className="flex-row gap-3">
-            <Link href="/home" asChild>
-              <Pressable
-                accessibilityRole="link"
-                className="flex-1 items-center rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft"
-              >
-                <Text className="text-sm font-medium text-text">{common.nav.home}</Text>
-              </Pressable>
-            </Link>
-            <Link href="/modules" asChild>
-              <Pressable
-                accessibilityRole="link"
-                className="flex-1 items-center rounded-xl bg-surface p-3 shadow-sm active:bg-primary-soft"
-              >
-                <Text className="text-sm font-medium text-text">{common.nav.modules}</Text>
-              </Pressable>
-            </Link>
-          </View>
-
           {prevModuleId && prevMeta && prevHref ? (
             <View>
               <Text className="mb-3 text-sm font-semibold text-text-muted">
