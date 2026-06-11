@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -18,6 +18,7 @@ import { BackButton } from '@/components/BackButton';
 import { AppTextInput } from '@/components/AppTextInput';
 import mood from '@/content/nl/mood.json';
 import { useSaveMoodLog } from '@/lib/mood-queries';
+import { useOnboardingIdleReset } from '@/lib/use-onboarding-idle-reset';
 import { defaultTabBarStyle, hiddenTabBarStyle } from '@/lib/tab-bar';
 import type { EmotionTag, MoodScore } from '@/types/content';
 
@@ -34,13 +35,22 @@ export default function MoodCheckinScreen() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const save = useSaveMoodLog();
-  const { from } = useLocalSearchParams<{ from?: string }>();
+  const { from, reset } = useLocalSearchParams<{ from?: string; reset?: string }>();
   const inOnboarding = from === 'onboarding';
 
   const [showIntro, setShowIntro] = useState(inOnboarding);
   const [score, setScore] = useState<MoodScore | null>(null);
   const [tags, setTags] = useState<EmotionTag[]>([]);
   const [note, setNote] = useState('');
+
+  const resetMoodState = useCallback(() => {
+    setShowIntro(inOnboarding);
+    setScore(null);
+    setTags([]);
+    setNote('');
+  }, [inOnboarding]);
+
+  useOnboardingIdleReset(reset, resetMoodState);
 
   useEffect(() => {
     if (!inOnboarding) return;

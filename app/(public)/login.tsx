@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import auth from '@/content/nl/auth.json';
 import common from '@/content/nl/common.json';
 import { AppTextInput } from '@/components/AppTextInput';
 import { supabase, SUPABASE_CONFIGURED } from '@/lib/supabase/client';
@@ -47,14 +48,19 @@ type Step = 'email' | 'sent';
 export default function LoginScreen() {
   const { session } = useAuth();
   const insets = useSafeAreaInsets();
-  const { error: errorParam } = useLocalSearchParams<{ error?: string }>();
+  const { error: errorParam, reason: reasonParam } = useLocalSearchParams<{
+    error?: string;
+    reason?: string;
+  }>();
 
   const [email, setEmail] = useState('');
   const [step, setStep] = useState<Step>('email');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(
-    errorParam === 'auth' ? 'Inloggen mislukt. Probeer het opnieuw.' : null,
-  );
+  const [error, setError] = useState<string | null>(() => {
+    if (reasonParam === 'session_expired') return auth.sessionExpired;
+    if (errorParam === 'auth') return 'Inloggen mislukt. Probeer het opnieuw.';
+    return null;
+  });
 
   if (session) {
     return <Redirect href="/home" />;
