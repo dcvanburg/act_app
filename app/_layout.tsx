@@ -1,6 +1,7 @@
 import '../global.css';
 
 import { Stack } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -10,6 +11,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 SplashScreen.preventAutoHideAsync().catch(() => {
   // Splash already hidden or unavailable (e.g. web) — safe to ignore.
 });
+
+WebBrowser.maybeCompleteAuthSession();
 
 import { Noodknop } from '@/components/emergency/Noodknop';
 import { AuthProvider } from '@/providers/AuthProvider';

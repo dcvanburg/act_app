@@ -1,8 +1,9 @@
 import type { Session, User } from '@supabase/supabase-js';
 import * as Linking from 'expo-linking';
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { AppState } from 'react-native';
 
+import { createSessionFromUrl } from '@/lib/auth-callback';
 import {
   clearSessionPolicyStorage,
   ensureSessionAnchor,
@@ -43,6 +44,8 @@ function isInvalidSessionError(error: { message?: string; status?: number | unde
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const linkingUrl = Linking.useLinkingURL();
+  const handledLinkUrl = useRef<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -138,31 +141,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    async function handleDeepLink(url: string | null) {
-      if (!url) return;
+    if (!linkingUrl || handledLinkUrl.current === linkingUrl) return;
 
-      // PKCE flow (Supabase v2 default): actapp://auth/callback?code=xxxx
-      const { queryParams } = Linking.parse(url);
-      if (queryParams?.code && typeof queryParams.code === 'string') {
-        await supabase.auth.exchangeCodeForSession(url);
-        return;
-      }
-
-      // Implicit flow fallback: actapp://auth/callback#access_token=...&refresh_token=...
-      const fragment = url.includes('#') ? url.slice(url.indexOf('#') + 1) : '';
-      if (!fragment) return;
-      const params = new URLSearchParams(fragment);
-      const access_token = params.get('access_token');
-      const refresh_token = params.get('refresh_token');
-      if (access_token && refresh_token) {
-        await supabase.auth.setSession({ access_token, refresh_token });
-      }
-    }
-
-    Linking.getInitialURL().then(handleDeepLink);
-    const subscription = Linking.addEventListener('url', ({ url }) => handleDeepLink(url));
-    return () => subscription.remove();
-  }, []);
+    handledLinkUrl.current = linkingUrl;
+    createSessionFromUrl(linkingUrl).catch(() => {
+      // Allow retry if the user returns to the app with the same link.
+      handledLinkUrl.current = null;
+    });
+  }, [linkingUrl]);
 
   return (
     <AuthContext.Provider
