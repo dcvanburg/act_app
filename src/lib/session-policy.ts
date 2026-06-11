@@ -146,7 +146,9 @@ function amsterdamLocalToUtc(
   };
 
   function matches(instant: Date): boolean {
-    const parts = Object.fromEntries(formatter.formatToParts(instant).map((p) => [p.type, p.value]));
+    const parts = Object.fromEntries(
+      formatter.formatToParts(instant).map((p) => [p.type, p.value]),
+    );
     const hour = parts.hour === '24' ? '00' : parts.hour;
     return (
       parts.year === target.year &&

@@ -76,7 +76,10 @@ export function SessionPolicyProvider({ children }: { children: ReactNode }) {
       });
 
       if (action === 'onboarding_start') {
-        const target = withResetParam(resolveOnboardingStartRoute(profile?.first_name), now.getTime());
+        const target = withResetParam(
+          resolveOnboardingStartRoute(profile?.first_name),
+          now.getTime(),
+        );
         router.replace(target as Href);
       } else if (action === 'home') {
         router.replace('/home');
