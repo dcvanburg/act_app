@@ -31,11 +31,21 @@ No anonymous or guest mode in v1.
 
 ```
 Auth flow:
-  / (landing)  →  /login (email input)  →  magic-link email  →  /auth/callback  →  / (home)
+  /login (email)  →  Supabase email (6-digit code + optional link)
+                 →  /login (enter code in app)  OR  /auth/callback (deep link)  →  /home
 
 Protected routes (middleware): /onboarding, /modules/*, /oefeningen, /dagboek, /check-in
 Public routes:                 /, /noodhulp, /auth/*, /privacy
 ```
+
+### Supabase email template
+
+The magic-link email must include the OTP token so users can log in without a
+working deep link (common on mobile browsers). In Supabase → Authentication →
+Email Templates → Magic Link, include `{{ .Token }}` (6-digit code).
+
+Redirect URLs (Authentication → URL Configuration): `actapp://**`, `exp://**`.
+Universal Links require a hosted HTTPS callback page (post-v1).
 
 ### Supabase schema (minimum)
 
