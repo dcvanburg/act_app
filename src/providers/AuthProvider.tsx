@@ -3,6 +3,12 @@ import * as Linking from 'expo-linking';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { AppState } from 'react-native';
 
+import {
+  clearSessionPolicyStorage,
+  ensureSessionAnchor,
+  setLastActiveAt,
+  setSessionAnchor,
+} from '@/lib/session-storage';
 import { supabase } from '@/lib/supabase/client';
 
 interface AuthContextValue {
@@ -73,6 +79,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setSession(localSession);
           setLoading(false);
         }
+        await ensureSessionAnchor();
+        await setLastActiveAt(new Date().toISOString());
+        supabase.auth.startAutoRefresh();
         return;
       }
 
@@ -84,13 +93,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(validatedSession ?? localSession);
         setLoading(false);
       }
+
+      await ensureSessionAnchor();
+      await setLastActiveAt(new Date().toISOString());
+      supabase.auth.startAutoRefresh();
     }
 
     bootstrapSession();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    } = supabase.auth.onAuthStateChange(async (event, nextSession) => {
+      if (event === 'SIGNED_IN' && nextSession) {
+        const now = new Date().toISOString();
+        await setSessionAnchor(now);
+        await setLastActiveAt(now);
+        supabase.auth.startAutoRefresh();
+      }
+
+      if (event === 'SIGNED_OUT') {
+        await clearSessionPolicyStorage();
+      }
+
       setSession(nextSession);
       setLoading(false);
     });
@@ -147,6 +171,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user: session?.user ?? null,
         loading,
         signOut: async () => {
+          await clearSessionPolicyStorage();
           await supabase.auth.signOut();
         },
       }}

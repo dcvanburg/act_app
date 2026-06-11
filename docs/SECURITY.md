@@ -51,9 +51,13 @@ Never ship with an empty safety check that lets all users proceed without screen
 | Right to erasure          | User can delete all local/account data                               |
 | No selling of health data | Hard rule — document in privacy policy                               |
 
-## Authentication (TBD)
+## Authentication
 
-See [OPEN_QUESTIONS.md](./OPEN_QUESTIONS.md). Until decided:
+Account required via Supabase magic-link (ADR-003). Client session policy (ADR-004):
+
+- Sessions expire after **30 days** at 03:00 Europe/Amsterdam
+- **30-minute idle** returns users to `/home`, or restarts onboarding if module 0 is incomplete
+- Tokens stored in `expo-secure-store`; crisis screen `/noodhulp` is never interrupted by idle redirects
 
 - Do not assume social login
 - Do not send health data to third-party analytics without consent
