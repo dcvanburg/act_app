@@ -1,42 +1,39 @@
 import * as Linking from 'expo-linking';
-import { Redirect, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { Redirect } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 
-import { supabase } from '@/lib/supabase/client';
+import { createSessionFromUrl } from '@/lib/auth-callback';
 import { useAuth } from '@/providers/AuthProvider';
 
 /**
  * Magic-link callback screen.
  *
- * Handles two flows:
- *   1. PKCE (Supabase v2 default): URL contains `?code=xxxx`. We call
- *      `exchangeCodeForSession` here as a fallback for cold-start deep links
- *      where AuthProvider's listener hasn't fired yet.
- *   2. Implicit: tokens are already set by AuthProvider's deep-link listener
- *      before this screen mounts — just redirect.
- *
- * The `exchanged` ref prevents a double exchange when AuthProvider and this
- * screen race on the same code.
+ * AuthProvider handles the deep link via `useLinkingURL`; this screen is a
+ * fallback when Expo Router lands here before the provider finishes, and
+ * shows loading / error UI while the session is established.
  */
 export default function AuthCallbackScreen() {
   const { session, loading } = useAuth();
-  const { code } = useLocalSearchParams<{ code?: string }>();
+  const linkingUrl = Linking.useLinkingURL();
+  const [authFailed, setAuthFailed] = useState(false);
   const exchanged = useRef(false);
 
   useEffect(() => {
-    if (!code || exchanged.current) return;
+    if (!linkingUrl || exchanged.current || session) return;
     exchanged.current = true;
 
-    const callbackUrl = Linking.createURL('/auth/callback', {
-      queryParams: { code },
-    });
-    supabase.auth.exchangeCodeForSession(callbackUrl).catch(() => {
-      // Ignore — AuthProvider may have already exchanged it.
-    });
-  }, [code]);
+    createSessionFromUrl(linkingUrl)
+      .then((nextSession) => {
+        if (!nextSession) setAuthFailed(true);
+      })
+      .catch(() => {
+        exchanged.current = false;
+        setAuthFailed(true);
+      });
+  }, [linkingUrl, session]);
 
-  if (loading || (code && !session)) {
+  if (!authFailed && (loading || (linkingUrl && !session))) {
     return (
       <View className="flex-1 items-center justify-center bg-background gap-3">
         <ActivityIndicator color="#3B6D11" />

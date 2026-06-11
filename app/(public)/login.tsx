@@ -1,4 +1,3 @@
-import * as Linking from 'expo-linking';
 import { Redirect, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -16,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import auth from '@/content/nl/auth.json';
 import common from '@/content/nl/common.json';
 import { AppTextInput } from '@/components/AppTextInput';
+import { getAuthRedirectUrl } from '@/lib/auth-redirect';
 import { supabase, SUPABASE_CONFIGURED } from '@/lib/supabase/client';
 import { useAuth } from '@/providers/AuthProvider';
 
@@ -26,14 +26,14 @@ const logo = require('../../assets/icon.png');
 /**
  * Where Supabase redirects after verifying the magic link.
  *
- * `Linking.createURL` resolves to the right scheme automatically:
+ * `makeRedirectUri` resolves to the right scheme automatically:
  *   - Expo Go dev: `exp://<lan-ip>:8081/--/auth/callback`
  *   - Standalone / dev-client build: `actapp://auth/callback`
  *
  * Both must be in Supabase → Authentication → URL Configuration → Redirect URLs.
  * Allowlist with wildcards: `actapp://**` and `exp://**`.
  */
-const REDIRECT_URL = Linking.createURL('/auth/callback');
+const REDIRECT_URL = getAuthRedirectUrl();
 
 type Step = 'email' | 'sent';
 
