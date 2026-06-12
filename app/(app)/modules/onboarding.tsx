@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -12,6 +12,7 @@ import { getModuleContent } from '@/lib/content';
 import { getModuleStatus } from '@/lib/progress';
 import { useSaveIntake, useSaveModuleProgress, useUserProgress } from '@/lib/progress-queries';
 import { isComplete, isProgramAllowed, worstOutcome } from '@/lib/safety';
+import { useOnboardingIdleReset } from '@/lib/use-onboarding-idle-reset';
 import type { ComplaintType, SafetyOutcome, SafetyQuestion } from '@/types/content';
 
 const COMPLAINT_KEYS: ComplaintType[] = ['pain', 'mental', 'alcohol', 'combination'];
@@ -27,7 +28,7 @@ export default function OnboardingScreen() {
   const { data: progress, isLoading } = useUserProgress();
   const saveIntake = useSaveIntake();
   const saveModuleProgress = useSaveModuleProgress();
-  const { from } = useLocalSearchParams<{ from?: string }>();
+  const { from, reset } = useLocalSearchParams<{ from?: string; reset?: string }>();
   const inOnboarding = from === 'onboarding';
 
   const questions = intake.safetyCheck.questions as SafetyQuestion[];
@@ -38,6 +39,17 @@ export default function OnboardingScreen() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [resolvedOutcome, setResolvedOutcome] = useState<SafetyOutcome | null>(null);
   const [moduleNotes, setModuleNotes] = useState<string | undefined>(undefined);
+
+  const resetOnboardingState = useCallback(() => {
+    setStep('welcome');
+    setComplaint(null);
+    setAnswers({});
+    setQuestionIndex(0);
+    setResolvedOutcome(null);
+    setModuleNotes(undefined);
+  }, []);
+
+  useOnboardingIdleReset(reset, resetOnboardingState);
 
   const currentQuestion = questions[questionIndex];
 

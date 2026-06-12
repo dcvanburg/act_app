@@ -66,6 +66,16 @@ Rendered as contextual cards linking to prior modules:
 | 6 Waarden            | 5 Zelf-als-context              |
 | 7 Toegewijd handelen | 6 Waarden + all prior           |
 
+## Session & idle behaviour
+
+See [ADR-004](./ADR/004-session-policy.md).
+
+| Trigger | Result |
+| ------- | ------ |
+| 30 days since login | Sign out at 03:00 Europe/Amsterdam on expiry date; redirect to `/login?reason=session_expired` |
+| 30 min inactive on onboarding pages (module 0 not complete) | Restart at `/wizard` or `/mood?from=onboarding` |
+| 30 min inactive elsewhere | Navigate to `/home` (no-op if already there; `/noodhulp` exempt) |
+
 ## Emergency button UX
 
 - **Position:** Fixed; does not scroll away (e.g. `position: fixed`, bottom-right)

@@ -1,6 +1,7 @@
 import '../global.css';
 
 import { Stack } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -11,9 +12,12 @@ SplashScreen.preventAutoHideAsync().catch(() => {
   // Splash already hidden or unavailable (e.g. web) — safe to ignore.
 });
 
+WebBrowser.maybeCompleteAuthSession();
+
 import { Noodknop } from '@/components/emergency/Noodknop';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
+import { SessionPolicyProvider } from '@/providers/SessionPolicyProvider';
 
 /**
  * Root layout — wraps the entire app.
@@ -39,14 +43,16 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <QueryProvider>
           <AuthProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="(public)" />
-              <Stack.Screen name="(app)" />
-              <Stack.Screen name="+not-found" />
-            </Stack>
-            <Noodknop />
-            <StatusBar style="dark" backgroundColor="#F5F0E8" />
+            <SessionPolicyProvider>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="(public)" />
+                <Stack.Screen name="(app)" />
+                <Stack.Screen name="+not-found" />
+              </Stack>
+              <Noodknop />
+              <StatusBar style="dark" backgroundColor="#F5F0E8" />
+            </SessionPolicyProvider>
           </AuthProvider>
         </QueryProvider>
       </SafeAreaProvider>

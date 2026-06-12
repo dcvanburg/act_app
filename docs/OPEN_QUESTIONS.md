@@ -35,6 +35,19 @@ Answer these before or during Phase 1 implementation. Mark resolved items with d
 | 17  | **App name (store listing):** Final name for App Store / Play Store?                                                  | Store submission                                              | _TBD_ — working title "Van Overleven naar Leven"                                                                                                                                 |
 | 18  | **App icons + splash + screenshots:** Asset source?                                                                   | Required for store submission                                 | _TBD_                                                                                                                                                                            |
 
+## RAG chatbot (2026-06-12)
+
+See [ADR-005](./ADR/005-rag-chatbot.md) for context. These six items gate Phase 1 of the chatbot work.
+
+| #   | Question                                                                                                                              | Impact                                                                     | Answer                                                                                                                                    |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| 19  | **Embedding provider:** Voyage AI `voyage-3-lite` (512 dims, free 200M tokens/m) vs OpenAI `text-embedding-3-small` (1536 dims, paid)? | Locks `vector(N)` in migration 0009 forever — HNSW index cannot be resized | ✅ **Resolved 2026-06-12:** Voyage AI `voyage-3-lite` (512 dims). See ADR-005.                                                             |
+| 20  | **LLM routing:** Direct Anthropic API (US-hosted) vs AWS Bedrock Frankfurt (EU)? Zero-retention agreement with Anthropic? Voyage AI DPA? | AVG Article 9 compliance; pilot launch; privacy policy                  | ✅ **Resolved 2026-06-12 (routing):** Direct Anthropic API (US). ⚠️ **Still required pre-pilot:** Anthropic DPA + zero-retention agreement + Voyage AI DPA. |
+| 21  | **Chat route placement:** Top-level `/chat` tab (always available to authed users) vs unlock after intake vs in-module contextual helper? | Navigation, intake flow, when chatbot first becomes usable             | ✅ **Resolved 2026-06-12:** Card / button on `/home` linking to `app/(app)/chat.tsx`. See ADR-005.                                         |
+| 22  | **Phase / module filter:** Restrict retrieved chunks to the user's current ACT module, or allow questions across all unlocked content? | Retrieval scope; whether `UserProgress.modules` drives `filterPhase`    | ⚠️ Open. **Recommendation:** ship v1 without a phase filter; add in v2 if retrieval noise warrants it.                                     |
+| 23  | **Therapist sign-off:** Who reviews the Dutch system prompt and every ingested document? Cadence of re-review when modules change?    | All phases — non-negotiable before any pilot user                       | ✅ **Resolved 2026-06-12:** User acts as therapist via `/therapeut` skill. Real-human therapist review still recommended before pilot.     |
+| 24  | **Crisis-signal keyword list:** Final Dutch keyword list for the pre-LLM safety filter (`chat-safety.ts`)?                            | Phase 3 client code; therapeutic safety                                 | ✅ **Resolved 2026-06-12:** Approved v1.0 in [docs/THERAPEUT_KB/chatbot-drafts.md § 2](./THERAPEUT_KB/chatbot-drafts.md#2-crisis-signal-keyword-list-dutch). Re-review every quarter or on major content changes. |
+
 ## Pivot to Expo (2026-06-09)
 
 Decisions made for the Next.js → Expo pivot:
@@ -61,3 +74,8 @@ Decisions made for the Next.js → Expo pivot:
 | 8   | Offline / PWA               | Connection required. Briefly reversed to "works offline" on 2026-06-09, then re-reversed same day. App will not function without network. | 2026-06-09 |
 | 9   | Analytics                   | Decide after pilot. Env var placeholder kept. No wiring in v1.                                                                            | 2026-06-08 |
 | 13  | Audio                       | No audio in v1. Body exercises are text-only. Audio player added in a future sprint.                                                      | 2026-06-08 |
+| 19  | RAG embedding provider      | Voyage AI `voyage-3-lite` (512 dims). See ADR-005.                                                                                        | 2026-06-12 |
+| 20  | RAG LLM routing             | Direct Anthropic API (US-hosted). DPAs + zero-retention agreement required pre-pilot.                                                     | 2026-06-12 |
+| 21  | Chat route placement        | Card / button on `/home` linking to `app/(app)/chat.tsx`.                                                                                 | 2026-06-12 |
+| 23  | Chatbot therapist sign-off  | User acts as therapist via `/therapeut` skill. Real-human review still recommended pre-pilot.                                             | 2026-06-12 |
+| 24  | Chatbot crisis keyword list | Approved v1.0 in `docs/THERAPEUT_KB/chatbot-drafts.md § 2`. Re-review every quarter or on major content changes.                          | 2026-06-12 |

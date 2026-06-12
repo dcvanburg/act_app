@@ -1,4 +1,3 @@
-import * as Linking from 'expo-linking';
 import { Redirect, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -13,8 +12,11 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import auth from '@/content/nl/auth.json';
 import common from '@/content/nl/common.json';
 import { AppTextInput } from '@/components/AppTextInput';
+import { getAuthRedirectUrl } from '@/lib/auth-redirect';
+import { isValidOtpCode, verifyEmailOtp } from '@/lib/auth-login';
 import { supabase, SUPABASE_CONFIGURED } from '@/lib/supabase/client';
 import { useAuth } from '@/providers/AuthProvider';
 
@@ -25,14 +27,14 @@ const logo = require('../../assets/icon.png');
 /**
  * Where Supabase redirects after verifying the magic link.
  *
- * `Linking.createURL` resolves to the right scheme automatically:
+ * `makeRedirectUri` resolves to the right scheme automatically:
  *   - Expo Go dev: `exp://<lan-ip>:8081/--/auth/callback`
  *   - Standalone / dev-client build: `actapp://auth/callback`
  *
  * Both must be in Supabase → Authentication → URL Configuration → Redirect URLs.
  * Allowlist with wildcards: `actapp://**` and `exp://**`.
  */
-const REDIRECT_URL = Linking.createURL('/auth/callback');
+const REDIRECT_URL = getAuthRedirectUrl();
 
 type Step = 'email' | 'sent';
 
@@ -47,14 +49,19 @@ type Step = 'email' | 'sent';
 export default function LoginScreen() {
   const { session } = useAuth();
   const insets = useSafeAreaInsets();
-  const { error: errorParam } = useLocalSearchParams<{ error?: string }>();
+  const { error: errorParam, reason: reasonParam } = useLocalSearchParams<{
+    error?: string;
+    reason?: string;
+  }>();
 
   const [email, setEmail] = useState('');
   const [step, setStep] = useState<Step>('email');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(
-    errorParam === 'auth' ? 'Inloggen mislukt. Probeer het opnieuw.' : null,
-  );
+  const [error, setError] = useState<string | null>(() => {
+    if (reasonParam === 'session_expired') return auth.sessionExpired;
+    if (errorParam === 'auth') return 'Inloggen mislukt. Probeer het opnieuw.';
+    return null;
+  });
 
   if (session) {
     return <Redirect href="/home" />;
@@ -86,6 +93,19 @@ export default function LoginScreen() {
     }
 
     setStep('sent');
+  }
+
+  async function handleVerifyOtp(code: string) {
+    setError(null);
+    setLoading(true);
+
+    try {
+      await verifyEmailOtp(email, code);
+    } catch {
+      setError(auth.sent.otpInvalid);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleResend() {
@@ -139,6 +159,7 @@ export default function LoginScreen() {
               loading={loading}
               error={error}
               onResend={handleResend}
+              onVerifyOtp={handleVerifyOtp}
               onChangeEmail={() => {
                 setStep('email');
                 setError(null);
@@ -209,18 +230,50 @@ function SentConfirmation(props: {
   loading: boolean;
   error: string | null;
   onResend: () => void;
+  onVerifyOtp: (code: string) => void;
   onChangeEmail: () => void;
 }) {
+  const [code, setCode] = useState('');
+  const canSubmit = isValidOtpCode(code);
+
   return (
     <View className="rounded-2xl bg-surface p-6 shadow-sm">
-      <Text className="mb-2 font-serif text-xl font-semibold text-text">Controleer je e-mail</Text>
-      <Text className="mb-5 text-sm text-text-subtle">
-        We hebben een inloglink gestuurd naar{' '}
-        <Text className="font-semibold text-text">{props.email}</Text>. Tik op de link in de e-mail
-        om in te loggen.
+      <Text className="mb-2 font-serif text-xl font-semibold text-text">{auth.sent.title}</Text>
+      <Text className="mb-3 text-sm text-text-subtle">
+        {auth.sent.body.replace('{email}', props.email)}
       </Text>
+      <Text className="mb-5 whitespace-pre-line text-sm text-text-subtle">{auth.sent.steps}</Text>
+
+      <Text className="mb-1 text-sm font-medium text-text">{auth.sent.otpOptionalTitle}</Text>
+      <Text className="mb-3 text-xs text-text-muted">{auth.sent.otpOptionalHint}</Text>
+      <Text className="mb-1 text-sm font-medium text-text">{auth.sent.otpLabel}</Text>
+      <AppTextInput
+        value={code}
+        onChangeText={(value) => setCode(value.replace(/\D/g, '').slice(0, 6))}
+        autoComplete="one-time-code"
+        keyboardType="number-pad"
+        textContentType="oneTimeCode"
+        editable={!props.loading}
+        placeholder={auth.sent.otpPlaceholder}
+        className="mb-4"
+      />
 
       {props.error ? <Text className="mb-3 text-sm text-crisis">{props.error}</Text> : null}
+
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => props.onVerifyOtp(code)}
+        disabled={!canSubmit || props.loading}
+        className="mb-5 rounded-lg bg-primary px-4 py-3 active:bg-primary-dark disabled:opacity-60"
+      >
+        {props.loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text className="text-center text-base font-semibold text-white">
+            {auth.sent.otpSubmit}
+          </Text>
+        )}
+      </Pressable>
 
       <View className="flex-row items-center justify-between">
         <Pressable
@@ -228,13 +281,13 @@ function SentConfirmation(props: {
           onPress={props.onChangeEmail}
           disabled={props.loading}
         >
-          <Text className="text-sm text-text-muted">← Ander e-mailadres</Text>
+          <Text className="text-sm text-text-muted">{auth.sent.changeEmail}</Text>
         </Pressable>
         <Pressable accessibilityRole="button" onPress={props.onResend} disabled={props.loading}>
           {props.loading ? (
             <ActivityIndicator color="#3B6D11" size="small" />
           ) : (
-            <Text className="text-sm text-primary">Stuur opnieuw</Text>
+            <Text className="text-sm text-primary">{auth.sent.resend}</Text>
           )}
         </Pressable>
       </View>

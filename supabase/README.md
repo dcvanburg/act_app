@@ -2,6 +2,9 @@
 
 Database migrations for the ACT app.
 
+**Magic-link login:** deploy the `auth-callback` edge function and configure
+redirect URLs — see [docs/SUPABASE_AUTH_SETUP.md](../docs/SUPABASE_AUTH_SETUP.md).
+
 ## Applying migrations
 
 ```bash

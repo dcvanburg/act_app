@@ -22,6 +22,7 @@ Self-guided ACT therapeutic mobile app. Dutch UI, English codebase.
 - Module specs: `docs/MODULES.md`
 - Open decisions: `docs/OPEN_QUESTIONS.md`
 - Therapist placeholders: `docs/CONTENT_PLACEHOLDERS.md`
+- Chatbot architecture: `docs/ADR/005-rag-chatbot.md`
 
 ## Non-negotiables
 
@@ -29,6 +30,7 @@ Self-guided ACT therapeutic mobile app. Dutch UI, English codebase.
 - Emergency Noodknop visible on every screen — top-level RN overlay, min 44pt touch target
 - `/noodhulp` crisis screen accessible without auth — first-class top-level route
 - Crisis flow and disclaimers must not be weakened
+- Chatbot: crisis keyword pre-filter runs before any LLM call (client + server); no message bodies persisted; therapist sign-off on system prompt and ingested content. See `docs/ADR/005-rag-chatbot.md` and `docs/SECURITY.md` → AI processing.
 - Never commit secrets or `.env`
 - Never push to `main`; use feature branches and PRs
 - Run `/verify` before opening a PR
