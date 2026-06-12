@@ -1,9 +1,14 @@
 # Supabase
 
-Database migrations for the ACT app.
+Database migrations and Edge Functions for the ACT app.
 
 **Magic-link login:** deploy the `auth-callback` edge function and configure
 redirect URLs — see [docs/SUPABASE_AUTH_SETUP.md](../docs/SUPABASE_AUTH_SETUP.md).
+
+**RAG chatbot search:** deploy the `search` edge function with
+`scripts/deploy-rag-functions.sh`. Requires `ANTHROPIC_API_KEY` and
+`VOYAGE_API_KEY` set in Supabase Edge Function secrets. See
+[docs/ADR/005-rag-chatbot.md](../docs/ADR/005-rag-chatbot.md).
 
 ## Applying migrations
 
@@ -30,6 +35,7 @@ Migrations apply in lexical order. Use a `NNNN_short_name.sql` filename pattern.
 | `0002_mood_logs.sql`                  | `mood_logs` (daily mood check-in)                                        |
 | `0003_profiles_subscription_tier.sql` | Adds `subscription_tier` to pre-pivot `profiles` rows                    |
 | `0004_waarden.sql`                    | `waarden`, `waarde_acties`, `waarde_barriers`, `waarde_checkins`         |
+| `0009_rag_chunks.sql`                 | `documents`, `chunks` (pgvector 512 + Dutch FTS), `hybrid_search()` RPC, `chat_sessions` (counter only). RAG chatbot — see ADR-005. |
 | _(future)_                            | `exercise_logs`, `streaks`, `user_badges`, `weekly_checkins` — Phase 2-γ |
 
 ## Row Level Security

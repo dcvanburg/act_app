@@ -22,6 +22,10 @@ module.exports = [
       'coverage/**',
       'ios/**',
       'android/**',
+      // Supabase Edge Functions run on Deno, not Node/RN. They are excluded
+      // from tsconfig.json for the same reason and require `console` for
+      // server-side observability (no other logging surface).
+      'supabase/functions/**',
       '*.config.js',
       '*.config.ts',
       'expo-env.d.ts',
