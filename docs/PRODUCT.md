@@ -73,6 +73,17 @@ After Module 7:
 
 Practical tasks per module are **PLACEHOLDER** in v1 concept — to be filled by the therapist. Track in [CONTENT_PLACEHOLDERS.md](./CONTENT_PLACEHOLDERS.md).
 
+## Chatbot (under design — see [ADR-005](./ADR/005-rag-chatbot.md))
+
+A scoped Q&A chatbot is in design for v1: it answers user questions using **only therapist-approved Dutch content** that has been ingested into a Supabase vector index. The chatbot:
+
+- Is **not** a therapeutic agent. It does not give clinical advice, diagnoses, or new exercises.
+- Synthesises short Dutch summaries from the therapist's own module copy, exercises, and psycho-education.
+- Refers users to huisarts, GGZ, or the crisis line for anything outside that scope.
+- Defers to `/noodhulp` immediately on any crisis signal (keyword pre-filter) — the LLM is never consulted for those messages.
+
+Therapist sign-off is required on the system prompt and every ingested document before pilot. See OPEN_QUESTIONS #19–24.
+
 ## Copyright note (from concept doc)
 
 - ACT as a method is not copyright-protected
