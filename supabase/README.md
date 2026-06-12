@@ -1,9 +1,14 @@
 # Supabase
 
-Database migrations for the ACT app.
+Database migrations and Edge Functions for the ACT app.
 
 **Magic-link login:** deploy the `auth-callback` edge function and configure
 redirect URLs — see [docs/SUPABASE_AUTH_SETUP.md](../docs/SUPABASE_AUTH_SETUP.md).
+
+**RAG chatbot search:** deploy the `search` edge function with
+`scripts/deploy-rag-functions.sh`. Requires `ANTHROPIC_API_KEY` and
+`VOYAGE_API_KEY` set in Supabase Edge Function secrets. See
+[docs/ADR/005-rag-chatbot.md](../docs/ADR/005-rag-chatbot.md).
 
 ## Applying migrations
 
