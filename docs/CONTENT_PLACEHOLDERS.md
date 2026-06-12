@@ -64,12 +64,24 @@
 | ------------------------------------- | ----------------------------- |
 | Back-reference link labels per module | ✅ Already set in module JSON |
 
+## RAG chatbot (under design — see [ADR-005](./ADR/005-rag-chatbot.md))
+
+The chatbot reuses existing module copy, exercises, and psycho-education — no new therapeutic content is required for retrieval itself. Four new artefacts need therapist input before pilot. Three are now approved; the ingest manifest is assembled in Phase 4.
+
+| Artefact                                | Description                                                                                                                                                                                                              | Status                                                                                                                       |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Dutch system prompt                     | The instructions Claude Haiku receives on every chat call. Must align with [crisis.json](../src/content/nl/crisis.json) wording, ACT philosophy, and the "not a clinician" boundary.                                      | ✅ APPROVED 2026-06-12 — see [chatbot-drafts.md § 1](./THERAPEUT_KB/chatbot-drafts.md#1-system-prompt-dutch--for-claude-haiku-45) |
+| Ingest manifest                         | The list of source documents to ingest (which module sections, exercises, daily-practice prompts). Therapist confirms each is final and approved for retrieval.                                                           | ⚠️ TBD — list assembled in Phase 4                                                                                            |
+| Crisis-signal keyword list              | Dutch terms / phrases that bypass retrieval entirely and route the user to `/noodhulp` (e.g. self-harm, suicidal ideation, severe relapse). Owned by `therapeut` agent; reviewed each time modules or intake change.       | ✅ APPROVED 2026-06-12 — see [chatbot-drafts.md § 2](./THERAPEUT_KB/chatbot-drafts.md#2-crisis-signal-keyword-list-dutch)     |
+| `src/content/nl/chat.json` (UI strings) | Dutch UI copy: placeholder text, suggested questions, disclaimer, empty-state, error messages. Drafted by `therapeut` agent then code-reviewed for tone.                                                                  | ✅ APPROVED 2026-06-12 — see [chatbot-drafts.md § 3](./THERAPEUT_KB/chatbot-drafts.md#3-chat-ui-strings--draft-srccontentnlchatjson) |
+
 ## Therapist review still needed
 
 1. **Clinical sign-off** on intake safety questions (`intake.json` — `draftNotice` remains)
 2. **Voice review** — does the Dutch copy match your therapeutic voice?
 3. **Audio recording** — transcripts ready; `audioUrl` still `null` on all exercises
 4. **Legal review** before public launch (copyright note in concept doc)
+5. **Chatbot sign-off** (when ADR-005 reaches Phase 3): system prompt, ingest manifest, crisis keyword list, chat UI strings
 
 ## How to submit revisions
 

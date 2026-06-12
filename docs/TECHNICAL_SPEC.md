@@ -180,9 +180,22 @@ See `src/types/content.ts` → `ConditionalExamples` and `docs/CONTENT_PLACEHOLD
 - **Email fallback:** Privacy policy documents a deletion-by-email route for users who cannot access the in-app flow.
 - Session is invalidated immediately on deletion.
 
+## RAG chatbot (under design — see [ADR-005](./ADR/005-rag-chatbot.md))
+
+A scoped Q&A chatbot is in design for v1. It retrieves from a Supabase pgvector + Dutch FTS index of therapist-approved content and synthesises short Dutch summaries via Claude Haiku 4.5. It is **not** a therapeutic agent — see [PRODUCT.md → Chatbot](./PRODUCT.md#chatbot-under-design--see-adr-005) and [SECURITY.md → AI processing](./SECURITY.md#ai-processing--llm-rag) for the constraints.
+
+Non-negotiables that affect downstream specs:
+
+- Crisis keyword pre-filter runs **client-side and server-side** before any LLM call. Crisis signals route to `/noodhulp`.
+- Chat history is **in-memory only**. The `chat_sessions` table stores at most a counter — no message bodies.
+- Edge Function requires a valid Supabase JWT — no anonymous use.
+- Therapist sign-off on the system prompt and ingested content before pilot.
+
+Implementation phased into four PRs (database → Edge Functions → client → content ingest). Decisions outstanding: OPEN_QUESTIONS #19–24.
+
 ## Out of scope (v1)
 
 - Therapist dashboard / clinician portal
 - Multi-user accounts with social features
 - Payment / subscription (unless decided otherwise)
-- AI-generated therapeutic content
+- Novel AI-generated therapeutic content (the chatbot in ADR-005 only summarises existing therapist-approved material — see that ADR for the boundary)

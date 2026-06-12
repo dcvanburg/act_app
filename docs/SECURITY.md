@@ -95,6 +95,37 @@ No data is retained after deletion. Do not add soft-delete in v1.
 - Hooks block writes to `.env` and protected branches
 - Security-reviewer agent required for auth, intake, and crisis flows
 
+## AI processing — LLM / RAG
+
+Applies to the chatbot in [ADR-005](./ADR/005-rag-chatbot.md). Treat the LLM as an **untrusted summarisation tool**, not a clinician.
+
+### Therapeutic safety
+
+- **Crisis pre-filter is mandatory and runs first.** A Dutch keyword list in `src/lib/chat-safety.ts` (and a copy in the Edge Function for defence-in-depth) routes crisis messages to `/noodhulp` **before** any embedding or LLM call. Never weaken or remove this check.
+- **No medical advice.** The system prompt instructs Claude to answer only from the supplied context and refer the user to huisarts / GGZ / 0800-0113 for anything outside that scope. Wording must match [src/content/nl/crisis.json](../src/content/nl/crisis.json).
+- **No model-invented exercises or interventions.** If the retrieved context does not contain the answer, the chatbot says so and does not extrapolate.
+- **Therapist sign-off** on the Dutch system prompt and every ingested document, tracked in [CONTENT_PLACEHOLDERS.md](./CONTENT_PLACEHOLDERS.md).
+
+### Data minimisation
+
+- **No message storage.** Chat history lives only in app memory and is sent to the LLM as transient context. The `chat_sessions` table stores at most a counter — no message bodies, ever.
+- **History window capped at 3 turns** (6 messages) — anything older is dropped before sending to Anthropic.
+- **Edge Function must not log request bodies.** A CI grep test guards against `console.log(question)` / `console.log(history)` regressions.
+- **Auth required** on every chat request — no anonymous use (consistent with ADR-003).
+
+### Vendor data transfer (AVG Article 9)
+
+The chatbot processes content that often qualifies as Article 9 (health) data. Routing decided 2026-06-12 (ADR-005): direct Anthropic API (US-hosted) for the LLM call, Voyage AI (US) for embeddings. Before any pilot user touches the feature, **all** of the following must be in place:
+
+| Requirement                                                              | Owner       | Status                                    |
+| ------------------------------------------------------------------------ | ----------- | ----------------------------------------- |
+| DPA with Anthropic                                                       | Legal       | ⚠️ Required pre-pilot (ADR-005)           |
+| DPA with Voyage AI                                                       | Legal       | ⚠️ Required pre-pilot (ADR-005)           |
+| Anthropic zero-data-retention agreement (no prompt retention / training) | Legal       | ⚠️ Required pre-pilot (ADR-005)           |
+| Privacy policy lists both processors and the chatbot purpose             | Legal       | OPEN_QUESTIONS #12                        |
+| Supabase project EU region confirmed (so Edge Function logs stay in EU)  | Engineering | OPEN_QUESTIONS #6                         |
+| Real-human therapist review of `docs/THERAPEUT_KB/chatbot-drafts.md`     | Therapist   | ⚠️ Recommended pre-pilot                  |
+
 ## Content security
 
 - Therapeutic content is therapist-owned; no copying from copyrighted ACT workbooks

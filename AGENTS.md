@@ -13,21 +13,22 @@ Self-guided ACT therapeutic mobile app. **UI: Dutch. Code: English.**
 
 ## Docs (read before implementing)
 
-| Doc                            | Use                                                               |
-| ------------------------------ | ----------------------------------------------------------------- |
-| `ARCHIVE_NOTICE.md`            | What survives the pivot and what is being replaced                |
-| `docs/PRODUCT.md`              | Vision, philosophy, scope                                         |
-| `docs/MODULES.md`              | Per-module specification                                          |
-| `docs/TECHNICAL_SPEC.md`       | Features, progress model, safety                                  |
-| `docs/NAVIGATION.md`           | Routes, unlock rules, emergency button                            |
-| `docs/SECURITY.md`             | GDPR, crisis flows, boundaries                                    |
-| `docs/WORKFLOW.md`             | Branching, definition of done                                     |
-| `docs/ADR/001-stack.md`        | Stack (now: Expo, TypeScript, NativeWind)                         |
-| `docs/ADR/002-i18n.md`         | Dutch content in `src/content/nl/`                                |
-| `docs/ADR/003-auth.md`         | **Accepted:** account required, Supabase magic-link via deep link |
-| `docs/CONTENT_PLACEHOLDERS.md` | Therapist content still needed                                    |
-| `docs/THERAPEUT_KB/`           | Therapist agent knowledge base (concept + ACT reference)          |
-| `docs/OPEN_QUESTIONS.md`       | Unresolved decisions                                              |
+| Doc                            | Use                                                                     |
+| ------------------------------ | ----------------------------------------------------------------------- |
+| `ARCHIVE_NOTICE.md`            | What survives the pivot and what is being replaced                      |
+| `docs/PRODUCT.md`              | Vision, philosophy, scope                                               |
+| `docs/MODULES.md`              | Per-module specification                                                |
+| `docs/TECHNICAL_SPEC.md`       | Features, progress model, safety                                        |
+| `docs/NAVIGATION.md`           | Routes, unlock rules, emergency button                                  |
+| `docs/SECURITY.md`             | GDPR, crisis flows, boundaries                                          |
+| `docs/WORKFLOW.md`             | Branching, definition of done                                           |
+| `docs/ADR/001-stack.md`        | Stack (now: Expo, TypeScript, NativeWind)                               |
+| `docs/ADR/002-i18n.md`         | Dutch content in `src/content/nl/`                                      |
+| `docs/ADR/003-auth.md`         | **Accepted:** account required, Supabase magic-link via deep link       |
+| `docs/ADR/005-rag-chatbot.md`  | **Accepted:** RAG chatbot architecture, safety guardrails, GDPR posture |
+| `docs/CONTENT_PLACEHOLDERS.md` | Therapist content still needed                                          |
+| `docs/THERAPEUT_KB/`           | Therapist agent knowledge base (concept + ACT reference)                |
+| `docs/OPEN_QUESTIONS.md`       | Unresolved decisions                                                    |
 
 ## Stack (post-pivot)
 
@@ -121,3 +122,4 @@ act_app/
 - Do not copy copyrighted ACT workbook text — therapist-owned content only
 - Do not commit `.env`, secrets, or API keys
 - Apple/Google data declarations: Article 9 data must be declared in App Privacy and Data Safety forms before submission
+- **Chatbot (ADR-005):** crisis keyword pre-filter runs before any LLM call (client + server); no message bodies persisted; therapist sign-off on system prompt and ingested content before pilot. See `docs/SECURITY.md` → AI processing.
