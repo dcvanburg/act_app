@@ -1,0 +1,43 @@
+{
+  "title": "Stel een vraag",
+  "subtitle": "Korte vragen over het programma. Geen medisch advies.",
+  "placeholder": "Wat wil je weten?",
+  "send": "Versturen",
+  "thinking": "Bezig met meedenken",
+  "youLabel": "Jij",
+  "assistantLabel": "Gids",
+  "homeCard": {
+    "title": "Vraag de gids",
+    "body": "Korte vragen over het programma.",
+    "action": "Stel een vraag"
+  },
+  "emptyState": {
+    "title": "Stel een vraag over het programma",
+    "subtitle": "Ik kan je helpen met informatie uit de modules en oefeningen. Voor persoonlijke zorgen verwijs ik je naar je huisarts."
+  },
+  "suggestedQuestions": [
+    "Wat betekent acceptatie in dit programma?",
+    "Welke oefening helpt bij spanning in mijn lichaam?",
+    "Wat doe ik als ik vastloop in een module?",
+    "Hoe gaat dit programma om met terugval?"
+  ],
+  "disclaimer": "Geen medisch advies. Voor persoonlijke vragen: huisarts of GGZ. Bij directe nood: 0800-0113.",
+  "errors": {
+    "generic": "Er ging iets mis. Probeer het opnieuw of bekijk de modules.",
+    "offline": "Je bent niet verbonden. Probeer het opnieuw zodra je weer online bent.",
+    "rateLimited": "Even pauze. Probeer het over een minuutje opnieuw.",
+    "unauthorized": "Je sessie is verlopen. Log opnieuw in.",
+    "tooLong": "Je vraag is te lang. Houd het korter.",
+    "empty": "Typ eerst een vraag."
+  },
+  "crisisDeflection": {
+    "title": "Even pauze met de app",
+    "body": "Het lijkt erop dat je nu veel meemaakt. Dit is een moment voor menselijke hulp, niet voor een app. Bel je huisarts, of bij directe nood 0800-0113 (24/7 bereikbaar).",
+    "actionPrimary": "Bekijk hulpmiddelen",
+    "actionSecondary": "Terug naar het programma"
+  },
+  "unavailable": {
+    "title": "Nog niet beschikbaar",
+    "body": "Deze functie is nog niet beschikbaar. Bekijk de modules of stel je vraag aan je huisarts."
+  }
+}
