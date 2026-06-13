@@ -6,14 +6,20 @@ import type { ModuleContent } from '@/types/content';
 
 describe('chunkModule', () => {
   it('produces chunks for acceptance module without placeholders', () => {
-    const doc = chunkModule(acceptance as ModuleContent, 'src/content/nl/modules/2-acceptance.json');
+    const doc = chunkModule(
+      acceptance as ModuleContent,
+      'src/content/nl/modules/2-acceptance.json',
+    );
     expect(doc.chunks.length).toBeGreaterThan(3);
     expect(doc.title).toBe('Acceptatie');
     expect(doc.category).toBe('module');
   });
 
   it('includes section about acceptatie vs opgeven', () => {
-    const doc = chunkModule(acceptance as ModuleContent, 'src/content/nl/modules/2-acceptance.json');
+    const doc = chunkModule(
+      acceptance as ModuleContent,
+      'src/content/nl/modules/2-acceptance.json',
+    );
     const section = doc.chunks.find((c) => c.metadata.sectionId === 'not-giving-up');
     expect(section?.content).toContain('Acceptatie is niet opgeven');
   });

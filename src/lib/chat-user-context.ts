@@ -7,11 +7,7 @@ import intake from '@/content/nl/intake.json';
 import moodContent from '@/content/nl/mood.json';
 import waardenContent from '@/content/nl/waarden.json';
 import type { ComplaintType, EmotionTag, MoodScore } from '@/types/content';
-import type {
-  BarriereType,
-  WaardeCheckinAntwoord,
-  WaardeTermijn,
-} from '@/types/waarden';
+import type { BarriereType, WaardeCheckinAntwoord, WaardeTermijn } from '@/types/waarden';
 
 const MOOD_SCORE_LABELS: Record<MoodScore, string> = Object.fromEntries(
   moodContent.scores.map((s) => [s.value, s.label]),
@@ -106,9 +102,7 @@ export function lastMoodPerDay(logs: ChatMoodEntry[]): ChatMoodEntry[] {
   for (const log of [...logs].sort((a, b) => a.date.localeCompare(b.date))) {
     byDate.set(log.date, log);
   }
-  return [...byDate.entries()]
-    .sort(([a], [b]) => b.localeCompare(a))
-    .map(([, log]) => log);
+  return [...byDate.entries()].sort(([a], [b]) => b.localeCompare(a)).map(([, log]) => log);
 }
 
 export function isUserContextEmpty(data: ChatUserContextData): boolean {
@@ -170,9 +164,7 @@ export function formatChatUserContext(data: ChatUserContextData): string {
   if (data.barriers.length > 0) {
     const lines = data.barriers.map((b) => {
       const typeLabel =
-        b.type === 'eigen' && b.eigen_label
-          ? b.eigen_label
-          : (BARRIER_LABELS[b.type] ?? b.type);
+        b.type === 'eigen' && b.eigen_label ? b.eigen_label : (BARRIER_LABELS[b.type] ?? b.type);
       return `• ${waardeName(data.waarden, b.waarde_id)} — barrière (${typeLabel}): «${b.omschrijving}»`;
     });
     sections.push(`Barrières:\n${lines.join('\n')}`);

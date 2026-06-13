@@ -21,9 +21,7 @@ const emptyProfile: ChatUserContextData = {
 
 const profileWithMood: ChatUserContextData = {
   ...emptyProfile,
-  moodLogs: [
-    { date: '2026-06-12', mood_score: 3, emotion_tags: ['stress'], note: null },
-  ],
+  moodLogs: [{ date: '2026-06-12', mood_score: 3, emotion_tags: ['stress'], note: null }],
 };
 
 describe('isVagueQuestion', () => {
@@ -102,8 +100,14 @@ describe('assessClarifyNeed', () => {
 
   it('returns ambiguous clarify with three retrieval options only for vague input', () => {
     const chunks: RetrievalChunk[] = [
-      { metadata: { moduleId: 'acceptance', sectionTitle: 'Acceptatie is niet opgeven' }, rrf_score: 0.02 },
-      { metadata: { moduleId: 'recognition', sectionTitle: 'De vermijdingscirkel' }, rrf_score: 0.019 },
+      {
+        metadata: { moduleId: 'acceptance', sectionTitle: 'Acceptatie is niet opgeven' },
+        rrf_score: 0.02,
+      },
+      {
+        metadata: { moduleId: 'recognition', sectionTitle: 'De vermijdingscirkel' },
+        rrf_score: 0.019,
+      },
     ];
     const decision = assessClarifyNeed('hm', chunks, emptyProfile, []);
     expect(decision?.reason).toBe('ambiguous_retrieval');
