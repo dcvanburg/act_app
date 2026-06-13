@@ -12,7 +12,9 @@ import { supabase } from '@/lib/supabase/client';
  *      entirely on a match. Returns a synthetic ChatResponse marked
  *      `crisis: true` carrying the Dutch deflection from chat.json.
  *   2. supabase.functions.invoke('search') with the user's question and the
- *      last 3 turns of history (server caps history at 6 entries too).
+ *      last 3 turns of history (server caps history at 6 entries too). The
+ *      Edge Function loads mood/waarden profile data server-side (JWT+RLS);
+ *      nothing personal is sent from the client.
  *   3. Map Supabase errors to Dutch error keys from chat.json.errors.
  *
  * History is held by the caller in component state and passed in on each
@@ -31,6 +33,11 @@ export interface ChatResponse {
   answer: string;
   chunksFound: number;
   crisis?: boolean;
+  /** True when hybrid_search returned zero chunks — client shows suggestion chips. */
+  noMatch?: boolean;
+  /** True when intent is unclear — client shows clarify chips after assistant bubble. */
+  clarify?: boolean;
+  clarifyOptions?: string[];
 }
 
 export interface ChatMutationArgs {
@@ -87,6 +94,9 @@ async function callSearchFunction(args: ChatMutationArgs): Promise<ChatResponse>
     answer: data.answer,
     chunksFound: data.chunksFound ?? 0,
     crisis: data.crisis === true,
+    noMatch: data.noMatch === true,
+    clarify: data.clarify === true,
+    clarifyOptions: Array.isArray(data.clarifyOptions) ? data.clarifyOptions : undefined,
   };
 }
 

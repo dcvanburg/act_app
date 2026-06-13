@@ -4,11 +4,14 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } fro
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BackButton } from '@/components/BackButton';
-import { ChatComposer } from '@/components/chat/ChatComposer';
+import { ChatComposer, type ChatComposerHandle } from '@/components/chat/ChatComposer';
 import { CrisisCard } from '@/components/chat/CrisisCard';
 import { MessageBubble } from '@/components/chat/MessageBubble';
+import { ClarifyCard } from '@/components/chat/ClarifyCard';
+import { NoMatchCard } from '@/components/chat/NoMatchCard';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import chat from '@/content/nl/chat.json';
+import { pickChatSuggestions } from '@/lib/chat-suggestions';
 import { useChatMutation, type ChatHistoryEntry, type ChatResponse } from '@/lib/chat-queries';
 
 const CHATBOT_ENABLED = (process.env.EXPO_PUBLIC_ENABLE_CHATBOT ?? 'true') !== 'false';
@@ -38,9 +41,12 @@ export default function ChatScreen() {
   const router = useRouter();
   const mutation = useChatMutation();
   const scrollRef = useRef<ScrollView | null>(null);
+  const composerRef = useRef<ChatComposerHandle | null>(null);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [crisisActive, setCrisisActive] = useState(false);
+  const [noMatchSuggestions, setNoMatchSuggestions] = useState<string[] | null>(null);
+  const [clarifyOptions, setClarifyOptions] = useState<string[] | null>(null);
   const [errorText, setErrorText] = useState<string | null>(null);
 
   useEffect(() => {
@@ -65,6 +71,8 @@ export default function ChatScreen() {
 
   function handleSend(question: string) {
     setErrorText(null);
+    setNoMatchSuggestions(null);
+    setClarifyOptions(null);
     appendUser(question);
 
     mutation.mutate(
@@ -73,6 +81,15 @@ export default function ChatScreen() {
         onSuccess: (data: ChatResponse) => {
           if (data.crisis) {
             setCrisisActive(true);
+            return;
+          }
+          if (data.noMatch) {
+            setNoMatchSuggestions(pickChatSuggestions(question));
+            return;
+          }
+          if (data.clarify) {
+            appendAssistant(data.answer);
+            setClarifyOptions(data.clarifyOptions ?? pickChatSuggestions(question));
             return;
           }
           appendAssistant(data.answer);
@@ -89,6 +106,29 @@ export default function ChatScreen() {
     handleSend(text);
   }
 
+  function handleTypeOwnQuestion() {
+    if (mutation.isPending || crisisActive) return;
+    requestAnimationFrame(() => composerRef.current?.focus());
+  }
+
+  function handleClearConversation() {
+    mutation.reset();
+    setMessages([]);
+    setCrisisActive(false);
+    setNoMatchSuggestions(null);
+    setClarifyOptions(null);
+    setErrorText(null);
+  }
+
+  const composerDisabled = mutation.isPending || crisisActive;
+  const canClear =
+    messages.length > 0 ||
+    crisisActive ||
+    noMatchSuggestions !== null ||
+    clarifyOptions !== null ||
+    errorText !== null ||
+    mutation.isPending;
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -104,6 +144,16 @@ export default function ChatScreen() {
           <Text className="font-semibold text-text">{chat.title}</Text>
           <Text className="text-xs text-text-subtle">{chat.subtitle}</Text>
         </View>
+        {canClear ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={chat.clearConversation}
+            onPress={handleClearConversation}
+            className="min-h-[44px] justify-center rounded-lg px-2 active:opacity-70"
+          >
+            <Text className="text-sm font-medium text-primary-dark">{chat.clearConversation}</Text>
+          </Pressable>
+        ) : null}
       </View>
 
       <ScrollView
@@ -118,6 +168,18 @@ export default function ChatScreen() {
         ))}
 
         {mutation.isPending ? <TypingIndicator /> : null}
+
+        {clarifyOptions ? (
+          <ClarifyCard
+            options={clarifyOptions}
+            onPick={handleSuggestion}
+            onTypeOwn={handleTypeOwnQuestion}
+          />
+        ) : null}
+
+        {noMatchSuggestions ? (
+          <NoMatchCard suggestions={noMatchSuggestions} onPick={handleSuggestion} />
+        ) : null}
 
         {crisisActive ? <CrisisCard /> : null}
 
@@ -137,7 +199,7 @@ export default function ChatScreen() {
         }}
       >
         <Text className="px-4 pt-2 text-xs text-text-muted">{chat.disclaimer}</Text>
-        <ChatComposer disabled={mutation.isPending || crisisActive} onSend={handleSend} />
+        <ChatComposer ref={composerRef} disabled={composerDisabled} onSend={handleSend} />
       </View>
     </KeyboardAvoidingView>
   );

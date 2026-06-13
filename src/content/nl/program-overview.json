@@ -1,0 +1,37 @@
+{
+  "title": "Over het programma",
+  "version": "v1.1",
+  "_status": "v1.1 — APPROVED via /therapeut skill 2026-06-13 (real-human review recommended pre-pilot)",
+  "sections": [
+    {
+      "id": "program-purpose",
+      "title": "Wat is Van Overleven naar Leven",
+      "body": "Van Overleven naar Leven is een zelfstandig therapeutisch programma. Het helpt je om verder te komen dan alleen overleven, ook als pijn, moeilijke gedachten of zware gevoelens blijven.\n\nHet programma bestaat uit acht modules, opgebouwd in drie fases. Je begint met een welkom en intake. Daarna volg je zeven inhoudelijke modules: Herkennen, Acceptatie, Defusie, Aanwezig zijn, Zelf als context, Waarden en Toegewijd handelen. Elke module combineert kennis met een lichaamsoefening, zodat je niet alleen leest maar ook voelt.\n\nDe basis is Acceptance and Commitment Therapy (ACT), aangevuld met lichaamsgerichte psychosomatische therapie. Je bepaalt zelf het tempo. Modules die je hebt afgerond, kun je altijd opnieuw bekijken."
+    },
+    {
+      "id": "for-whom",
+      "title": "Voor wie is dit programma",
+      "body": "Dit programma is gemaakt voor mensen in revalidatie of mensen die net klaar zijn met revalidatie. Het is bedoeld voor zelfstandig gebruik, ook als er geen therapeut beschikbaar is.\n\nHet past bij vier soorten klachten:\n\n• Chronische pijn, lichamelijk of psychosomatisch.\n• Mentale klachten, zoals angst, stress, somberheid of burn-out.\n• Alcohol of andere verslavingsklachten.\n• Een combinatie van deze klachten.\n\nWat deze klachten verbindt, is vaak hetzelfde patroon: vermijding, behoefte aan controle, en het verlies van contact met je lichaam.\n\nHet programma vervangt geen therapie bij acute crisis, ernstige psychiatrische klachten, of zware verslaving zonder begeleiding. Bij die situaties is menselijke hulp nodig."
+    },
+    {
+      "id": "act-in-plain-dutch",
+      "title": "Wat is ACT, in gewone taal",
+      "body": "ACT staat voor Acceptance and Commitment Therapy. Het is een vorm van therapie die niet gaat over je klachten wegwerken, maar over een leven opbouwen dat de moeite waard is, ook met wat moeilijk is.\n\nDe kern is eenvoudig. Je leert ruimte maken voor moeilijke gevoelens, gedachten en lichamelijke sensaties, zonder ertegen te vechten. Tegelijk leer je kiezen waar je naartoe wilt, op basis van wat voor jou belangrijk is. Dat noemen we waarden.\n\nTwee uitgangspunten staan centraal:\n\n• Klachten zijn niet de vijand. Vermijding wel.\n• Terugval is informatie, geen mislukking.\n\nDat tweede betekent: als iets even niet lukt, of als oude patronen terugkomen, dan is dat geen reden om jezelf af te vallen. Het laat je iets zien over wat je nodig hebt."
+    },
+    {
+      "id": "six-principles",
+      "title": "De zes principes van ACT",
+      "body": "ACT werkt met zes principes. In het programma kom je ze allemaal tegen, vaak verbonden aan een lichaamsoefening.\n\n• Acceptatie. Ruimte maken voor wat er is, ook als het ongemakkelijk is. Niet vechten, niet wegduwen.\n• Defusie. Afstand nemen van je gedachten. Een gedachte zien als een gedachte, niet als een feit.\n• Aanwezig zijn. Met je aandacht in dit moment landen, in plaats van in piekeren of voorspellen.\n• Waarden. Wat is voor jou echt belangrijk in dit leven. Je waarden geven je richting, ook als pijn of angst er nog zijn.\n• Toegewijd handelen. Kleine, concrete stappen zetten in de richting van je waarden. Geen sprongen, wel beweging.\n• Zelf als context. Jezelf zien als groter dan je gedachten en gevoelens. Jij bent niet je angst, jij bent degene die de angst opmerkt.\n\nDeze zes principes versterken elkaar. Je hoeft ze niet allemaal tegelijk te beheersen. Ze zijn er om mee te oefenen."
+    },
+    {
+      "id": "chatbot-role",
+      "title": "Wat doet de gids in de app",
+      "body": "In de app is er een gids waar je terechtkunt met vragen. De gids is een rustige begeleider in tekstvorm. De gids geeft antwoorden op basis van het programma en, als je dat zelf hebt ingevuld, op basis van je profiel in de app: stemming, waarden, check-ins, acties en barrières.\n\nWat de gids wel doet:\n\n• Je vragen beantwoorden over de modules en oefeningen.\n• Je helpen herinneren wat er in een eerdere module stond.\n• Vragen over je eigen profiel beantwoorden, op basis van wat erin staat.\n• Doorvragen als je vraag niet duidelijk is.\n\nWat de gids niet doet:\n\n• De gids is geen therapeut.\n• De gids geeft geen medisch advies, geen diagnose en geen behandelplan.\n• De gids doet geen uitspraken over medicatie of over stoppen met medicatie.\n• De gids verzint geen oefeningen, technieken of citaten die niet in het programma staan.\n\nBij vragen die buiten het programma vallen, verwijst de gids je naar je huisarts. Bij directe nood verwijst de gids je naar 0800-0113."
+    },
+    {
+      "id": "crisis-orientation",
+      "title": "Bij crisis: menselijke hulp, geen app",
+      "body": "Bij signalen van crisis is een app niet de juiste plek. Dan is menselijke hulp nodig.\n\nVoor directe nood bel je 0800-0113. Dit nummer is gratis, anoniem, en bereikbaar vierentwintig uur per dag, zeven dagen per week. Chatten kan via 113.nl.\n\nJe huisarts is een andere ingang voor zorg, zowel bij lichamelijke als bij mentale klachten. De huisarts kan je doorverwijzen naar de GGZ, een psycholoog, of een andere passende vorm van begeleiding.\n\nBij signalen van suïcidaliteit, zelfbeschadiging, ernstige verslaving zonder begeleiding, of acute psychische nood: kies altijd voor menselijke hulp. De app, de gids, en de modules zijn dan niet voldoende."
+    }
+  ]
+}
