@@ -19,6 +19,23 @@ export const EMPTY_WAARDEN_DATA: WaardenData = {
   checkins: [],
 };
 
+/** Shared plan / barriers / check-ins are scoped with a null waarde_id. */
+export function isCollectionScope(waardeId: string | null | undefined): boolean {
+  return waardeId === null || waardeId === undefined;
+}
+
+export function collectionActies(acties: WaardeActie[]): WaardeActie[] {
+  return acties.filter((item) => isCollectionScope(item.waarde_id));
+}
+
+export function collectionBarriers(barriers: WaardeBarriere[]): WaardeBarriere[] {
+  return barriers.filter((item) => isCollectionScope(item.waarde_id));
+}
+
+export function collectionCheckins(checkins: WaardeCheckin[]): WaardeCheckin[] {
+  return checkins.filter((item) => isCollectionScope(item.waarde_id));
+}
+
 /** Calendar days per plan termijn (komende week / maand / kwartaal). */
 export const TERMIJN_DAYS: Record<WaardeTermijn, number> = {
   kort: 7,
@@ -41,12 +58,16 @@ function normalizeBeoordeling(raw: unknown): WaardeActieBeoordeling | undefined 
   };
 }
 
+function normalizeWaardeScopeId(raw: string | null | undefined): string | null {
+  if (raw === null || raw === undefined || raw === '') return null;
+  return String(raw);
+}
+
 function normalizeActie(raw: Partial<WaardeActie>): WaardeActie | null {
   if (!raw || typeof raw !== 'object') return null;
   const id = String(raw.id ?? '');
-  const waarde_id = String(raw.waarde_id ?? '');
   const actie = typeof raw.actie === 'string' ? raw.actie.trim() : '';
-  if (!id || !waarde_id || !actie) return null;
+  if (!id || !actie) return null;
 
   const termijn = isTermijn(raw.termijn) ? raw.termijn : 'kort';
   const aangemaakt_op =
@@ -54,7 +75,7 @@ function normalizeActie(raw: Partial<WaardeActie>): WaardeActie | null {
 
   return {
     id,
-    waarde_id,
+    waarde_id: normalizeWaardeScopeId(raw.waarde_id),
     termijn,
     actie,
     aangemaakt_op,
@@ -75,9 +96,8 @@ function isBarriereType(value: unknown): value is BarriereType {
 function normalizeBarriere(raw: Partial<WaardeBarriere>): WaardeBarriere | null {
   if (!raw || typeof raw !== 'object') return null;
   const id = String(raw.id ?? '');
-  const waarde_id = String(raw.waarde_id ?? '');
   const omschrijving = typeof raw.omschrijving === 'string' ? raw.omschrijving : '';
-  if (!id || !waarde_id || !omschrijving.trim()) return null;
+  if (!id || !omschrijving.trim()) return null;
 
   const type = isBarriereType(raw.type) ? raw.type : 'eigen';
   const eigenLabel =
@@ -90,7 +110,7 @@ function normalizeBarriere(raw: Partial<WaardeBarriere>): WaardeBarriere | null 
 
   return {
     id,
-    waarde_id,
+    waarde_id: normalizeWaardeScopeId(raw.waarde_id),
     type,
     omschrijving,
     aangemaakt_op,
@@ -103,21 +123,60 @@ export function isWaardeItemFromToday(aangemaakt_op: string, today: string = iso
   return normalizeWaardeDatum(aangemaakt_op) === today;
 }
 
+function hasLegacyPerWaardeScope(data: WaardenData): boolean {
+  return (
+    data.acties.some((item) => !isCollectionScope(item.waarde_id)) ||
+    data.barriers.some((item) => !isCollectionScope(item.waarde_id)) ||
+    data.checkins.some((item) => !isCollectionScope(item.waarde_id))
+  );
+}
+
+/** Upgrade per-waarde plan/barriers/check-ins to shared collection scope. */
+export function upgradeToCollectionScope(data: WaardenData): WaardenData {
+  if (!hasLegacyPerWaardeScope(data)) return data;
+
+  const acties = data.acties.map((item) => ({ ...item, waarde_id: null }));
+  const barriers = data.barriers.map((item) => ({ ...item, waarde_id: null }));
+
+  const checkinsByDay = new Map<string, WaardeCheckin>();
+  for (const item of data.checkins) {
+    checkinsByDay.set(item.datum, { ...item, waarde_id: null });
+  }
+  const checkins = [...checkinsByDay.values()].sort((a, b) => a.datum.localeCompare(b.datum));
+
+  return { waarden: data.waarden, acties, barriers, checkins };
+}
+
+function kleurSortIndex(kleur: string): number {
+  const normalized = kleur.trim().toLowerCase();
+  const index = WAARDEN_KLEUREN.findIndex((option) => option.toLowerCase() === normalized);
+  return index >= 0 ? index : WAARDEN_KLEUREN.length;
+}
+
+/** Sort waarden by palette color, then alphabetically by name (nl). */
+export function sortWaarden(waarden: Waarde[]): Waarde[] {
+  return [...waarden].sort((a, b) => {
+    const byColor = kleurSortIndex(a.kleur) - kleurSortIndex(b.kleur);
+    if (byColor !== 0) return byColor;
+    return a.naam.localeCompare(b.naam, 'nl', { sensitivity: 'base' });
+  });
+}
+
 /** Guarantee arrays and valid check-in answers after storage or legacy data. */
 export function normalizeWaardenData(raw: Partial<WaardenData> | null | undefined): WaardenData {
   const checkins = (raw?.checkins ?? [])
     .filter((item): item is WaardeCheckin => !!item && typeof item === 'object')
     .map((item) => ({
       id: String(item.id ?? ''),
-      waarde_id: String(item.waarde_id ?? ''),
+      waarde_id: normalizeWaardeScopeId(item.waarde_id),
       datum: normalizeWaardeDatum(String(item.datum ?? '')),
       antwoord: isAntwoord(item.antwoord) ? item.antwoord : 'nee',
       notitie: typeof item.notitie === 'string' ? item.notitie : '',
     }))
-    .filter((item) => item.id && item.waarde_id && item.datum);
+    .filter((item) => item.id && item.datum);
 
-  return {
-    waarden: Array.isArray(raw?.waarden) ? raw.waarden : [],
+  const normalized: WaardenData = {
+    waarden: sortWaarden(Array.isArray(raw?.waarden) ? raw.waarden : []),
     acties: (raw?.acties ?? [])
       .map((item) => normalizeActie(item as Partial<WaardeActie>))
       .filter((item): item is WaardeActie => item !== null),
@@ -126,15 +185,19 @@ export function normalizeWaardenData(raw: Partial<WaardenData> | null | undefine
       .filter((item): item is WaardeBarriere => item !== null),
     checkins,
   };
+
+  return upgradeToCollectionScope(normalized);
 }
 
 export function createId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-/** Consecutive days with at least one waarden check-in. */
+/** Consecutive days with a collection check-in. */
 export function computeWaardenStreak(checkins: WaardeCheckin[], today: string = isoDate()): number {
-  const days = [...new Set(checkins.map((c) => c.datum))].sort().reverse();
+  const days = [...new Set(collectionCheckins(checkins).map((c) => c.datum))]
+    .sort()
+    .reverse();
   let streak = 0;
   let expected = today;
 
@@ -162,27 +225,79 @@ export function todayCheckins(
   return checkins.filter((c) => normalizeWaardeDatum(c.datum) === today);
 }
 
-/** Map of today's latest check-in per waarde (last entry wins). */
-export function todayCheckinByWaarde(
-  checkins: WaardeCheckin[] | null | undefined,
+export function todayCollectionCheckin(
+  checkins: WaardeCheckin[],
   today: string = isoDate(),
-): Map<string, WaardeCheckin> {
-  const map = new Map<string, WaardeCheckin>();
-  for (const checkin of checkins ?? []) {
-    if (normalizeWaardeDatum(checkin.datum) === today) {
-      map.set(checkin.waarde_id, checkin);
-    }
-  }
-  return map;
+): WaardeCheckin | null {
+  const entries = collectionCheckins(checkins).filter(
+    (c) => normalizeWaardeDatum(c.datum) === today,
+  );
+  return entries.length > 0 ? (entries[entries.length - 1] ?? null) : null;
 }
 
+/** Whether the user still needs to complete today's collection check-in. */
+export function needsCollectionCheckin(
+  waarden: Waarde[],
+  checkins: WaardeCheckin[],
+  today: string = isoDate(),
+): boolean {
+  return waarden.length > 0 && todayCollectionCheckin(checkins, today) === null;
+}
+
+const PLAN_TERMIJNEN: readonly WaardeTermijn[] = ['kort', 'middel', 'lang'];
+
+export interface CollectionPlanSetupGaps {
+  missingTermijnen: WaardeTermijn[];
+  missingBarriers: boolean;
+}
+
+export function getCollectionPlanSetupGaps(
+  acties: WaardeActie[],
+  barriers: WaardeBarriere[],
+): CollectionPlanSetupGaps {
+  const planActies = collectionActies(acties);
+  const planBarriers = collectionBarriers(barriers);
+  return {
+    missingTermijnen: PLAN_TERMIJNEN.filter(
+      (termijn) => !planActies.some((item) => item.termijn === termijn),
+    ),
+    missingBarriers: planBarriers.length === 0,
+  };
+}
+
+/** Whether the shared plan still needs actions (all termijnen) and at least one barrier. */
+export function needsCollectionPlanSetup(
+  acties: WaardeActie[],
+  barriers: WaardeBarriere[],
+): boolean {
+  const gaps = getCollectionPlanSetupGaps(acties, barriers);
+  return gaps.missingTermijnen.length > 0 || gaps.missingBarriers;
+}
+
+export function buildCollectionPlanSetupItems(
+  gaps: CollectionPlanSetupGaps,
+  termijnLabels: Record<WaardeTermijn, string>,
+  templates: { action: string; barriers: string },
+): string[] {
+  const items: string[] = [];
+  for (const termijn of gaps.missingTermijnen) {
+    items.push(
+      templates.action.replace('{termijn}', termijnLabels[termijn].toLowerCase()),
+    );
+  }
+  if (gaps.missingBarriers) {
+    items.push(templates.barriers);
+  }
+  return items;
+}
+
+/** @deprecated Use needsCollectionCheckin — kept for transitional imports. */
 export function pendingCheckinWaarden(
   waarden: Waarde[],
   checkins: WaardeCheckin[],
   today: string = isoDate(),
 ): Waarde[] {
-  const doneIds = new Set(todayCheckinByWaarde(checkins, today).keys());
-  return waarden.filter((w) => !doneIds.has(w.id));
+  return needsCollectionCheckin(waarden, checkins, today) ? waarden : [];
 }
 
 export function defaultKleurForIndex(index: number): string {
@@ -194,6 +309,16 @@ export function formatWaardeDate(date: string): string {
     day: 'numeric',
     month: 'short',
   });
+}
+
+export function last7Days(today: string = isoDate()): string[] {
+  const days: string[] = [];
+  let cursor = today;
+  for (let i = 0; i < 7; i++) {
+    days.unshift(cursor);
+    cursor = dayBefore(cursor);
+  }
+  return days;
 }
 
 export function last14Days(today: string = isoDate()): string[] {
@@ -216,21 +341,28 @@ export interface WaardeAntwoordCounts {
   nee: number;
 }
 
-/** Number of waarden with a check-in today (latest per waarde). */
-export function todayCheckinCount(checkins: WaardeCheckin[], today: string = isoDate()): number {
-  return todayCheckinByWaarde(checkins, today).size;
+/** Whether today's collection check-in is complete. */
+export function hasCollectionCheckinToday(
+  checkins: WaardeCheckin[],
+  today: string = isoDate(),
+): boolean {
+  return todayCollectionCheckin(checkins, today) !== null;
 }
 
-/** Count of today's check-in answers per antwoord type. */
+/** @deprecated Use hasCollectionCheckinToday. */
+export function todayCheckinCount(checkins: WaardeCheckin[], today: string = isoDate()): number {
+  return hasCollectionCheckinToday(checkins, today) ? 1 : 0;
+}
+
+/** Count of today's check-in answer (0 or 1). */
 export function todayAntwoordCounts(
   checkins: WaardeCheckin[],
   today: string = isoDate(),
 ): WaardeAntwoordCounts {
   const counts: WaardeAntwoordCounts = { ja: 0, neutraal: 0, nee: 0 };
-  for (const checkin of todayCheckinByWaarde(checkins, today).values()) {
-    if (isAntwoord(checkin.antwoord)) {
-      counts[checkin.antwoord] += 1;
-    }
+  const entry = todayCollectionCheckin(checkins, today);
+  if (entry && isAntwoord(entry.antwoord)) {
+    counts[entry.antwoord] = 1;
   }
   return counts;
 }
@@ -240,20 +372,33 @@ export function actieDeadline(actie: WaardeActie): string {
   return daysAfter(actie.aangemaakt_op, TERMIJN_DAYS[actie.termijn]);
 }
 
-/** Active actions still within their termijn window. */
-export function activeActiesForWaarde(acties: WaardeActie[], waardeId: string): WaardeActie[] {
-  return acties.filter((item) => item.waarde_id === waardeId && !item.beoordeling);
+/** Active collection actions still within their termijn window. */
+export function activeCollectionActies(acties: WaardeActie[]): WaardeActie[] {
+  return collectionActies(acties).filter((item) => !item.beoordeling);
 }
 
-/** Actions whose deadline has passed and still need a review. */
-export function pendingActieReviews(
+/** @deprecated Use activeCollectionActies. */
+export function activeActiesForWaarde(acties: WaardeActie[], _waardeId: string): WaardeActie[] {
+  return activeCollectionActies(acties);
+}
+
+/** Collection actions whose deadline has passed and still need a review. */
+export function pendingCollectionActieReviews(
   acties: WaardeActie[],
-  waardeId: string,
   today: string = isoDate(),
 ): WaardeActie[] {
-  return activeActiesForWaarde(acties, waardeId)
+  return activeCollectionActies(acties)
     .filter((item) => today >= actieDeadline(item))
     .sort((a, b) => actieDeadline(a).localeCompare(actieDeadline(b)));
+}
+
+/** @deprecated Use pendingCollectionActieReviews. */
+export function pendingActieReviews(
+  acties: WaardeActie[],
+  _waardeId: string,
+  today: string = isoDate(),
+): WaardeActie[] {
+  return pendingCollectionActieReviews(acties, today);
 }
 
 export interface WaardeCheckinSummary {
@@ -263,9 +408,9 @@ export interface WaardeCheckinSummary {
   dailyFocus: string | null;
 }
 
-function dateSeed(date: string, waardeId: string): number {
+function dateSeed(date: string, scopeKey: string): number {
   let hash = 0;
-  const key = `${date}:${waardeId}`;
+  const key = `${date}:${scopeKey}`;
   for (let i = 0; i < key.length; i++) {
     hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
   }
@@ -293,15 +438,14 @@ function fillReminderTemplate(
 export function buildCheckinSummary(
   acties: WaardeActie[],
   barriers: WaardeBarriere[],
-  waardeId: string,
   today: string,
   templates: string[],
   termijnLabels: Record<WaardeTermijn, string>,
   barrierTypeLabels: Record<BarriereType, string>,
 ): WaardeCheckinSummary | null {
-  const activeActies = activeActiesForWaarde(acties, waardeId);
-  const waardeBarriers = barriers.filter((item) => item.waarde_id === waardeId);
-  if (activeActies.length === 0 || waardeBarriers.length === 0) {
+  const activeActies = activeCollectionActies(acties);
+  const scopedBarriers = collectionBarriers(barriers);
+  if (activeActies.length === 0 || scopedBarriers.length === 0) {
     return null;
   }
 
@@ -312,10 +456,10 @@ export function buildCheckinSummary(
   };
 
   let dailyFocus: string | null = null;
-  if (activeActies.length > 0 && waardeBarriers.length > 0 && templates.length > 0) {
-    const seed = dateSeed(today, waardeId);
+  if (activeActies.length > 0 && scopedBarriers.length > 0 && templates.length > 0) {
+    const seed = dateSeed(today, 'collection');
     const actie = activeActies[seed % activeActies.length]!;
-    const barriere = waardeBarriers[(seed >>> 8) % waardeBarriers.length]!;
+    const barriere = scopedBarriers[(seed >>> 8) % scopedBarriers.length]!;
     const template = templates[(seed >>> 16) % templates.length]!;
     const termijnLabel = termijnLabels[actie.termijn];
     const barrierTypeLabel =
@@ -325,5 +469,5 @@ export function buildCheckinSummary(
     dailyFocus = fillReminderTemplate(template, actie, barriere, termijnLabel, barrierTypeLabel);
   }
 
-  return { actiesByTermijn, barriers: waardeBarriers, dailyFocus };
+  return { actiesByTermijn, barriers: scopedBarriers, dailyFocus };
 }

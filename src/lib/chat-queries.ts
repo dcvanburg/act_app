@@ -19,8 +19,8 @@ import { supabase } from '@/lib/supabase/client';
  *   3. Map Supabase errors to Dutch error keys from chat.json.errors.
  *
  * History is held by the caller in component state and passed in on each
- * call. Nothing is persisted client-side; the in-memory chat dies with
- * the screen (ADR-005 / SECURITY.md → AI processing).
+ * call. Messages persist in `chat_messages` (Supabase, RLS); the Edge
+ * Function loads stored history for LLM memory (ADR-005).
  */
 
 export type ChatRole = 'user' | 'assistant';

@@ -8,6 +8,7 @@ import { AppTextInput } from '@/components/AppTextInput';
 import common from '@/content/nl/common.json';
 import { FINAL_SCREEN_ID } from '@/lib/progress';
 import { useSaveModuleProgress } from '@/lib/progress-queries';
+import { useDebouncedSave } from '@/lib/use-debounced-save';
 import type { ComplaintType, ContentSection, ModuleContent } from '@/types/content';
 
 type Screen =
@@ -31,6 +32,8 @@ interface Props {
    *  Also prevents auto-saving completed:true so the caller handles completion.
    *  Receives the notes the user typed (undefined if empty). */
   onComplete?: (notes?: string) => void;
+  /** Existing module notes from progress (restored on the final screen). */
+  initialNotes?: string;
 }
 
 /**
@@ -40,7 +43,7 @@ interface Props {
  * navigation). On reaching FINAL_SCREEN_ID and tapping "Afronden" we save with
  * completed=true and return to /home.
  */
-export function ModulePlayer({ content, initialScreenId, complaintTypes, onComplete }: Props) {
+export function ModulePlayer({ content, initialScreenId, complaintTypes, onComplete, initialNotes }: Props) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const screens = buildScreens(content);
@@ -51,7 +54,7 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes, onCompl
       )
     : 0;
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  const [notes, setNotes] = useState('');
+  const [notes, setNotes] = useState(initialNotes ?? '');
   const saveMutation = useSaveModuleProgress();
 
   // Keep a ref so the save effect can read the current value without
@@ -62,6 +65,20 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes, onCompl
   });
 
   const currentScreen = screens[currentIndex];
+  const currentScreenRef = useRef(currentScreen);
+  currentScreenRef.current = currentScreen;
+
+  useDebouncedSave(notes, (val) => {
+    const screen = currentScreenRef.current;
+    if (!screen) return;
+    saveMutation.mutate({
+      moduleId: content.id,
+      lastStepId: screen.id,
+      completed: false,
+      notes: val.trim() || undefined,
+    });
+  }, { baseline: initialNotes ?? '' });
+
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === screens.length - 1;
   const progressPct = ((currentIndex + 1) / screens.length) * 100;

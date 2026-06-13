@@ -1,11 +1,12 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import common from '@/content/nl/common.json';
 import { BackButton } from '@/components/BackButton';
 import { AppTextInput } from '@/components/AppTextInput';
+import { KeyboardAwareScrollScreen } from '@/components/KeyboardAwareScrollScreen';
 import { useDeleteAccount, useProfile, useUpdateProfile } from '@/lib/profile-queries';
 import { useAuth } from '@/providers/AuthProvider';
 
@@ -82,8 +83,7 @@ export default function AccountScreen() {
   const email = profile?.email ?? user?.email ?? '—';
 
   return (
-    <ScrollView
-      className="flex-1 bg-background"
+    <KeyboardAwareScrollScreen
       contentContainerStyle={{
         paddingTop: insets.top + 12,
         paddingBottom: insets.bottom + 112,
@@ -151,7 +151,7 @@ export default function AccountScreen() {
           </>
         )}
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollScreen>
   );
 }
 

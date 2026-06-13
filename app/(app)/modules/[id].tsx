@@ -42,6 +42,8 @@ export default function ModuleScreen() {
   const status = getModuleStatus(moduleId, progress);
   const lastStepId =
     progress.modules.find((m: ModuleProgress) => m.moduleId === moduleId)?.lastStepId ?? null;
+  const moduleNotes =
+    progress.modules.find((m: ModuleProgress) => m.moduleId === moduleId)?.notes ?? '';
 
   if (status === 'completed') {
     return <ModuleReadOnlyView content={content} complaintTypes={progress.intake.complaintTypes} />;
@@ -52,6 +54,7 @@ export default function ModuleScreen() {
       content={content}
       initialScreenId={lastStepId}
       complaintTypes={progress.intake.complaintTypes}
+      initialNotes={moduleNotes}
     />
   );
 }

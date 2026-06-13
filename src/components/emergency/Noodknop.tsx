@@ -30,7 +30,7 @@ export function Noodknop() {
         left: 0,
         right: 0,
         bottom: insets.bottom + 16,
-        alignItems: 'flex-end',
+        alignItems: 'flex-start',
         paddingHorizontal: 16,
       }}
     >

@@ -9,7 +9,7 @@
  *   5. Claude Haiku 4.5 call with two-block system prompt:
  *        - stable persona + ACT instructions (prompt-cached, ephemeral)
  *        - dynamic chunks + user profile (not cached)
- *      plus last 3 turns of history (in-memory only on the client).
+ *      plus last 3 turns of history and older stored messages as memory.
  *
  * Safety (docs/SECURITY.md → AI processing):
  *   - Request body is never logged. Only error messages reach console.
@@ -46,6 +46,11 @@ import {
   formatChatUserContext,
   isUserContextEmpty,
 } from './user-context.ts';
+import {
+  fetchStoredChatMessages,
+  formatConversationMemory,
+  recentTurnMessages,
+} from './conversation-context.ts';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -97,7 +102,7 @@ ACT-principes die je toepast wanneer de bronnen dat ondersteunen:
 Je gebruikt deze taal alleen als de "INFORMATIE UIT HET PROGRAMMA" het ondersteunt. Je verzint geen oefeningen of metaforen die er niet staan.
 
 Wat je doet:
-• Je beantwoordt vragen op basis van "INFORMATIE UIT HET PROGRAMMA" en, als de vraag daarover gaat, "INFORMATIE UIT JE PROFIEL IN DE APP" (stemming, waarden, check-ins, acties, barrières).
+• Je beantwoordt vragen op basis van "INFORMATIE UIT HET PROGRAMMA" en, als de vraag daarover gaat, "INFORMATIE UIT JE PROFIEL IN DE APP" (stemming, waarden, check-ins, acties, barrières) en "Eerdere gesprekken met de gids" wanneer die aanwezig zijn.
 • Bij vragen over het verloop van stemming of waarden: beschrijf alleen wat in het profiel staat. Geen interpretatie, geen diagnose, geen advies om iets te veranderen.
 • Koppel profielinformatie waar nuttig aan programmainformatie, maar blijf binnen wat er staat.
 • Als persoonlijke gegevens ontbreken, zeg dat eerlijk en verwijs naar het betreffende scherm in de app (stemming, waarden).
@@ -328,6 +333,7 @@ async function askClaude(
   chunks: Chunk[],
   history: ChatMessage[],
   userContextText: string,
+  conversationMemory: string,
 ): Promise<ClaudeResult> {
   const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not configured');
@@ -341,7 +347,9 @@ async function askClaude(
     ? `INFORMATIE UIT JE PROFIEL IN DE APP:\n\n${userContextText}`
     : 'INFORMATIE UIT JE PROFIEL IN DE APP:\n\n(Geen persoonlijke gegevens ingevuld in de app.)';
 
-  const dynamicSystemBlock = `INFORMATIE UIT HET PROGRAMMA:\n\n${programContext}\n\n${profileSection}`;
+  const memorySection = conversationMemory ? `${conversationMemory}\n\n` : '';
+
+  const dynamicSystemBlock = `INFORMATIE UIT HET PROGRAMMA:\n\n${programContext}\n\n${memorySection}${profileSection}`;
 
   const messages = [...history.slice(-MAX_HISTORY_MESSAGES), { role: 'user', content: question }];
 
@@ -491,7 +499,18 @@ Deno.serve(async (req: Request) => {
     }
 
     const firstName = await fetchFirstName(supabase, user.id);
-    const isFirstTurn = history.length === 0;
+    const storedMessages = await fetchStoredChatMessages(supabase, user.id);
+    const effectiveHistory =
+      storedMessages.length > 0
+        ? recentTurnMessages(storedMessages, MAX_HISTORY_MESSAGES)
+        : history;
+    const lastStored = effectiveHistory[effectiveHistory.length - 1];
+    const historyForLlm =
+      lastStored?.role === 'user' && lastStored.content === question
+        ? effectiveHistory.slice(0, -1)
+        : effectiveHistory;
+    const conversationMemory = formatConversationMemory(storedMessages, MAX_HISTORY_MESSAGES);
+    const isFirstTurn = historyForLlm.length === 0;
 
     if (isFirstTurn && isGreetingOnly(question)) {
       return jsonResponse({
@@ -517,16 +536,16 @@ Deno.serve(async (req: Request) => {
 
     if (chunks.length === 0 && isUserContextEmpty(userContextData)) {
       return jsonResponse({
-        answer: firstTurnAnswer(OUT_OF_SCOPE_RESPONSE, history, firstName),
+        answer: firstTurnAnswer(OUT_OF_SCOPE_RESPONSE, historyForLlm, firstName),
         chunksFound: 0,
         noMatch: true,
       });
     }
 
-    const preClarify = assessClarifyNeed(searchQuestion, chunks, userContextData, history);
+    const preClarify = assessClarifyNeed(searchQuestion, chunks, userContextData, historyForLlm);
     if (preClarify) {
       return jsonResponse({
-        answer: firstTurnAnswer(stripClarifyBulletOptions(CLARIFY_PROMPTS[preClarify.reason]), history, firstName),
+        answer: firstTurnAnswer(stripClarifyBulletOptions(CLARIFY_PROMPTS[preClarify.reason]), historyForLlm, firstName),
         chunksFound: chunks.length,
         clarify: true,
         clarifyOptions: preClarify.options,
@@ -534,7 +553,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const { reply, inputTokens, cacheReadInputTokens, cacheCreationInputTokens } =
-      await askClaude(searchQuestion, chunks, history, userContextText);
+      await askClaude(searchQuestion, chunks, historyForLlm, userContextText, conversationMemory);
 
     const usage = {
       inputTokens,
@@ -545,7 +564,7 @@ Deno.serve(async (req: Request) => {
     if (reply.type === 'clarify') {
       const options = resolveClarifyOptions(reply, searchQuestion, chunks, userContextData);
       return jsonResponse({
-        answer: firstTurnAnswer(stripClarifyBulletOptions(reply.text), history, firstName),
+        answer: firstTurnAnswer(stripClarifyBulletOptions(reply.text), historyForLlm, firstName),
         chunksFound: chunks.length,
         clarify: true,
         clarifyOptions: options,
@@ -555,7 +574,7 @@ Deno.serve(async (req: Request) => {
 
     if (reply.type === 'out_of_scope') {
       return jsonResponse({
-        answer: firstTurnAnswer(reply.text || OUT_OF_SCOPE_RESPONSE, history, firstName),
+        answer: firstTurnAnswer(reply.text || OUT_OF_SCOPE_RESPONSE, historyForLlm, firstName),
         chunksFound: chunks.length,
         noMatch: true,
         ...usage,
@@ -563,7 +582,7 @@ Deno.serve(async (req: Request) => {
     }
 
     return jsonResponse({
-      answer: firstTurnAnswer(reply.text, history, firstName),
+      answer: firstTurnAnswer(reply.text, historyForLlm, firstName),
       chunksFound: chunks.length,
       ...usage,
     });

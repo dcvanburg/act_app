@@ -13,7 +13,7 @@ Applies to all files. Critical for auth, intake, journal, crisis, chatbot flows.
 
 - Crisis keyword pre-filter runs **before** any embedding or LLM call — client AND server (defence-in-depth). Never weaken.
 - LLM answers only from retrieved therapist-approved chunks; no medical advice, no invented exercises.
-- No chat message bodies persisted; `chat_sessions` stores only a counter. History is in-memory only, capped at 3 turns.
+- Chat messages persist in `chat_messages` (RLS, user can wipe via "Gesprek wissen"). LLM gets 3 live turns + memory block of older turns.
 - Edge Function must not log `question` or `history` fields. CI test guards against regressions.
 - Chat requests require a valid Supabase JWT — no anonymous use.
 - Therapist sign-off required on system prompt and every ingested document before pilot.

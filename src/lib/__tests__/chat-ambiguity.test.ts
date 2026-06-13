@@ -17,6 +17,7 @@ const emptyProfile: ChatUserContextData = {
   acties: [],
   barriers: [],
   checkins: [],
+  moduleNotes: [],
 };
 
 const profileWithMood: ChatUserContextData = {

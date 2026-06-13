@@ -8,7 +8,8 @@ paths:
 # Frontend Patterns
 
 - Mobile-first (Expo / React Native). Primary use on phones; iPad / tablet support deferred.
-- Emergency button (`Noodknop`): always-visible top-level overlay in `app/_layout.tsx`. Min 44pt touch target.
+- Emergency button (`Noodknop`): always-visible overlay in `app/_layout.tsx`, bottom-left. Min 44pt touch target.
+- Chat floating button (`ChatFloatingButton`): always-visible on authenticated screens in `app/(app)/_layout.tsx`, bottom-right.
 - Accessible: focus states (RN: `accessibilityState`), `accessibilityLabel` in Dutch, semantic component naming.
 - Module screens (active flow): paginated, one screen at a time, clear step indicator (X of N), pause/resume without data loss.
 - Module screens (revisit): single scrollable page — no pagination, no step tracking.

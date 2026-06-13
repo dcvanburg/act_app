@@ -29,7 +29,7 @@ function mapWaarde(row: { id: string; naam: string; beschrijving: string; kleur:
 
 function mapActie(row: {
   id: string;
-  waarde_id: string;
+  waarde_id: string | null;
   termijn: string;
   actie: string;
   aangemaakt_op: string;
@@ -37,7 +37,7 @@ function mapActie(row: {
 }): WaardeActie {
   return {
     id: row.id,
-    waarde_id: row.waarde_id,
+    waarde_id: row.waarde_id ?? null,
     termijn: row.termijn as WaardeActie['termijn'],
     actie: row.actie,
     aangemaakt_op: row.aangemaakt_op,
@@ -47,7 +47,7 @@ function mapActie(row: {
 
 function mapBarriere(row: {
   id: string;
-  waarde_id: string;
+  waarde_id: string | null;
   type: string;
   eigen_label: string | null;
   omschrijving: string;
@@ -62,7 +62,7 @@ function mapBarriere(row: {
 
   return {
     id: row.id,
-    waarde_id: row.waarde_id,
+    waarde_id: row.waarde_id ?? null,
     type: row.type as WaardeBarriere['type'],
     omschrijving: row.omschrijving,
     aangemaakt_op,
@@ -72,14 +72,14 @@ function mapBarriere(row: {
 
 function mapCheckin(row: {
   id: string;
-  waarde_id: string;
+  waarde_id: string | null;
   datum: string;
   antwoord: string;
   notitie: string;
 }): WaardeCheckin {
   return {
     id: row.id,
-    waarde_id: row.waarde_id,
+    waarde_id: row.waarde_id ?? null,
     datum: normalizeWaardeDatum(row.datum),
     antwoord: row.antwoord as WaardeCheckin['antwoord'],
     notitie: row.notitie ?? '',
@@ -350,16 +350,39 @@ export async function upsertCheckinRemote(
   checkin: WaardeCheckin,
 ): Promise<void> {
   await ensureProfile(userId, email);
-  const { error } = await supabase.from('waarde_checkins').upsert(
-    {
-      id: checkin.id,
-      user_id: userId,
-      waarde_id: checkin.waarde_id,
-      datum: checkin.datum,
-      antwoord: checkin.antwoord,
-      notitie: checkin.notitie,
-    },
-    { onConflict: 'user_id,waarde_id,datum' },
-  );
+
+  const { data: existing, error: selectError } = await supabase
+    .from('waarde_checkins')
+    .select('id')
+    .eq('user_id', userId)
+    .is('waarde_id', null)
+    .eq('datum', checkin.datum)
+    .maybeSingle();
+
+  if (selectError) throw selectError;
+
+  const payload = {
+    id: existing?.id ?? checkin.id,
+    user_id: userId,
+    waarde_id: null,
+    datum: checkin.datum,
+    antwoord: checkin.antwoord,
+    notitie: checkin.notitie,
+  };
+
+  if (existing?.id) {
+    const { error } = await supabase
+      .from('waarde_checkins')
+      .update({
+        antwoord: checkin.antwoord,
+        notitie: checkin.notitie,
+      })
+      .eq('user_id', userId)
+      .eq('id', existing.id);
+    if (error) throw error;
+    return;
+  }
+
+  const { error } = await supabase.from('waarde_checkins').insert(payload);
   if (error) throw error;
 }

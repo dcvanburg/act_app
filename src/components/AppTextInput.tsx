@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import {
   Platform,
   TextInput,
@@ -7,6 +8,8 @@ import {
   type TextStyle,
   type ViewStyle,
 } from 'react-native';
+
+import { useKeyboardAwareScroll } from '@/components/KeyboardAwareScrollScreen';
 
 type AppTextInputProps = TextInputProps & {
   className?: string;
@@ -31,9 +34,18 @@ export function AppTextInput({
   multiline,
   style,
   placeholderTextColor = '#888780',
+  onFocus,
   ...props
 }: AppTextInputProps) {
   const fontSize = compact ? FONT_SIZE.compact : FONT_SIZE.normal;
+  const inputRef = useRef<TextInput>(null);
+  const keyboardScroll = useKeyboardAwareScroll();
+
+  const handleFocus: NonNullable<TextInputProps['onFocus']> = (event) => {
+    keyboardScroll?.scrollInputIntoView(inputRef);
+    onFocus?.(event);
+  };
+
   const boxClass = [
     'rounded-lg border border-border bg-background px-3',
     invalid ? 'border-crisis' : '',
@@ -49,9 +61,11 @@ export function AppTextInput({
       <View className={boxClass} style={[multilineBoxStyle, boxStyle]}>
         <TextInput
           {...props}
+          ref={inputRef}
           multiline
           placeholderTextColor={placeholderTextColor}
           textAlignVertical="top"
+          onFocus={handleFocus}
           className="flex-1 bg-transparent p-0 text-text"
           style={multilineInputStyle(fontSize)}
         />
@@ -69,8 +83,10 @@ export function AppTextInput({
     >
       <TextInput
         {...props}
+        ref={inputRef}
         placeholderTextColor={placeholderTextColor}
         textAlignVertical="center"
+        onFocus={handleFocus}
         className="bg-transparent p-0 text-text"
         style={[
           singleInputStyle(fontSize),

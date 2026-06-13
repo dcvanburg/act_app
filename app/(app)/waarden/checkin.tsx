@@ -1,10 +1,11 @@
 import { Redirect, useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppTextInput } from '@/components/AppTextInput';
+import { KeyboardAwareScrollScreen } from '@/components/KeyboardAwareScrollScreen';
 import { BackButton } from '@/components/BackButton';
 import { CheckboxIcon } from '@/components/icons/CheckboxIcon';
 import { CrossIcon } from '@/components/icons/CrossIcon';
@@ -14,9 +15,8 @@ import waarden from '@/content/nl/waarden.json';
 import { isoDate } from '@/lib/mood';
 import {
   buildCheckinSummary,
-  pendingActieReviews,
-  pendingCheckinWaarden,
-  todayCheckinCount,
+  needsCollectionCheckin,
+  pendingCollectionActieReviews,
 } from '@/lib/waarden';
 import { useWaarden } from '@/providers/WaardenProvider';
 import type { WaardeActie, WaardeCheckinAntwoord } from '@/types/waarden';
@@ -32,48 +32,33 @@ export default function WaardenCheckinScreen() {
   const { data, addCheckin, reviewActie } = useWaarden();
   const today = isoDate();
 
-  const queue = useMemo(
-    () => pendingCheckinWaarden(data.waarden, data.checkins, today),
-    [data.waarden, data.checkins, today],
-  );
+  const needsCheckin = needsCollectionCheckin(data.waarden, data.checkins, today);
 
   const [phase, setPhase] = useState<CheckinPhase>('main');
   const [deadlineIndex, setDeadlineIndex] = useState(0);
-
   const [keuze, setKeuze] = useState<WaardeCheckinAntwoord | null>(null);
   const [notitie, setNotitie] = useState('');
-
   const [behaald, setBehaald] = useState<boolean | null>(null);
   const [deadlineBeschrijving, setDeadlineBeschrijving] = useState('');
   const [wantsNewAction, setWantsNewAction] = useState<boolean | null>(null);
   const [nieuweActie, setNieuweActie] = useState('');
 
-  // Always process the first pending waarde — the queue shrinks after each check-in.
-  const current = queue[0] ?? null;
-  const totalWaarden = data.waarden.length;
-  const doneToday = todayCheckinCount(data.checkins, today);
-  const progressCurrent = doneToday + 1;
-  const progressPercent = totalWaarden > 0 ? (doneToday / totalWaarden) * 100 : 0;
-
   const deadlineQueue = useMemo(
-    () => (current ? pendingActieReviews(data.acties, current.id, today) : []),
-    [current, data.acties, today],
+    () => pendingCollectionActieReviews(data.acties, today),
+    [data.acties, today],
   );
 
   const planSummary = useMemo(
     () =>
-      current
-        ? buildCheckinSummary(
-            data.acties,
-            data.barriers,
-            current.id,
-            today,
-            waarden.checkin.reminderTemplates,
-            termijnLabels,
-            barrierTypeLabels,
-          )
-        : null,
-    [current, data.acties, data.barriers, today],
+      buildCheckinSummary(
+        data.acties,
+        data.barriers,
+        today,
+        waarden.checkin.reminderTemplates,
+        termijnLabels,
+        barrierTypeLabels,
+      ),
+    [data.acties, data.barriers, today],
   );
 
   const currentDeadline = deadlineQueue[deadlineIndex];
@@ -96,34 +81,14 @@ export default function WaardenCheckinScreen() {
     return 'main';
   }
 
-  // Fresh session when re-entering check-in (screen stays mounted in the tab stack).
   useFocusEffect(
     useCallback(() => {
       resetMainForm();
       resetDeadlineForm();
       setDeadlineIndex(0);
-    }, []),
+      setPhase(resolveInitialPhase(deadlineQueue, planSummary !== null));
+    }, [deadlineQueue, planSummary]),
   );
-
-  // Reset flow when advancing to the next pending waarde.
-  useEffect(() => {
-    if (!current) return;
-    resetMainForm();
-    resetDeadlineForm();
-    setDeadlineIndex(0);
-    const due = pendingActieReviews(data.acties, current.id, today);
-    const summary = buildCheckinSummary(
-      data.acties,
-      data.barriers,
-      current.id,
-      today,
-      waarden.checkin.reminderTemplates,
-      termijnLabels,
-      barrierTypeLabels,
-    );
-    setPhase(resolveInitialPhase(due, summary !== null));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: waarde id only
-  }, [current?.id]);
 
   function advanceAfterDeadline() {
     resetDeadlineForm();
@@ -147,19 +112,16 @@ export default function WaardenCheckinScreen() {
   }
 
   function submitMain() {
-    if (!current || keuze === null) return;
+    if (keuze === null) return;
     addCheckin({
-      waarde_id: current.id,
       datum: today,
       antwoord: keuze,
       notitie,
     });
-    resetMainForm();
-    resetDeadlineForm();
-    setDeadlineIndex(0);
+    router.replace('/waarden');
   }
 
-  if (queue.length === 0) {
+  if (!needsCheckin) {
     return <Redirect href="/waarden" />;
   }
 
@@ -179,8 +141,7 @@ export default function WaardenCheckinScreen() {
     : termijnLabels.kort;
 
   return (
-    <ScrollView
-      className="flex-1 bg-background"
+    <KeyboardAwareScrollScreen
       contentContainerStyle={{
         paddingTop: insets.top + 12,
         paddingBottom: insets.bottom + 112,
@@ -194,207 +155,191 @@ export default function WaardenCheckinScreen() {
           <Text className="text-sm text-text-muted">{waarden.detail.back}</Text>
         </View>
 
-        {current ? (
-          <View className="rounded-2xl bg-surface p-5 shadow-sm">
-            <Text className="mb-2 text-sm text-text-muted">
-              {waarden.checkin.progress
-                .replace('{current}', String(progressCurrent))
-                .replace('{total}', String(totalWaarden))}
-            </Text>
-            <View className="mb-6 h-1 overflow-hidden rounded-full bg-border">
+        <View className="rounded-2xl bg-surface p-5 shadow-sm">
+          <View className="mb-4 flex-row flex-wrap gap-2">
+            {data.waarden.map((waarde) => (
               <View
-                className="h-full rounded-full bg-primary"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </View>
-
-            <View className="mb-2 flex-row items-center gap-2.5">
-              <View className="h-3.5 w-3.5 rounded" style={{ backgroundColor: current.kleur }} />
-              <Text className="font-serif text-xl font-bold text-text">{current.naam}</Text>
-            </View>
-            {current.beschrijving ? (
-              <Text className="mb-5 text-sm text-text-subtle">{current.beschrijving}</Text>
-            ) : (
-              <View className="mb-5" />
-            )}
-
-            {phase === 'deadline' && currentDeadline ? (
-              <View>
-                <Text className="mb-1 font-serif text-xl font-bold text-text">
-                  {waarden.checkin.deadlineTitle}
-                </Text>
-                <Text className="mb-4 text-sm text-text-subtle">
-                  {waarden.checkin.deadlineIntro}
-                </Text>
-
-                <View className="mb-4 rounded-xl border border-primary-border-soft bg-primary-soft px-4 py-3">
-                  <Text className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
-                    {termijnLabel}
-                  </Text>
-                  <Text className="text-sm font-medium leading-5 text-primary-dark">
-                    {currentDeadline.actie}
-                  </Text>
-                </View>
-
-                <Text className="mb-3 font-semibold text-text">
-                  {waarden.checkin.deadlineQuestion}
-                </Text>
-                <View className="mb-4 flex-row gap-2">
-                  <BinaryChoiceButton
-                    selected={behaald === true}
-                    label={waarden.checkin.deadlineYes}
-                    tone="positive"
-                    onPress={() => setBehaald(true)}
-                  />
-                  <BinaryChoiceButton
-                    selected={behaald === false}
-                    label={waarden.checkin.deadlineNo}
-                    tone="negative"
-                    onPress={() => setBehaald(false)}
-                  />
-                </View>
-
-                {behaald !== null ? (
-                  <View>
-                    <Text className="mb-2 text-sm font-medium text-text">
-                      {waarden.checkin.deadlineDescriptionLabel}
-                    </Text>
-                    <AppTextInput
-                      value={deadlineBeschrijving}
-                      onChangeText={setDeadlineBeschrijving}
-                      placeholder={waarden.checkin.deadlineDescriptionPlaceholder}
-                      multiline
-                      numberOfLines={3}
-                      className="mb-4 rounded-xl bg-surface-muted px-3.5"
-                      style={{ minHeight: 88 }}
-                    />
-
-                    <Text className="mb-3 font-semibold text-text">
-                      {waarden.checkin.deadlineNewActionQuestion}
-                    </Text>
-                    <View className="mb-4 flex-row gap-2">
-                      <BinaryChoiceButton
-                        selected={wantsNewAction === true}
-                        label={waarden.checkin.deadlineNewActionYes}
-                        tone="positive"
-                        onPress={() => setWantsNewAction(true)}
-                      />
-                      <BinaryChoiceButton
-                        selected={wantsNewAction === false}
-                        label={waarden.checkin.deadlineNewActionNo}
-                        tone="neutral"
-                        onPress={() => {
-                          setWantsNewAction(false);
-                          setNieuweActie('');
-                        }}
-                      />
-                    </View>
-
-                    {wantsNewAction === true ? (
-                      <AppTextInput
-                        value={nieuweActie}
-                        onChangeText={setNieuweActie}
-                        placeholder={waarden.checkin.deadlineNewActionPlaceholder.replace(
-                          '{termijn}',
-                          termijnLabel,
-                        )}
-                        className="mb-4 rounded-xl bg-surface-muted px-3.5"
-                      />
-                    ) : null}
-
-                    <Pressable
-                      accessibilityRole="button"
-                      disabled={!deadlineCanContinue}
-                      onPress={submitDeadlineReview}
-                      className={
-                        'rounded-xl py-4 ' +
-                        (deadlineCanContinue ? 'bg-primary active:bg-primary-dark' : 'bg-border')
-                      }
-                    >
-                      <Text className="text-center font-semibold text-white">
-                        {waarden.checkin.deadlineContinue} →
-                      </Text>
-                    </Pressable>
-                  </View>
-                ) : null}
+                key={waarde.id}
+                className="flex-row items-center gap-2 rounded-full border border-border bg-surface-muted px-3 py-1.5"
+              >
+                <View className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: waarde.kleur }} />
+                <Text className="text-sm font-medium text-text">{waarde.naam}</Text>
               </View>
-            ) : null}
-
-            {phase === 'summary' && planSummary ? (
-              <View>
-                <Text className="mb-3 font-serif text-xl font-bold text-text">
-                  {waarden.checkin.summaryTitle}
-                </Text>
-                <Pressable
-                  accessibilityRole="button"
-                  onPress={() => setPhase('main')}
-                  className="mb-5 rounded-xl bg-primary py-4 active:bg-primary-dark"
-                >
-                  <Text className="text-center font-semibold text-white">
-                    {waarden.checkin.summaryContinue} →
-                  </Text>
-                </Pressable>
-                <WaardenCheckinSummaryCard summary={planSummary} />
-              </View>
-            ) : null}
-
-            {phase === 'main' ? (
-              <View>
-                <Text className="mb-5 font-serif text-xl font-bold leading-7 text-text">
-                  {waarden.checkin.question}
-                </Text>
-
-                <View className="mb-5 flex-row gap-2">
-                  <ChoiceButton
-                    selected={keuze === 'ja'}
-                    tone="ja"
-                    label={waarden.checkin.yesLabel}
-                    onPress={() => setKeuze('ja')}
-                  />
-                  <ChoiceButton
-                    selected={keuze === 'neutraal'}
-                    tone="neutraal"
-                    label={waarden.checkin.neutralLabel}
-                    onPress={() => setKeuze('neutraal')}
-                  />
-                  <ChoiceButton
-                    selected={keuze === 'nee'}
-                    tone="nee"
-                    label={waarden.checkin.noLabel}
-                    onPress={() => setKeuze('nee')}
-                  />
-                </View>
-
-                {keuze !== null ? (
-                  <View>
-                    <AppTextInput
-                      value={notitie}
-                      onChangeText={setNotitie}
-                      placeholder={notePlaceholder}
-                      multiline
-                      numberOfLines={3}
-                      className="mb-4 rounded-xl bg-surface-muted px-3.5"
-                      style={{ minHeight: 88 }}
-                    />
-                    <Pressable
-                      accessibilityRole="button"
-                      onPress={submitMain}
-                      className="rounded-xl bg-primary py-4 active:bg-primary-dark"
-                    >
-                      <Text className="text-center font-semibold text-white">
-                        {queue.length === 1
-                          ? `${waarden.checkin.finishAction} ✓`
-                          : `${waarden.checkin.nextAction} →`}
-                      </Text>
-                    </Pressable>
-                  </View>
-                ) : null}
-              </View>
-            ) : null}
+            ))}
           </View>
-        ) : null}
+
+          {phase === 'deadline' && currentDeadline ? (
+            <View>
+              <Text className="mb-1 font-serif text-xl font-bold text-text">
+                {waarden.checkin.deadlineTitle}
+              </Text>
+              <Text className="mb-4 text-sm text-text-subtle">{waarden.checkin.deadlineIntro}</Text>
+
+              <View className="mb-4 rounded-xl border border-primary-border-soft bg-primary-soft px-4 py-3">
+                <Text className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
+                  {termijnLabel}
+                </Text>
+                <Text className="text-sm font-medium leading-5 text-primary-dark">
+                  {currentDeadline.actie}
+                </Text>
+              </View>
+
+              <Text className="mb-3 font-semibold text-text">
+                {waarden.checkin.deadlineQuestion}
+              </Text>
+              <View className="mb-4 flex-row gap-2">
+                <BinaryChoiceButton
+                  selected={behaald === true}
+                  label={waarden.checkin.deadlineYes}
+                  tone="positive"
+                  onPress={() => setBehaald(true)}
+                />
+                <BinaryChoiceButton
+                  selected={behaald === false}
+                  label={waarden.checkin.deadlineNo}
+                  tone="negative"
+                  onPress={() => setBehaald(false)}
+                />
+              </View>
+
+              {behaald !== null ? (
+                <View>
+                  <Text className="mb-2 text-sm font-medium text-text">
+                    {waarden.checkin.deadlineDescriptionLabel}
+                  </Text>
+                  <AppTextInput
+                    value={deadlineBeschrijving}
+                    onChangeText={setDeadlineBeschrijving}
+                    placeholder={waarden.checkin.deadlineDescriptionPlaceholder}
+                    multiline
+                    numberOfLines={3}
+                    className="mb-4 rounded-xl bg-surface-muted px-3.5"
+                    style={{ minHeight: 88 }}
+                  />
+
+                  <Text className="mb-3 font-semibold text-text">
+                    {waarden.checkin.deadlineNewActionQuestion}
+                  </Text>
+                  <View className="mb-4 flex-row gap-2">
+                    <BinaryChoiceButton
+                      selected={wantsNewAction === true}
+                      label={waarden.checkin.deadlineNewActionYes}
+                      tone="positive"
+                      onPress={() => setWantsNewAction(true)}
+                    />
+                    <BinaryChoiceButton
+                      selected={wantsNewAction === false}
+                      label={waarden.checkin.deadlineNewActionNo}
+                      tone="neutral"
+                      onPress={() => {
+                        setWantsNewAction(false);
+                        setNieuweActie('');
+                      }}
+                    />
+                  </View>
+
+                  {wantsNewAction === true ? (
+                    <AppTextInput
+                      value={nieuweActie}
+                      onChangeText={setNieuweActie}
+                      placeholder={waarden.checkin.deadlineNewActionPlaceholder.replace(
+                        '{termijn}',
+                        termijnLabel,
+                      )}
+                      className="mb-4 rounded-xl bg-surface-muted px-3.5"
+                    />
+                  ) : null}
+
+                  <Pressable
+                    accessibilityRole="button"
+                    disabled={!deadlineCanContinue}
+                    onPress={submitDeadlineReview}
+                    className={
+                      'rounded-xl py-4 ' +
+                      (deadlineCanContinue ? 'bg-primary active:bg-primary-dark' : 'bg-border')
+                    }
+                  >
+                    <Text className="text-center font-semibold text-white">
+                      {waarden.checkin.deadlineContinue} →
+                    </Text>
+                  </Pressable>
+                </View>
+              ) : null}
+            </View>
+          ) : null}
+
+          {phase === 'summary' && planSummary ? (
+            <View>
+              <Text className="mb-3 font-serif text-xl font-bold text-text">
+                {waarden.checkin.summaryTitle}
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setPhase('main')}
+                className="mb-5 rounded-xl bg-primary py-4 active:bg-primary-dark"
+              >
+                <Text className="text-center font-semibold text-white">
+                  {waarden.checkin.summaryContinue} →
+                </Text>
+              </Pressable>
+              <WaardenCheckinSummaryCard summary={planSummary} />
+            </View>
+          ) : null}
+
+          {phase === 'main' ? (
+            <View>
+              <Text className="mb-5 font-serif text-xl font-bold leading-7 text-text">
+                {waarden.checkin.question}
+              </Text>
+
+              <View className="mb-5 flex-row gap-2">
+                <ChoiceButton
+                  selected={keuze === 'ja'}
+                  tone="ja"
+                  label={waarden.checkin.yesLabel}
+                  onPress={() => setKeuze('ja')}
+                />
+                <ChoiceButton
+                  selected={keuze === 'neutraal'}
+                  tone="neutraal"
+                  label={waarden.checkin.neutralLabel}
+                  onPress={() => setKeuze('neutraal')}
+                />
+                <ChoiceButton
+                  selected={keuze === 'nee'}
+                  tone="nee"
+                  label={waarden.checkin.noLabel}
+                  onPress={() => setKeuze('nee')}
+                />
+              </View>
+
+              {keuze !== null ? (
+                <View>
+                  <AppTextInput
+                    value={notitie}
+                    onChangeText={setNotitie}
+                    placeholder={notePlaceholder}
+                    multiline
+                    numberOfLines={3}
+                    className="mb-4 rounded-xl bg-surface-muted px-3.5"
+                    style={{ minHeight: 88 }}
+                  />
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={submitMain}
+                    className="rounded-xl bg-primary py-4 active:bg-primary-dark"
+                  >
+                    <Text className="text-center font-semibold text-white">
+                      {waarden.checkin.finishAction} ✓
+                    </Text>
+                  </Pressable>
+                </View>
+              ) : null}
+            </View>
+          ) : null}
+        </View>
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollScreen>
   );
 }
 
