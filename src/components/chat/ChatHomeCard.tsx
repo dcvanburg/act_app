@@ -5,8 +5,8 @@ import { ChatIcon } from '@/components/icons/ChatIcon';
 import chat from '@/content/nl/chat.json';
 
 /**
- * Home-screen chatbot entry card. Sits between MoodHomeCard and
- * WaardenHomeCard on /home. Visibility gated by EXPO_PUBLIC_ENABLE_CHATBOT
+ * Home-screen chatbot entry card. Sits below ProgramHomeCard on /home.
+ * Visibility gated by EXPO_PUBLIC_ENABLE_CHATBOT
  * in the parent screen, not here — this component assumes it should render
  * when included.
  */

@@ -33,6 +33,12 @@ describe('crisis.json', () => {
     expect(crisis.resources.ggz.name.length).toBeGreaterThan(0);
   });
 
+  it('exposes the 113.nl crisis chat as an alternative to calling', () => {
+    expect(crisis.resources.crisisChat.url).toBe('https://113.nl');
+    expect(crisis.resources.crisisChat.name.length).toBeGreaterThan(0);
+    expect(crisis.resources.crisisChat.description.length).toBeGreaterThan(0);
+  });
+
   it('has a safetyBlock with title and body', () => {
     expect(crisis.safetyBlock.title.length).toBeGreaterThan(0);
     expect(crisis.safetyBlock.body.length).toBeGreaterThan(0);

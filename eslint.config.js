@@ -26,6 +26,9 @@ module.exports = [
       // from tsconfig.json for the same reason and require `console` for
       // server-side observability (no other logging surface).
       'supabase/functions/**',
+      // Node CLI scripts (ingest, deploy helpers) print progress to stdout —
+      // same rationale as edge functions: no other logging surface.
+      'scripts/**',
       '*.config.js',
       '*.config.ts',
       'expo-env.d.ts',

@@ -2,8 +2,22 @@
 
 **Status:** Accepted (provisional — pending DPAs and pilot review)
 **Date:** 2026-06-12
+**Last updated:** 2026-06-13 (v1.1 in-flight — see "Update 2026-06-13" below)
 **Builds on:** ADR-001 (stack), ADR-003 (auth)
 **Resolves:** OPEN_QUESTIONS.md #19, #20, #21, #23, #24 (decided 2026-06-12). #22 still open (recommendation: defer phase filter to v2).
+
+## Update 2026-06-13 — v1.1 in-flight (not yet pilot-approved)
+
+Three changes layer on top of the v1.0 decisions below. v1.0 stays the fallback in production until v1.1 is signed off by the therapist.
+
+| Change | What | Where |
+|---|---|---|
+| Embedding upgrade | `voyage-3-lite` (512 d) → `voyage-3` (1024 d). Better Dutch retrieval. | Migration `0012_rag_chunks_voyage3.sql`; ingest script `VOYAGE_MODEL`. Requires re-ingest. |
+| Warmer ACT-begeleider tone | System prompt persona shifts to a reflective ACT-grounded begeleider while keeping scope, structured tool output, crisis routing, and 0800-0113 wording unchanged. | `supabase/functions/search/index.ts` `SYSTEM_PROMPT_INSTRUCTIONS`; draft in [chatbot-drafts.md § 4](../THERAPEUT_KB/chatbot-drafts.md). Awaiting therapist sign-off. |
+| Anthropic prompt caching | Two-block `system` array: stable persona + ACT instructions cached ephemeral; per-request chunks + user profile uncached. Adds `anthropic-beta: prompt-caching-2024-07-31` header. Response surfaces `inputTokens` / `cacheReadInputTokens` / `cacheCreationInputTokens` for monitoring. | `supabase/functions/search/index.ts` `askClaude()`. |
+| Program-overview content | New ingestable Dutch content (`src/content/nl/program-overview.json`, category `overview`) so the chatbot can answer "wat is dit programma?", "wat is ACT?", "voor wie is dit?", "wat doet de gids?". | Migration `0013_documents_overview_category.sql`; ingest script. Therapist draft in [chatbot-drafts.md § 4b](../THERAPEUT_KB/chatbot-drafts.md). |
+
+**Unchanged from v1.0 (all non-negotiables intact):** crisis keyword pre-filter (client + server), structured `chat_reply` tool output (`answer` / `clarify` / `out_of_scope`), in-memory only history capped at 3 turns, `chat_sessions` counter only, JWT-authed Edge Function, server logging never includes request body.
 
 ## Context
 

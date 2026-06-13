@@ -1,9 +1,10 @@
--- ── RAG chatbot: documents, chunks, hybrid_search, chat_sessions ───────────
--- See docs/ADR/005-rag-chatbot.md. Vector dimension locked at 512 (Voyage voyage-3-lite).
+-- Repair pre-release RAG schema (source/phase int) → ADR-005 target schema.
+-- Safe when tables are empty; drops legacy documents/chunks and recreates.
 
-create extension if not exists vector;
+drop table if exists public.chunks cascade;
+drop table if exists public.documents cascade;
 
-create table if not exists public.documents (
+create table public.documents (
   id            uuid primary key default gen_random_uuid(),
   source_path   text not null unique,
   title         text not null,
@@ -13,7 +14,7 @@ create table if not exists public.documents (
   created_at    timestamptz not null default now()
 );
 
-create table if not exists public.chunks (
+create table public.chunks (
   id          uuid primary key default gen_random_uuid(),
   document_id uuid not null references public.documents(id) on delete cascade,
   content     text not null,
@@ -23,22 +24,10 @@ create table if not exists public.chunks (
   created_at  timestamptz not null default now()
 );
 
-create index if not exists idx_chunks_document on public.chunks(document_id);
-create index if not exists idx_chunks_fts on public.chunks using gin (fts);
-create index if not exists idx_chunks_embedding on public.chunks
+create index idx_chunks_document on public.chunks(document_id);
+create index idx_chunks_fts on public.chunks using gin (fts);
+create index idx_chunks_embedding on public.chunks
   using hnsw (embedding vector_cosine_ops);
-
-create table if not exists public.chat_sessions (
-  id            uuid primary key default gen_random_uuid(),
-  user_id       uuid not null references public.profiles(id) on delete cascade,
-  message_count int not null default 0 check (message_count >= 0),
-  created_at    timestamptz not null default now(),
-  updated_at    timestamptz not null default now()
-);
-
-create index if not exists idx_chat_sessions_user on public.chat_sessions(user_id);
-
--- ── hybrid_search: vector + Dutch FTS fused with RRF (k=60) ─────────────────
 
 create or replace function public.hybrid_search(
   query_text text,
@@ -107,11 +96,8 @@ $$;
 grant execute on function public.hybrid_search(text, vector(512), int, text, int)
   to authenticated, service_role;
 
--- ── RLS: program content readable by authenticated users; ingest via service role
-
 alter table public.documents enable row level security;
 alter table public.chunks enable row level security;
-alter table public.chat_sessions enable row level security;
 
 drop policy if exists "Authenticated users can read documents" on public.documents;
 create policy "Authenticated users can read documents"
@@ -122,18 +108,3 @@ drop policy if exists "Authenticated users can read chunks" on public.chunks;
 create policy "Authenticated users can read chunks"
   on public.chunks for select to authenticated
   using (true);
-
-drop policy if exists "Users can view own chat sessions" on public.chat_sessions;
-create policy "Users can view own chat sessions"
-  on public.chat_sessions for select
-  using (auth.uid() = user_id);
-
-drop policy if exists "Users can insert own chat sessions" on public.chat_sessions;
-create policy "Users can insert own chat sessions"
-  on public.chat_sessions for insert
-  with check (auth.uid() = user_id);
-
-drop policy if exists "Users can update own chat sessions" on public.chat_sessions;
-create policy "Users can update own chat sessions"
-  on public.chat_sessions for update
-  using (auth.uid() = user_id);

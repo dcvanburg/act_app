@@ -61,11 +61,6 @@ export default function HomeScreen() {
         <FeatureErrorBoundary>
           <MoodHomeCard />
         </FeatureErrorBoundary>
-        {CHATBOT_ENABLED ? (
-          <FeatureErrorBoundary>
-            <ChatHomeCard />
-          </FeatureErrorBoundary>
-        ) : null}
         <FeatureErrorBoundary>
           <WaardenHomeCard />
         </FeatureErrorBoundary>
@@ -77,6 +72,11 @@ export default function HomeScreen() {
         ) : (
           <ProgramHomeCard progress={progress} />
         )}
+        {CHATBOT_ENABLED ? (
+          <FeatureErrorBoundary>
+            <ChatHomeCard />
+          </FeatureErrorBoundary>
+        ) : null}
       </View>
     </ScrollView>
   );

@@ -46,26 +46,38 @@ None (first module).
 
 ## Module 1: Herkennen (`recognition`)
 
-**ACT process:** Psycho-education & avoidance cycle  
+**ACT process:** Psycho-education & avoidance cycle
 **Goal:** User recognizes their own pattern of responding to complaints.
 
-### Content blocks
+### Content blocks (5 sections, post-v1.1 expansion)
 
-- How pain/stress/urge works in the system
-- Avoidance cycle: short-term relief, long-term reinforcement
-- Psycho-education: brain as survival machine
+1. **Een eerlijke blik** — emotional welcome; frame the problem as the relationship with the complaint, not the complaint itself
+2. **Het brein als overlevingsmachine** — physical and emotional pain activate the same network; brain on standby high
+3. **De vermijdingscirkel** — 5 steps: Trigger → Reactie → Korte termijn → Lange termijn → Gevolg, plus per-complaint examples
+4. **Vermijding heeft vele gezichten** — 7 avoidance subtypes (afleiding, analyseren, pleasen, sport-of-niet, verdoven, geforceerd positief denken, lichaam negeren)
+5. **Wat het lichaam onthoudt** — body as the place where stress expresses itself; paraphrased framing (no copyrighted phrasing)
 
 ### Body work
 
-Body scan — where do you live in your body? Which areas are present, which are absent?
+Bodyscan as an exercise in presence, not relaxation. Map of where the user lives in the body; which areas are present, which feel absent. Frames pain and tension as valid information rather than something to fix.
 
 ### Practical task
 
-`[PLACEHOLDER — therapist to fill]`
+Two-part task:
+- **Reflectie na de bodyscan** — three written prompts: which avoidance strategies are recognised, walking one recent situation through the cycle, where the body feels present vs absent
+- **Dagelijkse check-in voor de komende week** — one minute per day: three breaths plus "wat is er nu in mijn lichaam?". Optional one-sentence diary
 
 ### Back-references
 
 None (first content module).
+
+### Voice / safety notes (post-v1.1 merge 2026-06-13)
+
+- Source: therapist text "Module_1_Herkennen.txt"
+- Dash punctuation cleaned (all `—` clause breaks replaced with `.`, `,`, `:`)
+- "Het lichaam houdt de score bij" (Bessel van der Kolk) **paraphrased** as "Wat de geest probeert te vergeten, draagt het lichaam vaak nog mee"
+- "Wie zijn vijand kent…" (Sun Tzu-derived) **paraphrased** as "Wat je leert herkennen, hoef je niet te bevechten"
+- No diagnostic claims, no cure promises, no medication advice
 
 ---
 

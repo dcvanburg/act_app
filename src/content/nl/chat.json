@@ -1,8 +1,9 @@
 {
   "title": "Stel een vraag",
-  "subtitle": "Korte vragen over het programma. Geen medisch advies.",
+  "subtitle": "Vragen over het programma, je stemming of je waarden. Geen medisch advies.",
   "placeholder": "Wat wil je weten?",
   "send": "Versturen",
+  "clearConversation": "Gesprek wissen",
   "thinking": "Bezig met meedenken",
   "youLabel": "Jij",
   "assistantLabel": "Gids",
@@ -21,6 +22,15 @@
     "Wat doe ik als ik vastloop in een module?",
     "Hoe gaat dit programma om met terugval?"
   ],
+  "noMatch": {
+    "title": "Daar kan ik geen antwoord op vinden",
+    "body": "Ik kan alleen informatie geven uit het programma. Bedoelde je misschien een van deze onderwerpen?",
+    "prompt": "Probeer een van deze vragen:"
+  },
+  "clarify": {
+    "prompt": "Tik op een onderwerp om een antwoord te krijgen:",
+    "typeOwn": "Typ zelf je vraag"
+  },
   "disclaimer": "Geen medisch advies. Voor persoonlijke vragen: huisarts of GGZ. Bij directe nood: 0800-0113.",
   "errors": {
     "generic": "Er ging iets mis. Probeer het opnieuw of bekijk de modules.",

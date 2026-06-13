@@ -17,6 +17,7 @@
     "test:watch": "vitest",
     "test:e2e": "maestro test e2e/",
     "validate:content": "tsx scripts/validate-content.ts",
+    "ingest:rag": "tsx scripts/ingest-rag-content.ts",
     "format:check": "prettier --check \"app/**/*.{ts,tsx}\" \"src/**/*.{ts,tsx}\"",
     "format": "prettier --write \"app/**/*.{ts,tsx}\" \"src/**/*.{ts,tsx}\"",
     "prepare": "husky"

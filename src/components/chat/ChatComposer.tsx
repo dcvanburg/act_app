@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 
 import chat from '@/content/nl/chat.json';
 
 const MAX_LENGTH = 2000;
+
+export type ChatComposerHandle = {
+  focus: () => void;
+};
 
 interface Props {
   disabled: boolean;
@@ -14,8 +18,16 @@ interface Props {
  * Bottom input bar: multi-line text input + send button. The parent owns
  * the disabled flag (mutation in flight, crisis mode active, etc.).
  */
-export function ChatComposer({ disabled, onSend }: Props) {
+export const ChatComposer = forwardRef<ChatComposerHandle, Props>(function ChatComposer(
+  { disabled, onSend },
+  ref,
+) {
+  const inputRef = useRef<TextInput | null>(null);
   const [value, setValue] = useState('');
+
+  useImperativeHandle(ref, () => ({
+    focus: () => inputRef.current?.focus(),
+  }));
 
   function handleSend() {
     const trimmed = value.trim();
@@ -29,6 +41,7 @@ export function ChatComposer({ disabled, onSend }: Props) {
   return (
     <View className="flex-row items-end gap-2 border-t border-border bg-surface px-4 py-3">
       <TextInput
+        ref={inputRef}
         className="flex-1 max-h-32 min-h-[44px] rounded-2xl border border-border bg-background px-4 py-2 text-base text-text"
         value={value}
         onChangeText={setValue}
@@ -51,4 +64,4 @@ export function ChatComposer({ disabled, onSend }: Props) {
       </Pressable>
     </View>
   );
-}
+});
