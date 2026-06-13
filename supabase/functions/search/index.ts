@@ -34,7 +34,15 @@ import {
   type StructuredReply,
 } from './ambiguity.ts';
 import {
+  formatGreetingOnlyReply,
+  isGreetingOnly,
+  prependFirstTurnGreeting,
+  stripClarifyBulletOptions,
+  stripGreetingPrefix,
+} from './greeting.ts';
+import {
   fetchChatUserContext,
+  fetchFirstName,
   formatChatUserContext,
   isUserContextEmpty,
 } from './user-context.ts';
@@ -96,7 +104,7 @@ Wat je doet:
 • Je benadrukt dat klachten geen vijand zijn en dat terugval informatie is, geen mislukking.
 
 Bij twijfel over de bedoeling van de vraag:
-• Gebruik type "clarify": stel één korte verduidelijkingsvraag. Geef maximaal drie concrete opties in options.
+• Gebruik type "clarify": stel één korte verduidelijkingsvraag in text. Zet de keuzemogelijkheden uitsluitend in options, niet als opsomming in text.
 • Geef geen antwoord als je niet zeker bent.
 
 Antwoordformaat (verplicht via tool chat_reply):
@@ -415,6 +423,28 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
+function resolveClarifyOptions(
+  reply: StructuredReply,
+  question: string,
+  chunks: Chunk[],
+  userContextData: Awaited<ReturnType<typeof fetchChatUserContext>>,
+): string[] {
+  const fromLlm = (reply.options ?? []).map((o) => o.trim()).filter(Boolean).slice(0, 3);
+  if (fromLlm.length >= 2) return fromLlm;
+  if (chunks.length > 0) return buildTopRetrievalOptions(chunks);
+  if (fromLlm.length > 0) return fromLlm;
+  return buildClarifyOptions(question, chunks, userContextData);
+}
+
+function firstTurnAnswer(
+  answer: string,
+  history: ChatMessage[],
+  firstName: string | null,
+): string {
+  if (history.length > 0) return answer;
+  return prependFirstTurnGreeting(answer, firstName);
+}
+
 // ── Handler ─────────────────────────────────────────────────────────────────
 
 Deno.serve(async (req: Request) => {
@@ -460,13 +490,26 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    const firstName = await fetchFirstName(supabase, user.id);
+    const isFirstTurn = history.length === 0;
+
+    if (isFirstTurn && isGreetingOnly(question)) {
+      return jsonResponse({
+        answer: formatGreetingOnlyReply(firstName),
+        chunksFound: 0,
+      });
+    }
+
+    const searchQuestion =
+      isFirstTurn && !isGreetingOnly(question) ? stripGreetingPrefix(question) : question;
+
     const userContextData = await fetchChatUserContext(supabase, user.id);
     const userContextText = formatChatUserContext(userContextData);
 
-    const embedding = await getEmbedding(question);
+    const embedding = await getEmbedding(searchQuestion);
     const chunks = await hybridSearch(
       supabase,
-      question,
+      searchQuestion,
       embedding,
       filterCategory,
       filterPhase,
@@ -474,16 +517,16 @@ Deno.serve(async (req: Request) => {
 
     if (chunks.length === 0 && isUserContextEmpty(userContextData)) {
       return jsonResponse({
-        answer: OUT_OF_SCOPE_RESPONSE,
+        answer: firstTurnAnswer(OUT_OF_SCOPE_RESPONSE, history, firstName),
         chunksFound: 0,
         noMatch: true,
       });
     }
 
-    const preClarify = assessClarifyNeed(question, chunks, userContextData, history);
+    const preClarify = assessClarifyNeed(searchQuestion, chunks, userContextData, history);
     if (preClarify) {
       return jsonResponse({
-        answer: CLARIFY_PROMPTS[preClarify.reason],
+        answer: firstTurnAnswer(stripClarifyBulletOptions(CLARIFY_PROMPTS[preClarify.reason]), history, firstName),
         chunksFound: chunks.length,
         clarify: true,
         clarifyOptions: preClarify.options,
@@ -491,7 +534,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const { reply, inputTokens, cacheReadInputTokens, cacheCreationInputTokens } =
-      await askClaude(question, chunks, history, userContextText);
+      await askClaude(searchQuestion, chunks, history, userContextText);
 
     const usage = {
       inputTokens,
@@ -500,14 +543,9 @@ Deno.serve(async (req: Request) => {
     };
 
     if (reply.type === 'clarify') {
-      const options =
-        chunks.length > 0
-          ? buildTopRetrievalOptions(chunks)
-          : reply.options && reply.options.length > 0
-            ? reply.options.slice(0, 3)
-            : buildClarifyOptions(question, chunks, userContextData);
+      const options = resolveClarifyOptions(reply, searchQuestion, chunks, userContextData);
       return jsonResponse({
-        answer: reply.text,
+        answer: firstTurnAnswer(stripClarifyBulletOptions(reply.text), history, firstName),
         chunksFound: chunks.length,
         clarify: true,
         clarifyOptions: options,
@@ -517,7 +555,7 @@ Deno.serve(async (req: Request) => {
 
     if (reply.type === 'out_of_scope') {
       return jsonResponse({
-        answer: reply.text || OUT_OF_SCOPE_RESPONSE,
+        answer: firstTurnAnswer(reply.text || OUT_OF_SCOPE_RESPONSE, history, firstName),
         chunksFound: chunks.length,
         noMatch: true,
         ...usage,
@@ -525,7 +563,7 @@ Deno.serve(async (req: Request) => {
     }
 
     return jsonResponse({
-      answer: reply.text,
+      answer: firstTurnAnswer(reply.text, history, firstName),
       chunksFound: chunks.length,
       ...usage,
     });

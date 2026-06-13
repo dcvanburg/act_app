@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -11,8 +11,16 @@ import { ClarifyCard } from '@/components/chat/ClarifyCard';
 import { NoMatchCard } from '@/components/chat/NoMatchCard';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import chat from '@/content/nl/chat.json';
+import { stripClarifyBulletOptions } from '@/lib/chat-greeting';
+import { pickChatOpeningSuggestions } from '@/lib/chat-opening-suggestions';
 import { pickChatSuggestions } from '@/lib/chat-suggestions';
 import { useChatMutation, type ChatHistoryEntry, type ChatResponse } from '@/lib/chat-queries';
+import { useMoodLogs, useTodaysMood } from '@/lib/mood-queries';
+import { getDefaultProgress } from '@/lib/progress';
+import { useUserProgress } from '@/lib/progress-queries';
+import { useProfile } from '@/lib/profile-queries';
+import { EMPTY_WAARDEN_DATA } from '@/lib/waarden';
+import { useWaarden } from '@/providers/WaardenProvider';
 
 const CHATBOT_ENABLED = (process.env.EXPO_PUBLIC_ENABLE_CHATBOT ?? 'true') !== 'false';
 
@@ -40,12 +48,29 @@ export default function ChatScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const mutation = useChatMutation();
+  const { data: profile } = useProfile();
+  const { data: progress } = useUserProgress();
+  const { data: moodLogs } = useMoodLogs('7d');
+  const { data: todaysMood } = useTodaysMood();
+  const { data: waardenData } = useWaarden();
+
+  const openingSuggestions = useMemo(
+    () =>
+      pickChatOpeningSuggestions({
+        progress: progress ?? getDefaultProgress(),
+        moodLogs: moodLogs ?? [],
+        todaysMood: todaysMood ?? null,
+        waarden: waardenData ?? EMPTY_WAARDEN_DATA,
+      }),
+    [progress, moodLogs, todaysMood, waardenData],
+  );
   const scrollRef = useRef<ScrollView | null>(null);
   const composerRef = useRef<ChatComposerHandle | null>(null);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [crisisActive, setCrisisActive] = useState(false);
   const [noMatchSuggestions, setNoMatchSuggestions] = useState<string[] | null>(null);
+  const [clarifyPrompt, setClarifyPrompt] = useState<string | null>(null);
   const [clarifyOptions, setClarifyOptions] = useState<string[] | null>(null);
   const [errorText, setErrorText] = useState<string | null>(null);
 
@@ -72,11 +97,12 @@ export default function ChatScreen() {
   function handleSend(question: string) {
     setErrorText(null);
     setNoMatchSuggestions(null);
+    setClarifyPrompt(null);
     setClarifyOptions(null);
     appendUser(question);
 
     mutation.mutate(
-      { question, history },
+      { question, history, firstName: profile?.first_name ?? null },
       {
         onSuccess: (data: ChatResponse) => {
           if (data.crisis) {
@@ -88,7 +114,7 @@ export default function ChatScreen() {
             return;
           }
           if (data.clarify) {
-            appendAssistant(data.answer);
+            setClarifyPrompt(stripClarifyBulletOptions(data.answer));
             setClarifyOptions(data.clarifyOptions ?? pickChatSuggestions(question));
             return;
           }
@@ -116,6 +142,7 @@ export default function ChatScreen() {
     setMessages([]);
     setCrisisActive(false);
     setNoMatchSuggestions(null);
+    setClarifyPrompt(null);
     setClarifyOptions(null);
     setErrorText(null);
   }
@@ -125,6 +152,7 @@ export default function ChatScreen() {
     messages.length > 0 ||
     crisisActive ||
     noMatchSuggestions !== null ||
+    clarifyPrompt !== null ||
     clarifyOptions !== null ||
     errorText !== null ||
     mutation.isPending;
@@ -161,7 +189,9 @@ export default function ChatScreen() {
         contentContainerStyle={{ padding: 16, paddingBottom: 24 }}
         keyboardShouldPersistTaps="handled"
       >
-        {messages.length === 0 && !crisisActive ? <EmptyState onPick={handleSuggestion} /> : null}
+        {messages.length === 0 && !crisisActive ? (
+          <EmptyState suggestions={openingSuggestions} onPick={handleSuggestion} />
+        ) : null}
 
         {messages.map((m) => (
           <MessageBubble key={m.id} role={m.role} content={m.content} />
@@ -169,8 +199,9 @@ export default function ChatScreen() {
 
         {mutation.isPending ? <TypingIndicator /> : null}
 
-        {clarifyOptions ? (
+        {clarifyPrompt && clarifyOptions ? (
           <ClarifyCard
+            prompt={clarifyPrompt}
             options={clarifyOptions}
             onPick={handleSuggestion}
             onTypeOwn={handleTypeOwnQuestion}
@@ -205,13 +236,19 @@ export default function ChatScreen() {
   );
 }
 
-function EmptyState({ onPick }: { onPick: (q: string) => void }) {
+function EmptyState({
+  suggestions,
+  onPick,
+}: {
+  suggestions: string[];
+  onPick: (q: string) => void;
+}) {
   return (
     <View className="py-6">
       <Text className="mb-2 text-lg font-semibold text-text">{chat.emptyState.title}</Text>
       <Text className="mb-5 text-sm text-text-subtle">{chat.emptyState.subtitle}</Text>
       <View className="gap-2">
-        {chat.suggestedQuestions.map((q) => (
+        {suggestions.map((q) => (
           <Pressable
             key={q}
             accessibilityRole="button"

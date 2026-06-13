@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 
 import chat from '@/content/nl/chat.json';
+import { formatGreetingOnlyReply, isGreetingOnly } from '@/lib/chat-greeting';
 import { containsCrisisSignal } from '@/lib/chat-safety';
 import { supabase } from '@/lib/supabase/client';
 
@@ -43,6 +44,8 @@ export interface ChatResponse {
 export interface ChatMutationArgs {
   question: string;
   history: ChatHistoryEntry[];
+  /** Profile first name — used for first-turn greetings (client-side fast path). */
+  firstName?: string | null;
 }
 
 const HISTORY_WINDOW = 6;
@@ -52,6 +55,13 @@ function localCrisisResponse(): ChatResponse {
     answer: chat.crisisDeflection.body,
     chunksFound: 0,
     crisis: true,
+  };
+}
+
+function localGreetingResponse(firstName: string | null | undefined): ChatResponse {
+  return {
+    answer: formatGreetingOnlyReply(firstName ?? null),
+    chunksFound: 0,
   };
 }
 
@@ -112,7 +122,15 @@ export function useChatMutation() {
         return localCrisisResponse();
       }
 
-      return callSearchFunction({ question, history: args.history });
+      if (args.history.length === 0 && isGreetingOnly(question)) {
+        return localGreetingResponse(args.firstName);
+      }
+
+      return callSearchFunction({
+        question,
+        history: args.history,
+        firstName: args.firstName,
+      });
     },
   });
 }

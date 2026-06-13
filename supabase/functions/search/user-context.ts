@@ -215,6 +215,21 @@ export function formatChatUserContext(data: ChatUserContextData): string {
   return sections.length > 0 ? sections.join('\n\n') : '';
 }
 
+export async function fetchFirstName(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('first_name')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) throw new Error(`profiles: ${error.message}`);
+  const name = data?.first_name;
+  return typeof name === 'string' && name.trim() ? name.trim() : null;
+}
+
 export async function fetchChatUserContext(
   supabase: SupabaseClient,
   userId: string,
