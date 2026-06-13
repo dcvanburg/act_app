@@ -1,5 +1,7 @@
-import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useNavigation } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -21,13 +23,17 @@ import { NoMatchCard } from '@/components/chat/NoMatchCard';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import chat from '@/content/nl/chat.json';
 import { stripClarifyBulletOptions } from '@/lib/chat-greeting';
+import { ensureQuestionMarks } from '@/lib/chat-punctuation';
+import { defaultTabBarStyle, hiddenTabBarStyle } from '@/lib/tab-bar';
 import {
+  ACTIVE_CHAT_SESSION_KEY,
   useActiveChatSession,
   useChatMessages,
   useClearCurrentChat,
   useInsertChatMessage,
 } from '@/lib/chat-messages-queries';
 import { pickChatOpeningSuggestions } from '@/lib/chat-opening-suggestions';
+import { sanitizeClarifyOptions } from '@/lib/chat-ambiguity';
 import { pickChatSuggestions } from '@/lib/chat-suggestions';
 import { useChatMutation, type ChatHistoryEntry, type ChatResponse } from '@/lib/chat-queries';
 import { useMoodLogs, useTodaysMood } from '@/lib/mood-queries';
@@ -35,6 +41,7 @@ import { getDefaultProgress } from '@/lib/progress';
 import { useUserProgress } from '@/lib/progress-queries';
 import { useProfile } from '@/lib/profile-queries';
 import { EMPTY_WAARDEN_DATA } from '@/lib/waarden';
+import { useAuth } from '@/providers/AuthProvider';
 import { useWaarden } from '@/providers/WaardenProvider';
 
 const CHATBOT_ENABLED = (process.env.EXPO_PUBLIC_ENABLE_CHATBOT ?? 'true') !== 'false';
@@ -74,10 +81,25 @@ function resetChatUiState(setters: {
 export default function ChatScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const navigation = useNavigation();
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const scrollRef = useRef<ScrollView | null>(null);
+  const composerRef = useRef<ChatComposerHandle | null>(null);
+  const loadedSessionRef = useRef<string | null>(null);
+
   const mutation = useChatMutation();
-  const { data: sessionId, isLoading: sessionLoading } = useActiveChatSession();
-  const { data: persistedMessages, isLoading: messagesLoading } = useChatMessages(sessionId);
-  const insertMessage = useInsertChatMessage(sessionId);
+  const {
+    data: sessionId,
+    isLoading: sessionLoading,
+    isError: sessionError,
+    isFetched: sessionFetched,
+    refetch: refetchSession,
+  } = useActiveChatSession();
+  const effectiveSessionId = sessionId ?? loadedSessionRef.current ?? undefined;
+  const { data: persistedMessages, isLoading: messagesLoading } =
+    useChatMessages(effectiveSessionId);
+  const insertMessage = useInsertChatMessage(effectiveSessionId);
   const clearCurrentChat = useClearCurrentChat();
   const { data: profile } = useProfile();
   const { data: progress } = useUserProgress();
@@ -95,10 +117,6 @@ export default function ChatScreen() {
       }),
     [progress, moodLogs, todaysMood, waardenData],
   );
-  const scrollRef = useRef<ScrollView | null>(null);
-  const composerRef = useRef<ChatComposerHandle | null>(null);
-  const loadedSessionRef = useRef<string | null>(null);
-
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [crisisActive, setCrisisActive] = useState(false);
@@ -106,10 +124,25 @@ export default function ChatScreen() {
   const [clarifyOptions, setClarifyOptions] = useState<string[] | null>(null);
   const [errorText, setErrorText] = useState<string | null>(null);
 
+  useFocusEffect(
+    useCallback(() => {
+      navigation.getParent()?.setOptions({ tabBarStyle: hiddenTabBarStyle });
+      return () => {
+        navigation.getParent()?.setOptions({
+          tabBarStyle: defaultTabBarStyle(insets.bottom),
+        });
+      };
+    }, [navigation, insets.bottom]),
+  );
+
   useEffect(() => {
-    if (!sessionId || messagesLoading) return;
-    if (loadedSessionRef.current === sessionId && hydrated) return;
-    if (!persistedMessages) return;
+    if (sessionId) loadedSessionRef.current = sessionId;
+  }, [sessionId]);
+
+  useEffect(() => {
+    if (!effectiveSessionId || messagesLoading) return;
+    if (loadedSessionRef.current === effectiveSessionId && hydrated) return;
+    if (persistedMessages === undefined) return;
 
     setMessages(
       persistedMessages.map((m) => ({
@@ -118,9 +151,9 @@ export default function ChatScreen() {
         content: m.content,
       })),
     );
-    loadedSessionRef.current = sessionId;
+    loadedSessionRef.current = effectiveSessionId;
     setHydrated(true);
-  }, [sessionId, messagesLoading, persistedMessages, hydrated]);
+  }, [effectiveSessionId, messagesLoading, persistedMessages, hydrated]);
 
   useEffect(() => {
     if (!CHATBOT_ENABLED) return;
@@ -149,12 +182,22 @@ export default function ChatScreen() {
     setMessages((prev) => [...prev, { id: makeId(), role: 'assistant', content }]);
   }
 
-  async function persistMessage(role: 'user' | 'assistant', content: string) {
-    await insertMessage.mutateAsync({ role, content });
+  async function persistMessage(role: 'user' | 'assistant', content: string): Promise<boolean> {
+    try {
+      await insertMessage.mutateAsync({ role, content });
+      return true;
+    } catch {
+      try {
+        await insertMessage.mutateAsync({ role, content });
+        return true;
+      } catch {
+        return false;
+      }
+    }
   }
 
   async function handleSend(question: string) {
-    if (!sessionId) return;
+    if (!effectiveSessionId || crisisActive) return;
 
     setErrorText(null);
     setNoMatchSuggestions(null);
@@ -163,10 +206,9 @@ export default function ChatScreen() {
 
     const historyForRequest: ChatHistoryEntry[] = [...history, { role: 'user', content: question }];
 
-    try {
-      await persistMessage('user', question);
-    } catch {
-      setErrorText(chat.errors.generic);
+    const userPersisted = await persistMessage('user', question);
+    if (!userPersisted) {
+      setErrorText(chat.errors.persistFailed);
       return;
     }
 
@@ -179,27 +221,37 @@ export default function ChatScreen() {
             return;
           }
           if (data.noMatch) {
+            const answerText = ensureQuestionMarks(data.answer);
+            appendAssistant(answerText);
+            void persistMessage('assistant', answerText);
             setNoMatchSuggestions(pickChatSuggestions(question));
             return;
           }
           if (data.clarify) {
-            const clarifyText = stripClarifyBulletOptions(data.answer);
+            const clarifyText = ensureQuestionMarks(stripClarifyBulletOptions(data.answer));
             appendAssistant(clarifyText);
-            try {
-              await persistMessage('assistant', clarifyText);
-            } catch {
-              setErrorText(chat.errors.generic);
-              return;
-            }
-            setClarifyOptions(data.clarifyOptions ?? pickChatSuggestions(question));
+            void persistMessage('assistant', clarifyText);
+            setClarifyOptions(
+              sanitizeClarifyOptions(
+                data.clarifyOptions ?? pickChatSuggestions(question),
+                question,
+                [],
+                {
+                  complaintTypes: [],
+                  moodLogs: [],
+                  waarden: [],
+                  acties: [],
+                  barriers: [],
+                  checkins: [],
+                  moduleNotes: [],
+                },
+              ),
+            );
             return;
           }
-          appendAssistant(data.answer);
-          try {
-            await persistMessage('assistant', data.answer);
-          } catch {
-            setErrorText(chat.errors.generic);
-          }
+          const answerText = ensureQuestionMarks(data.answer);
+          appendAssistant(answerText);
+          void persistMessage('assistant', answerText);
         },
         onError: (err) => {
           setErrorText(err.message);
@@ -218,10 +270,9 @@ export default function ChatScreen() {
     requestAnimationFrame(() => composerRef.current?.focus());
   }
 
-  function afterClear() {
+  function afterClear(newSessionId?: string) {
     mutation.reset();
-    loadedSessionRef.current = null;
-    setHydrated(false);
+    loadedSessionRef.current = newSessionId ?? null;
     resetChatUiState({
       setMessages,
       setHydrated,
@@ -233,23 +284,30 @@ export default function ChatScreen() {
   }
 
   function confirmClearCurrent() {
-    if (!sessionId) return;
+    if (!effectiveSessionId) return;
     Alert.alert(chat.clear.currentTitle, chat.clear.currentBody, [
       { text: chat.clear.cancel, style: 'cancel' },
       {
         text: chat.clear.currentAction,
         style: 'destructive',
         onPress: () =>
-          clearCurrentChat.mutate(sessionId, {
-            onSuccess: afterClear,
-            onError: () => setErrorText(chat.errors.generic),
+          clearCurrentChat.mutate(effectiveSessionId, {
+            onSuccess: async (newSessionId) => {
+              loadedSessionRef.current = newSessionId;
+              await queryClient.refetchQueries({
+                queryKey: ACTIVE_CHAT_SESSION_KEY(user?.id),
+              });
+              afterClear(newSessionId);
+            },
+            onError: () => setErrorText(chat.errors.clearFailed),
           }),
       },
     ]);
   }
 
   const clearing = clearCurrentChat.isPending;
-  const composerDisabled = mutation.isPending || crisisActive || clearing || !sessionId;
+  const composerDisabled =
+    mutation.isPending || clearing || (!effectiveSessionId && sessionLoading);
   const canClear =
     messages.length > 0 || crisisActive || noMatchSuggestions !== null || clarifyOptions !== null;
 
@@ -315,14 +373,30 @@ export default function ChatScreen() {
             <Text className="text-sm text-crisis-dark">{errorText}</Text>
           </View>
         ) : null}
+
+        {sessionFetched && sessionError && !effectiveSessionId ? (
+          <View className="mb-3 rounded-2xl border border-crisis-border bg-crisis-soft p-3">
+            <Text className="mb-2 text-sm text-crisis-dark">{chat.errors.sessionFailed}</Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Opnieuw proberen"
+              onPress={() => void refetchSession()}
+              className="self-start rounded-lg bg-primary px-3 py-2 active:bg-primary-dark"
+            >
+              <Text className="text-sm font-medium text-white">Opnieuw proberen</Text>
+            </Pressable>
+          </View>
+        ) : null}
       </ScrollView>
 
-      <ChatComposer
-        ref={composerRef}
-        disabled={composerDisabled}
-        onSend={handleSend}
-        footerNote={chat.disclaimer}
-      />
+      <View style={{ paddingBottom: Math.max(insets.bottom, 8) }}>
+        <ChatComposer
+          ref={composerRef}
+          disabled={composerDisabled}
+          onSend={handleSend}
+          footerNote={chat.disclaimer}
+        />
+      </View>
     </KeyboardAvoidingView>
   );
 }

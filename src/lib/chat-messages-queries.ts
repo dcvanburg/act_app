@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { truncateChatMessage } from '@/lib/chat-message-limits';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/providers/AuthProvider';
 
@@ -11,7 +12,12 @@ export type PersistedChatMessage = {
   session_id: string;
 };
 
-const ACTIVE_SESSION_KEY = (userId: string | undefined) => ['chat_sessions', 'active', userId];
+export const ACTIVE_CHAT_SESSION_KEY = (userId: string | undefined) => [
+  'chat_sessions',
+  'active',
+  userId,
+];
+
 const CHAT_MESSAGES_KEY = (userId: string | undefined, sessionId: string | undefined) => [
   'chat_messages',
   userId,
@@ -20,16 +26,63 @@ const CHAT_MESSAGES_KEY = (userId: string | undefined, sessionId: string | undef
 
 const MAX_LOADED_MESSAGES = 200;
 
-async function getOrCreateActiveSession(userId: string): Promise<string> {
-  const { data: active, error: activeError } = await supabase
+async function fetchLatestActiveSessionId(userId: string): Promise<string | null> {
+  let result = await supabase
     .from('chat_sessions')
     .select('id')
     .eq('user_id', userId)
     .is('ended_at', null)
-    .maybeSingle();
+    .order('started_at', { ascending: false })
+    .limit(1);
 
-  if (activeError) throw activeError;
-  if (active?.id) return active.id as string;
+  const missingStartedAt =
+    result.error?.code === '42703' || result.error?.message?.includes('started_at');
+  if (missingStartedAt) {
+    result = await supabase
+      .from('chat_sessions')
+      .select('id')
+      .eq('user_id', userId)
+      .is('ended_at', null)
+      .order('created_at', { ascending: false })
+      .limit(1);
+  }
+
+  if (result.error) throw result.error;
+  return result.data?.[0]?.id ?? null;
+}
+
+async function endChatSessions(userId: string, sessionIds: string[]): Promise<void> {
+  const endedAt = new Date().toISOString();
+  const { error } = await supabase
+    .from('chat_sessions')
+    .update({ ended_at: endedAt })
+    .eq('user_id', userId)
+    .in('id', sessionIds);
+
+  if (!error) return;
+
+  const { error: legacyError } = await supabase
+    .from('chat_sessions')
+    .update({ ended_at: endedAt, updated_at: endedAt })
+    .eq('user_id', userId)
+    .in('id', sessionIds);
+  if (legacyError) throw legacyError;
+}
+
+async function listActiveSessionIds(userId: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('chat_sessions')
+    .select('id')
+    .eq('user_id', userId)
+    .is('ended_at', null);
+
+  if (error) throw error;
+  return (data ?? []).map((row) => row.id as string);
+}
+
+async function getOrCreateActiveSession(userId: string): Promise<string> {
+  const activeId = await fetchLatestActiveSessionId(userId);
+  if (activeId) return activeId;
 
   const { data: created, error: createError } = await supabase
     .from('chat_sessions')
@@ -37,16 +90,71 @@ async function getOrCreateActiveSession(userId: string): Promise<string> {
     .select('id')
     .single();
 
-  if (createError) throw createError;
+  if (createError) {
+    if (createError.code === '23505') {
+      const retryId = await fetchLatestActiveSessionId(userId);
+      if (retryId) return retryId;
+    }
+    throw createError;
+  }
   return created.id as string;
+}
+
+/** Client fallback when clear_current_chat_session RPC is not deployed yet. */
+async function clearCurrentChatFallback(userId: string, activeSessionId: string): Promise<string> {
+  const activeIds = await listActiveSessionIds(userId);
+  const sessionIds = [...new Set([activeSessionId, ...activeIds])];
+
+  if (sessionIds.length > 0) {
+    const { error: deleteMessagesError } = await supabase
+      .from('chat_messages')
+      .delete()
+      .eq('user_id', userId)
+      .in('session_id', sessionIds);
+    if (deleteMessagesError) throw deleteMessagesError;
+
+    const { error: deleteSessionsError } = await supabase
+      .from('chat_sessions')
+      .delete()
+      .eq('user_id', userId)
+      .in('id', sessionIds);
+
+    if (deleteSessionsError) {
+      await endChatSessions(userId, sessionIds);
+    }
+  }
+
+  return getOrCreateActiveSession(userId);
+}
+
+async function clearCurrentChatSession(userId: string, activeSessionId: string): Promise<string> {
+  const { data, error } = await supabase.rpc('clear_current_chat_session');
+  if (!error && typeof data === 'string') {
+    return data;
+  }
+
+  const missingRpc =
+    error?.code === 'PGRST202' ||
+    error?.message?.toLowerCase().includes('clear_current_chat_session') ||
+    error?.message?.toLowerCase().includes('function') ||
+    error?.code === '42883';
+
+  if (missingRpc) {
+    return clearCurrentChatFallback(userId, activeSessionId);
+  }
+
+  if (error) throw error;
+  return clearCurrentChatFallback(userId, activeSessionId);
 }
 
 export function useActiveChatSession() {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ACTIVE_SESSION_KEY(user?.id),
+    queryKey: ACTIVE_CHAT_SESSION_KEY(user?.id),
     enabled: !!user,
+    retry: 2,
+    placeholderData: (previousData) => previousData,
     queryFn: async (): Promise<string> => {
       if (!user) throw new Error('Not authenticated');
       return getOrCreateActiveSession(user.id);
@@ -82,7 +190,7 @@ export function useInsertChatMessage(sessionId: string | undefined) {
   return useMutation({
     mutationFn: async (args: { role: 'user' | 'assistant'; content: string }) => {
       if (!user || !sessionId) throw new Error('Not authenticated');
-      const content = args.content.trim();
+      const content = truncateChatMessage(args.content);
       if (!content) return;
       const { error } = await supabase.from('chat_messages').insert({
         user_id: user.id,
@@ -102,7 +210,7 @@ function invalidateChatQueries(
   queryClient: ReturnType<typeof useQueryClient>,
   userId: string | undefined,
 ) {
-  void queryClient.invalidateQueries({ queryKey: ACTIVE_SESSION_KEY(userId) });
+  void queryClient.invalidateQueries({ queryKey: ACTIVE_CHAT_SESSION_KEY(userId) });
   void queryClient.invalidateQueries({ queryKey: ['chat_messages', userId] });
 }
 
@@ -112,30 +220,13 @@ export function useClearCurrentChat() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (activeSessionId: string) => {
+    mutationFn: async (activeSessionId: string): Promise<string> => {
       if (!user) throw new Error('Not authenticated');
-
-      const { error: deleteError } = await supabase
-        .from('chat_messages')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('session_id', activeSessionId);
-      if (deleteError) throw deleteError;
-
-      const { error: endError } = await supabase
-        .from('chat_sessions')
-        .update({ ended_at: new Date().toISOString(), updated_at: new Date().toISOString() })
-        .eq('id', activeSessionId)
-        .eq('user_id', user.id);
-      if (endError) throw endError;
-
-      const { error: createError } = await supabase
-        .from('chat_sessions')
-        .insert({ user_id: user.id });
-      if (createError) throw createError;
+      return clearCurrentChatSession(user.id, activeSessionId);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       invalidateChatQueries(queryClient, user?.id);
+      await queryClient.refetchQueries({ queryKey: ACTIVE_CHAT_SESSION_KEY(user?.id) });
     },
   });
 }
