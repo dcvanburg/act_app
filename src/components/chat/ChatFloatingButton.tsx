@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ChatIcon } from '@/components/icons/ChatIcon';
 import chat from '@/content/nl/chat.json';
+import { BOTTOM_CHROME, fabBottomOffset } from '@/lib/bottom-chrome';
 
 const CHATBOT_ENABLED = (process.env.EXPO_PUBLIC_ENABLE_CHATBOT ?? 'true') !== 'false';
 
@@ -30,9 +31,9 @@ export function ChatFloatingButton() {
         position: 'absolute',
         left: 0,
         right: 0,
-        bottom: insets.bottom + 16,
+        bottom: fabBottomOffset(insets.bottom, BOTTOM_CHROME.chatFabSize),
         alignItems: 'flex-end',
-        paddingHorizontal: 16,
+        paddingHorizontal: BOTTOM_CHROME.edgePadding,
       }}
     >
       <Pressable

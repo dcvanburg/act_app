@@ -4,6 +4,7 @@ import { ActivityIndicator, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ChatFloatingButton } from '@/components/chat/ChatFloatingButton';
+import { AppTabBar } from '@/components/navigation/AppTabBar';
 import common from '@/content/nl/common.json';
 import { resolveAppBootstrapTarget } from '@/lib/auth-bootstrap';
 import { useProfile } from '@/lib/profile-queries';
@@ -68,15 +69,12 @@ function AppTabs({ insets }: { insets: { bottom: number } }) {
   return (
     <View style={{ flex: 1 }}>
       <Tabs
+        tabBar={(props) => <AppTabBar {...props} />}
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: '#3B6D11',
           tabBarInactiveTintColor: '#888780',
           tabBarStyle: defaultTabBarStyle(insets.bottom),
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: '600',
-          },
         }}
       >
         <Tabs.Screen
