@@ -12,7 +12,7 @@ export function ClarifyCard({
   onPick,
   onTypeOwn,
 }: {
-  prompt: string;
+  prompt?: string;
   options: string[];
   onPick: (question: string) => void;
   onTypeOwn: () => void;
@@ -21,9 +21,8 @@ export function ClarifyCard({
 
   return (
     <View className="mb-4 self-start max-w-[85%]">
-      <Text className="mb-1 text-xs text-text-muted">{chat.assistantLabel}</Text>
       <View className="rounded-2xl rounded-bl border border-primary-border-soft bg-primary-soft px-4 py-3">
-        <Text className="mb-3 text-base text-text">{prompt}</Text>
+        {prompt ? <Text className="mb-3 text-base text-text">{prompt}</Text> : null}
         <Text className="mb-2 text-xs font-medium text-text-muted">{chat.clarify.prompt}</Text>
         <View className="gap-2">
           {options.map((q) => (

@@ -17,7 +17,8 @@ export interface WaardeActieBeoordeling {
 
 export interface WaardeActie {
   id: string;
-  waarde_id: string;
+  /** null = shared plan for the user's selected waarden collection */
+  waarde_id: string | null;
   termijn: WaardeTermijn;
   actie: string;
   /** ISO date when the action was created — used to compute the termijn deadline. */
@@ -27,7 +28,8 @@ export interface WaardeActie {
 
 export interface WaardeBarriere {
   id: string;
-  waarde_id: string;
+  /** null = shared barriers for the user's selected waarden collection */
+  waarde_id: string | null;
   type: BarriereType;
   /** User-defined label when type is `eigen`. */
   eigenLabel?: string;
@@ -40,7 +42,8 @@ export type WaardeCheckinAntwoord = 'ja' | 'neutraal' | 'nee';
 
 export interface WaardeCheckin {
   id: string;
-  waarde_id: string;
+  /** null = daily check-in for the whole waarden collection */
+  waarde_id: string | null;
   datum: string;
   antwoord: WaardeCheckinAntwoord;
   notitie: string;

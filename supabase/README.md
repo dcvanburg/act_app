@@ -58,7 +58,9 @@ Migrations apply in lexical order. Use a `NNNN_short_name.sql` filename pattern.
 | `0011_hybrid_search_overload_fix.sql` | Drops duplicate `hybrid_search` overloads (legacy `rrf_k` variant). |
 | `0012_rag_chunks_voyage3.sql`         | Embedding upgrade: voyage-3-lite (512 d) → voyage-3 (1024 d). Truncates `chunks`, alters column type, recreates HNSW index + `hybrid_search` signature. Triggers full re-ingest. |
 | `0013_documents_overview_category.sql`| Allows `category = 'overview'` on `documents` for `src/content/nl/program-overview.json` (what the program is, ACT in plain Dutch, who the chatbot is). |
-| _(future)_                            | `exercise_logs`, `streaks`, `user_badges`, `weekly_checkins` — Phase 2-γ |
+| `0014_waarden_shared_collection.sql`  | Shared waarden plan/barriers/check-ins (`waarde_id` nullable). |
+| `0015_chat_messages.sql`              | `chat_messages` — persisted chat history for conversation memory (ADR-005 update). |
+| `0016_chat_sessions.sql`              | `session_id` on messages; one active session per user for current vs full history wipe. |
 
 ## Row Level Security
 

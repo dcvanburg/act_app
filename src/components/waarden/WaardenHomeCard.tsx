@@ -5,7 +5,7 @@ import { FlameIcon } from '@/components/icons/FlameIcon';
 import { StarIcon } from '@/components/icons/StarIcon';
 import waarden from '@/content/nl/waarden.json';
 import { isoDate } from '@/lib/mood';
-import { computeWaardenStreak, todayCheckinCount } from '@/lib/waarden';
+import { computeWaardenStreak, hasCollectionCheckinToday } from '@/lib/waarden';
 import { useWaarden } from '@/providers/WaardenProvider';
 
 /** Home-screen card: check-in progress only (scores live on /waarden). */
@@ -23,17 +23,15 @@ export function WaardenHomeCard() {
 
   const today = isoDate();
   const total = data.waarden.length;
-  const doneToday = todayCheckinCount(data.checkins, today);
+  const checkedInToday = hasCollectionCheckinToday(data.checkins, today);
   const streak = computeWaardenStreak(data.checkins, today);
-  const pending = total - doneToday;
-  const allDone = total > 0 && pending === 0;
 
   const statusText =
     total === 0
       ? waarden.homeCard.body
-      : allDone
+      : checkedInToday
         ? waarden.homeCard.bodyAllDone
-        : waarden.homeCard.pendingRemaining.replace('{pending}', String(pending));
+        : waarden.homeCard.pendingRemaining;
 
   return (
     <Pressable
@@ -42,17 +40,17 @@ export function WaardenHomeCard() {
       onPress={() => router.push('/waarden')}
       className={
         'mb-4 flex-row items-center gap-4 rounded-2xl p-4 shadow-sm active:opacity-90 ' +
-        (allDone ? 'border border-primary-border-soft bg-primary-soft' : 'bg-surface')
+        (checkedInToday ? 'border border-primary-border-soft bg-primary-soft' : 'bg-surface')
       }
     >
       <View className="h-12 w-12 items-center justify-center rounded-full bg-primary-soft">
-        <StarIcon size={26} color={allDone ? '#27500A' : '#3B6D11'} />
+        <StarIcon size={26} color={checkedInToday ? '#27500A' : '#3B6D11'} />
       </View>
       <View className="flex-1">
-        <Text className={'font-semibold ' + (allDone ? 'text-primary-dark' : 'text-text')}>
+        <Text className={'font-semibold ' + (checkedInToday ? 'text-primary-dark' : 'text-text')}>
           {waarden.homeCard.title}
         </Text>
-        <Text className={'text-sm ' + (allDone ? 'text-primary' : 'text-text-subtle')}>
+        <Text className={'text-sm ' + (checkedInToday ? 'text-primary' : 'text-text-subtle')}>
           {statusText}
         </Text>
         {streak > 0 ? (
@@ -64,7 +62,7 @@ export function WaardenHomeCard() {
           </View>
         ) : null}
       </View>
-      <Text className={allDone ? 'text-primary' : 'text-text-muted'}>›</Text>
+      <Text className={checkedInToday ? 'text-primary' : 'text-text-muted'}>›</Text>
     </Pressable>
   );
 }

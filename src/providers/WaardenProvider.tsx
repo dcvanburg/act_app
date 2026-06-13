@@ -9,7 +9,13 @@ import {
 } from 'react';
 
 import { isoDate } from '@/lib/mood';
-import { createId, EMPTY_WAARDEN_DATA, normalizeWaardenData } from '@/lib/waarden';
+import {
+  createId,
+  defaultKleurForIndex,
+  EMPTY_WAARDEN_DATA,
+  isCollectionScope,
+  normalizeWaardenData,
+} from '@/lib/waarden';
 import {
   deleteActieRemote,
   deleteBarriereRemote,
@@ -39,9 +45,11 @@ interface WaardenContextValue {
   data: WaardenData;
   loading: boolean;
   addWaarde: (input: { naam: string; beschrijving: string; kleur: string }) => Waarde;
+  addWaarden: (inputs: Array<{ naam: string; beschrijving?: string; kleur?: string }>) => Waarde[];
   updateWaarde: (id: string, input: { naam: string; beschrijving: string; kleur: string }) => void;
+  updateWaardeBeschrijving: (id: string, beschrijving: string) => void;
   deleteWaarde: (id: string) => void;
-  addActie: (waardeId: string, termijn: WaardeTermijn, actie: string) => void;
+  addActie: (termijn: WaardeTermijn, actie: string) => void;
   updateActie: (actie: WaardeActie) => void;
   deleteActie: (id: string) => void;
   reviewActie: (
@@ -52,20 +60,10 @@ interface WaardenContextValue {
       nieuweActie?: string;
     },
   ) => void;
-  addBarriere: (
-    waardeId: string,
-    type: BarriereType,
-    omschrijving: string,
-    eigenLabel?: string,
-  ) => void;
+  addBarriere: (type: BarriereType, omschrijving: string, eigenLabel?: string) => void;
   updateBarriere: (barriere: WaardeBarriere) => void;
   deleteBarriere: (id: string) => void;
-  addCheckin: (input: {
-    waarde_id: string;
-    datum: string;
-    antwoord: WaardeCheckinAntwoord;
-    notitie: string;
-  }) => void;
+  addCheckin: (input: { datum: string; antwoord: WaardeCheckinAntwoord; notitie: string }) => void;
 }
 
 const WaardenContext = createContext<WaardenContextValue | null>(null);
@@ -156,14 +154,32 @@ export function WaardenProvider({ children }: { children: ReactNode }) {
     [user, reload],
   );
 
+  const updateWaardeBeschrijving = useCallback(
+    (id: string, beschrijving: string) => {
+      setData((prev) => {
+        const existing = prev.waarden.find((w) => w.id === id);
+        if (!existing) return prev;
+        const updated: Waarde = { ...existing, beschrijving: beschrijving.trim() };
+        if (user) {
+          void updateWaardeRemote(user.id, updated).catch(() => {
+            void reload();
+          });
+        }
+        return normalizeWaardenData({
+          ...prev,
+          waarden: prev.waarden.map((w) => (w.id === id ? updated : w)),
+        });
+      });
+    },
+    [user, reload],
+  );
+
   const deleteWaarde = useCallback(
     (id: string) => {
       setData((prev) =>
         normalizeWaardenData({
+          ...prev,
           waarden: prev.waarden.filter((w) => w.id !== id),
-          acties: prev.acties.filter((a) => a.waarde_id !== id),
-          barriers: prev.barriers.filter((b) => b.waarde_id !== id),
-          checkins: prev.checkins.filter((c) => c.waarde_id !== id),
         }),
       );
       if (user) {
@@ -175,13 +191,45 @@ export function WaardenProvider({ children }: { children: ReactNode }) {
     [user, reload],
   );
 
+  const addWaarden = useCallback(
+    (inputs: Array<{ naam: string; beschrijving?: string; kleur?: string }>) => {
+      const created: Waarde[] = inputs
+        .map((input, index) => {
+          const naam = input.naam.trim();
+          if (!naam) return null;
+          return {
+            id: createId(),
+            naam,
+            beschrijving: input.beschrijving?.trim() ?? '',
+            kleur: input.kleur ?? defaultKleurForIndex(data.waarden.length + index),
+          } satisfies Waarde;
+        })
+        .filter((item): item is Waarde => item !== null);
+
+      if (created.length === 0) return [];
+
+      setData((prev) => normalizeWaardenData({ ...prev, waarden: [...prev.waarden, ...created] }));
+
+      if (user) {
+        for (const waarde of created) {
+          void insertWaarde(user.id, user.email, waarde).catch(() => {
+            void reload();
+          });
+        }
+      }
+
+      return created;
+    },
+    [data.waarden.length, user, reload],
+  );
+
   const addActie = useCallback(
-    (waardeId: string, termijn: WaardeTermijn, actie: string) => {
+    (termijn: WaardeTermijn, actie: string) => {
       const trimmed = actie.trim();
       if (!trimmed) return;
       const item: WaardeActie = {
         id: createId(),
-        waarde_id: waardeId,
+        waarde_id: null,
         termijn,
         actie: trimmed,
         aangemaakt_op: isoDate(),
@@ -222,7 +270,7 @@ export function WaardenProvider({ children }: { children: ReactNode }) {
         const extraActie: WaardeActie | null = nieuweActie
           ? {
               id: createId(),
-              waarde_id: target.waarde_id,
+              waarde_id: null,
               termijn: target.termijn,
               actie: nieuweActie,
               aangemaakt_op: isoDate(),
@@ -291,7 +339,7 @@ export function WaardenProvider({ children }: { children: ReactNode }) {
   );
 
   const addBarriere = useCallback(
-    (waardeId: string, type: BarriereType, omschrijving: string, eigenLabel?: string) => {
+    (type: BarriereType, omschrijving: string, eigenLabel?: string) => {
       const trimmed = omschrijving.trim();
       if (!trimmed) return;
       const trimmedEigen = eigenLabel?.trim();
@@ -299,7 +347,7 @@ export function WaardenProvider({ children }: { children: ReactNode }) {
 
       const item: WaardeBarriere = {
         id: createId(),
-        waarde_id: waardeId,
+        waarde_id: null,
         type,
         omschrijving: trimmed,
         aangemaakt_op: isoDate(),
@@ -357,15 +405,10 @@ export function WaardenProvider({ children }: { children: ReactNode }) {
   );
 
   const addCheckin = useCallback(
-    (input: {
-      waarde_id: string;
-      datum: string;
-      antwoord: WaardeCheckinAntwoord;
-      notitie: string;
-    }) => {
+    (input: { datum: string; antwoord: WaardeCheckinAntwoord; notitie: string }) => {
       const item = {
         id: createId(),
-        waarde_id: input.waarde_id,
+        waarde_id: null,
         datum: input.datum,
         antwoord: input.antwoord,
         notitie: input.notitie.trim(),
@@ -375,7 +418,7 @@ export function WaardenProvider({ children }: { children: ReactNode }) {
           ...prev,
           checkins: [
             ...prev.checkins.filter(
-              (c) => !(c.waarde_id === input.waarde_id && c.datum === input.datum),
+              (c) => !(isCollectionScope(c.waarde_id) && c.datum === input.datum),
             ),
             item,
           ],
@@ -395,7 +438,9 @@ export function WaardenProvider({ children }: { children: ReactNode }) {
       data,
       loading,
       addWaarde,
+      addWaarden,
       updateWaarde,
+      updateWaardeBeschrijving,
       deleteWaarde,
       addActie,
       updateActie,
@@ -410,7 +455,9 @@ export function WaardenProvider({ children }: { children: ReactNode }) {
       data,
       loading,
       addWaarde,
+      addWaarden,
       updateWaarde,
+      updateWaardeBeschrijving,
       deleteWaarde,
       addActie,
       updateActie,

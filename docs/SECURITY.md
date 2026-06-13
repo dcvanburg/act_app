@@ -108,8 +108,8 @@ Applies to the chatbot in [ADR-005](./ADR/005-rag-chatbot.md). Treat the LLM as 
 
 ### Data minimisation
 
-- **No message storage.** Chat history lives only in app memory and is sent to the LLM as transient context. The `chat_sessions` table stores at most a counter — no message bodies, ever.
-- **History window capped at 3 turns** (6 messages) — anything older is dropped before sending to Anthropic.
+- **Message storage.** Chat messages persist in `chat_messages` (Supabase, RLS), grouped by `chat_sessions`. Users can wipe the **current chat** via the Geschiedenis control; account deletion cascades. The LLM gets the last 3 turns live plus a summary of older stored turns — not the full transcript every request.
+- **History window capped at 3 live turns** (6 messages) sent as Claude `messages`; older stored turns appear in a memory block in the system prompt.
 - **Edge Function must not log request bodies.** A CI grep test guards against `console.log(question)` / `console.log(history)` regressions.
 - **Auth required** on every chat request — no anonymous use (consistent with ADR-003).
 

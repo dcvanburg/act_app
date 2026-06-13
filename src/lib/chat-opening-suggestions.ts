@@ -8,7 +8,7 @@ import { MODULE_QUESTIONS } from '@/lib/chat-ambiguity';
 import { MODULE_META } from '@/lib/content';
 import { daysAgo, isoDate } from '@/lib/mood';
 import { getDefaultProgress, getModuleStatus, MODULE_ORDER } from '@/lib/progress';
-import { pendingCheckinWaarden } from '@/lib/waarden';
+import { needsCollectionCheckin } from '@/lib/waarden';
 import type { EmotionTag, ModuleId, MoodLog, UserProgress } from '@/types/content';
 import type { WaardenData } from '@/types/waarden';
 
@@ -100,7 +100,7 @@ function hasTensionSignal(log: MoodLog | null | undefined): boolean {
 
 function recentWaardenCheckins(waarden: WaardenData, today: string): boolean {
   const from = daysAgo(WAARDEN_CHECKIN_LOOKBACK_DAYS - 1, new Date(`${today}T12:00:00`));
-  return waarden.checkins.some((c) => c.datum >= from && c.datum <= today);
+  return waarden.checkins.some((c) => c.waarde_id === null && c.datum >= from && c.datum <= today);
 }
 
 /**
@@ -153,12 +153,12 @@ export function pickChatOpeningSuggestions(
   }
 
   if (waarden.waarden.length > 0) {
-    const pending = pendingCheckinWaarden(waarden.waarden, waarden.checkins, today);
-    if (pending.length > 0) {
+    if (needsCollectionCheckin(waarden.waarden, waarden.checkins, today)) {
+      const waardeLabel = waarden.waarden[0]?.naam ?? 'mijn waarden';
       addUnique(
         picked,
         seen,
-        applyTemplate(chat.openingSuggestions.waardenPending, { waarde: pending[0]!.naam }),
+        applyTemplate(chat.openingSuggestions.waardenPending, { waarde: waardeLabel }),
       );
     }
 

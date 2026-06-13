@@ -17,7 +17,7 @@ Three changes layer on top of the v1.0 decisions below. v1.0 stays the fallback 
 | Anthropic prompt caching | Two-block `system` array: stable persona + ACT instructions cached ephemeral; per-request chunks + user profile uncached. Adds `anthropic-beta: prompt-caching-2024-07-31` header. Response surfaces `inputTokens` / `cacheReadInputTokens` / `cacheCreationInputTokens` for monitoring. | `supabase/functions/search/index.ts` `askClaude()`. |
 | Program-overview content | New ingestable Dutch content (`src/content/nl/program-overview.json`, category `overview`) so the chatbot can answer "wat is dit programma?", "wat is ACT?", "voor wie is dit?", "wat doet de gids?". | Migration `0013_documents_overview_category.sql`; ingest script. Therapist draft in [chatbot-drafts.md § 4b](../THERAPEUT_KB/chatbot-drafts.md). |
 
-**Unchanged from v1.0 (all non-negotiables intact):** crisis keyword pre-filter (client + server), structured `chat_reply` tool output (`answer` / `clarify` / `out_of_scope`), in-memory only history capped at 3 turns, `chat_sessions` counter only, JWT-authed Edge Function, server logging never includes request body.
+**Unchanged from v1.0 (all non-negotiables intact):** crisis keyword pre-filter (client + server), structured `chat_reply` tool output (`answer` / `clarify` / `out_of_scope`), live LLM history capped at 3 turns with older turns in a memory block, JWT-authed Edge Function, server logging never includes request body.
 
 ## Context
 
@@ -42,7 +42,7 @@ Build a **Hybrid Retrieval-Augmented Generation (RAG)** chatbot:
 | LLM caching | **Anthropic prompt caching** on system prompt | ~90 % cost reduction on cached system tokens |
 | Backend | **Supabase Edge Function** (`search`) | Same auth surface as existing functions; JWT-protected |
 | Ingest | **Node script (`scripts/ingest-rag-content.ts`)** invoked manually with service role | No public ingest endpoint — chunks are append-only therapist content |
-| Frontend entry | **Card / button on `/home`** (decided 2026-06-12) | Lowest-commitment placement. New `ChatHomeCard` component links to `app/(app)/chat.tsx`. Easy to remove or relocate later. |
+| Frontend entry | **Floating button (bottom-right)** on authenticated screens (decided 2026-06-12, relocated 2026-06-13). Links to `app/(app)/chat.tsx`. Noodknop moved to bottom-left. |
 | Sign-off | **User acts as therapist via `/therapeut` skill** (decided 2026-06-12) | Drafts in `docs/THERAPEUT_KB/chatbot-drafts.md`. Real-human therapist review still recommended before pilot. |
 
 ### Data flow per request
@@ -76,7 +76,7 @@ Rendered as message bubble in client
 
 1. **Crisis keyword pre-filter — client AND server.** A Dutch keyword list (e.g. "zelfmoord", "mezelf iets aandoen", "niet meer leven", "einde maken") bypasses retrieval entirely and returns a hardcoded deflection that links to `/noodhulp`. Implemented in both [src/lib/chat-safety.ts] (client UX) and the Edge Function (defence in depth). Keyword list reviewed by `therapeut` agent.
 2. **System prompt constrains scope.** Claude is instructed: answer only from the supplied context; if the answer is not present, say so and refer the user to their huisarts / GGZ / crisis line (matching the wording in [src/content/nl/crisis.json](../../src/content/nl/crisis.json)); never give medical advice or diagnoses.
-3. **No message storage.** Chat history lives only in app memory (cleared on app close). Server-side `chat_sessions` table stores at most a counter (`message_count`) per session — no message bodies. This is the only persistent trace.
+3. **Message storage (updated 2026-06-13).** Chat messages persist in `chat_messages` (Supabase, RLS, cascade delete on profile). Users can wipe history via "Gesprek wissen". The LLM receives the last 3 turns live plus a summary block of older stored turns. Article 9 data — listed in privacy policy before pilot.
 4. **Auth required.** Edge Function rejects requests without a valid Supabase JWT — anonymous chat is not permitted (consistent with ADR-003).
 5. **Therapist sign-off on system prompt + ingested content.** Both the Dutch system prompt and every document ingested into `chunks` go through the `therapeut` agent / clinical review before reaching production. Tracked in [CONTENT_PLACEHOLDERS.md](../CONTENT_PLACEHOLDERS.md).
 6. **Disclaimer in UI.** Every chat session shows a Dutch disclaimer pulled from `src/content/nl/chat.json` referencing `crisis.json` resources — not a hardcoded string.
@@ -107,7 +107,7 @@ Mitigations:
 | Pre-written FAQ | Doesn't scale to 8 modules + daily practice + intake; can't paraphrase therapist material flexibly |
 | Local on-device model | RN-friendly LLMs (e.g. Llama-3-8B on CoreML) are too large for app bundle and too weak for grounded Dutch summarisation |
 | OpenAI text-embedding-3-small (1536 dims) instead of Voyage | Paid; not Anthropic-recommended; locks dim choice if we later add OpenAI alternatives — Voyage default keeps options open |
-| Storing full conversation history server-side | Article 9 data — every retained message is a data-minimisation violation; in-memory only is sufficient for our 3-turn context window |
+| Storing full conversation history server-side | Rejected in v1.0 (data minimisation). **Revised 2026-06-13:** user-requested persistence in `chat_messages` with wipe control and cascade delete; older turns summarized for LLM context beyond the 3-turn live window. |
 | Public ingest endpoint | Content is therapist-owned and curated; a manual script invoked by an admin with the service role keeps the trust boundary tight |
 
 ## Consequences

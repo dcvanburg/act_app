@@ -3,6 +3,8 @@ import { Redirect, Tabs, usePathname, useRouter } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ChatFloatingButton } from '@/components/chat/ChatFloatingButton';
+import { AppTabBar } from '@/components/navigation/AppTabBar';
 import common from '@/content/nl/common.json';
 import { resolveAppBootstrapTarget } from '@/lib/auth-bootstrap';
 import { useProfile } from '@/lib/profile-queries';
@@ -65,59 +67,55 @@ function AppTabs({ insets }: { insets: { bottom: number } }) {
   const { handleTabPress } = useUnsavedChangesGuard();
 
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: '#3B6D11',
-        tabBarInactiveTintColor: '#888780',
-        tabBarStyle: defaultTabBarStyle(insets.bottom),
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="home/index"
-        listeners={{
-          tabPress: (e) => {
-            e.preventDefault();
-            handleTabPress(() => router.navigate('/home'));
-          },
+    <View style={{ flex: 1 }}>
+      <Tabs
+        tabBar={(props) => <AppTabBar {...props} />}
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: '#3B6D11',
+          tabBarInactiveTintColor: '#888780',
+          tabBarStyle: defaultTabBarStyle(insets.bottom),
         }}
-        options={{
-          title: common.nav.home,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="modules"
-        listeners={{
-          tabPress: (e) => {
-            e.preventDefault();
-            handleTabPress(() => router.navigate('/modules'));
-          },
-        }}
-        options={{
-          title: common.nav.modules,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="layers-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen name="wizard" options={{ href: null, tabBarStyle: { display: 'none' } }} />
-      <Tabs.Screen name="onboarding/index" options={{ href: null }} />
-      <Tabs.Screen name="account/index" options={{ href: null }} />
-      <Tabs.Screen name="mood/index" options={{ href: null }} />
-      <Tabs.Screen name="mood/history" options={{ href: null }} />
-      <Tabs.Screen name="waarden/index" options={{ href: null }} />
-      <Tabs.Screen name="waarden/new" options={{ href: null }} />
-      <Tabs.Screen name="waarden/[id]" options={{ href: null }} />
-      <Tabs.Screen name="waarden/edit/[id]" options={{ href: null }} />
-      <Tabs.Screen name="waarden/checkin" options={{ href: null }} />
-      <Tabs.Screen name="chat" options={{ href: null }} />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="home/index"
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              handleTabPress(() => router.navigate('/home'));
+            },
+          }}
+          options={{
+            title: common.nav.home,
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="home-outline" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="modules"
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              handleTabPress(() => router.navigate('/modules'));
+            },
+          }}
+          options={{
+            title: common.nav.modules,
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="layers-outline" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen name="wizard" options={{ href: null, tabBarStyle: { display: 'none' } }} />
+        <Tabs.Screen name="onboarding/index" options={{ href: null }} />
+        <Tabs.Screen name="account/index" options={{ href: null }} />
+        <Tabs.Screen name="mood/index" options={{ href: null }} />
+        <Tabs.Screen name="mood/history" options={{ href: null }} />
+        <Tabs.Screen name="waarden" options={{ href: null }} />
+        <Tabs.Screen name="chat" options={{ href: null }} />
+      </Tabs>
+      <ChatFloatingButton />
+    </View>
   );
 }

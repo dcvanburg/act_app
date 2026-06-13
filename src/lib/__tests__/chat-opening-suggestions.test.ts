@@ -66,7 +66,7 @@ describe('pickChatOpeningSuggestions', () => {
         checkins: [
           {
             id: 'c1',
-            waarde_id: 'w1',
+            waarde_id: null,
             datum: '2026-06-11',
             antwoord: 'ja',
             notitie: '',

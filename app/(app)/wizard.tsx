@@ -1,17 +1,10 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppTextInput } from '@/components/AppTextInput';
+import { KeyboardAwareScrollScreen } from '@/components/KeyboardAwareScrollScreen';
 import content from '@/content/nl/onboarding.json';
 import { useUpdateProfile } from '@/lib/profile-queries';
 import { useAuth } from '@/providers/AuthProvider';
@@ -29,24 +22,18 @@ export default function WizardScreen() {
   const insets = useSafeAreaInsets();
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      className="flex-1 bg-background"
+    <KeyboardAwareScrollScreen
+      contentContainerStyle={{
+        flexGrow: 1,
+        padding: 24,
+        paddingTop: insets.top + 24,
+        paddingBottom: insets.bottom + 32,
+      }}
     >
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          padding: 24,
-          paddingTop: insets.top + 24,
-          paddingBottom: insets.bottom + 32,
-        }}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View className="mx-auto w-full max-w-md">
-          <PersonalDataForm />
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      <View className="mx-auto w-full max-w-md">
+        <PersonalDataForm />
+      </View>
+    </KeyboardAwareScrollScreen>
   );
 }
 

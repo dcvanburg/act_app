@@ -187,7 +187,7 @@ A scoped Q&A chatbot is in design for v1. It retrieves from a Supabase pgvector 
 Non-negotiables that affect downstream specs:
 
 - Crisis keyword pre-filter runs **client-side and server-side** before any LLM call. Crisis signals route to `/noodhulp`.
-- Chat history is **in-memory only**. The `chat_sessions` table stores at most a counter — no message bodies.
+- Chat history persists in `chat_messages` (Supabase, RLS). Users can wipe via "Gesprek wissen". The LLM receives 3 live turns plus a memory block of older messages.
 - Edge Function requires a valid Supabase JWT — no anonymous use.
 - Therapist sign-off on the system prompt and ingested content before pilot.
 

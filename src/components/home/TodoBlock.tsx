@@ -6,7 +6,7 @@ import { isoDate } from '@/lib/mood';
 import { useTodaysMood } from '@/lib/mood-queries';
 import { getModuleStatus, MODULE_ORDER } from '@/lib/progress';
 import { useUserProgress } from '@/lib/progress-queries';
-import { pendingCheckinWaarden } from '@/lib/waarden';
+import { needsCollectionCheckin, needsCollectionPlanSetup } from '@/lib/waarden';
 import { useWaarden } from '@/providers/WaardenProvider';
 import home from '@/content/nl/home.json';
 
@@ -43,8 +43,13 @@ export function TodoBlock() {
       onPress: () => router.push('/waarden/new'),
     });
   } else {
-    const pending = pendingCheckinWaarden(waardenData.waarden, waardenData.checkins, today);
-    if (pending.length > 0) {
+    if (needsCollectionPlanSetup(waardenData.acties, waardenData.barriers)) {
+      items.push({
+        key: 'waarden-plan',
+        label: home.todo.waardenPlanItem,
+        onPress: () => router.push('/waarden/plan'),
+      });
+    } else if (needsCollectionCheckin(waardenData.waarden, waardenData.checkins, today)) {
       items.push({
         key: 'waarden-checkin',
         label: home.todo.waardenCheckinItem,

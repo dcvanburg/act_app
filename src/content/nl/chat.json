@@ -3,7 +3,13 @@
   "subtitle": "Vragen over het programma, je stemming of je waarden. Geen medisch advies.",
   "placeholder": "Wat wil je weten?",
   "send": "Versturen",
-  "clearConversation": "Gesprek wissen",
+  "clearMenuLabel": "Geschiedenis",
+  "clear": {
+    "cancel": "Annuleren",
+    "currentTitle": "Huidige chat wissen?",
+    "currentBody": "De berichten in dit gesprek worden verwijderd. Eerdere gesprekken blijven bewaard voor de gids.",
+    "currentAction": "Huidige chat wissen"
+  },
   "thinking": "Bezig met meedenken",
   "youLabel": "Jij",
   "assistantLabel": "Gids",
@@ -11,6 +17,9 @@
     "title": "Vraag de gids",
     "body": "Korte vragen over het programma.",
     "action": "Stel een vraag"
+  },
+  "floatingButton": {
+    "label": "Vraag de gids"
   },
   "emptyState": {
     "title": "Stel een vraag over het programma",

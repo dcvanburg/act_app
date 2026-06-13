@@ -6,7 +6,7 @@
 import intake from '@/content/nl/intake.json';
 import moodContent from '@/content/nl/mood.json';
 import waardenContent from '@/content/nl/waarden.json';
-import type { ComplaintType, EmotionTag, MoodScore } from '@/types/content';
+import type { ComplaintType, EmotionTag, ModuleId, MoodScore } from '@/types/content';
 import type { BarriereType, WaardeCheckinAntwoord, WaardeTermijn } from '@/types/waarden';
 
 const MOOD_SCORE_LABELS: Record<MoodScore, string> = Object.fromEntries(
@@ -37,7 +37,7 @@ const COMPLAINT_LABELS: Record<ComplaintType, string> = {
   combination: intake.complaintTypes.options.combination.label,
 };
 
-const MAX_NOTE_LENGTH = 200;
+const MAX_NOTE_LENGTH = 500;
 
 export type ChatMoodEntry = {
   date: string;
@@ -53,7 +53,7 @@ export type ChatWaarde = {
 };
 
 export type ChatWaardeActie = {
-  waarde_id: string;
+  waarde_id: string | null;
   termijn: WaardeTermijn;
   actie: string;
   beoordeling?: {
@@ -64,17 +64,23 @@ export type ChatWaardeActie = {
 };
 
 export type ChatWaardeBarriere = {
-  waarde_id: string;
+  waarde_id: string | null;
   type: BarriereType;
   eigen_label: string | null;
   omschrijving: string;
 };
 
 export type ChatWaardeCheckin = {
-  waarde_id: string;
+  waarde_id: string | null;
   datum: string;
   antwoord: WaardeCheckinAntwoord;
   notitie: string;
+};
+
+export type ChatModuleNote = {
+  moduleId: ModuleId;
+  title: string;
+  notes: string;
 };
 
 export type ChatUserContextData = {
@@ -84,6 +90,7 @@ export type ChatUserContextData = {
   acties: ChatWaardeActie[];
   barriers: ChatWaardeBarriere[];
   checkins: ChatWaardeCheckin[];
+  moduleNotes: ChatModuleNote[];
 };
 
 function truncateNote(note: string | null | undefined): string | null {
@@ -92,7 +99,8 @@ function truncateNote(note: string | null | undefined): string | null {
   return trimmed.length > MAX_NOTE_LENGTH ? `${trimmed.slice(0, MAX_NOTE_LENGTH)}…` : trimmed;
 }
 
-function waardeName(waarden: ChatWaarde[], id: string): string {
+function waardeName(waarden: ChatWaarde[], id: string | null): string {
+  if (id === null) return 'waardenverzameling';
   return waarden.find((w) => w.id === id)?.naam ?? 'Onbekende waarde';
 }
 
@@ -112,7 +120,8 @@ export function isUserContextEmpty(data: ChatUserContextData): boolean {
     data.waarden.length === 0 &&
     data.acties.length === 0 &&
     data.barriers.length === 0 &&
-    data.checkins.length === 0
+    data.checkins.length === 0 &&
+    data.moduleNotes.length === 0
   );
 }
 
@@ -144,7 +153,7 @@ export function formatChatUserContext(data: ChatUserContextData): string {
 
   if (data.waarden.length > 0) {
     const lines = data.waarden.map((w) => {
-      const desc = w.beschrijving.trim();
+      const desc = truncateNote(w.beschrijving) ?? '';
       return `• ${w.naam}${desc ? `: ${desc}` : ''}`;
     });
     sections.push(`Persoonlijke waarden:\n${lines.join('\n')}`);
@@ -158,25 +167,34 @@ export function formatChatUserContext(data: ChatUserContextData): string {
         : '';
       return `• ${waardeName(data.waarden, a.waarde_id)} — actie (${termijn}): «${a.actie}»${review}`;
     });
-    sections.push(`Acties per waarde:\n${lines.join('\n')}`);
+    sections.push(`Gedeeld waardenplan:\n${lines.join('\n')}`);
   }
 
   if (data.barriers.length > 0) {
     const lines = data.barriers.map((b) => {
       const typeLabel =
         b.type === 'eigen' && b.eigen_label ? b.eigen_label : (BARRIER_LABELS[b.type] ?? b.type);
-      return `• ${waardeName(data.waarden, b.waarde_id)} — barrière (${typeLabel}): «${b.omschrijving}»`;
+      const scope = waardeName(data.waarden, b.waarde_id);
+      return `• ${scope} — barrière (${typeLabel}): «${b.omschrijving}»`;
     });
-    sections.push(`Barrières:\n${lines.join('\n')}`);
+    sections.push(`Barrières in het waardenplan:\n${lines.join('\n')}`);
   }
 
   if (data.checkins.length > 0) {
     const lines = data.checkins.map((c) => {
       const antwoord = CHECKIN_LABELS[c.antwoord] ?? c.antwoord;
       const note = truncateNote(c.notitie);
-      return `• ${c.datum} — ${waardeName(data.waarden, c.waarde_id)}: ${antwoord}${note ? ` — «${note}»` : ''}`;
+      return `• ${c.datum}: ${antwoord}${note ? ` — «${note}»` : ''}`;
     });
     sections.push(`Waarden-check-ins:\n${lines.join('\n')}`);
+  }
+
+  if (data.moduleNotes.length > 0) {
+    const lines = data.moduleNotes.map((m) => {
+      const note = truncateNote(m.notes);
+      return note ? `• ${m.title}: «${note}»` : `• ${m.title}`;
+    });
+    sections.push(`Module-reflecties:\n${lines.join('\n')}`);
   }
 
   if (sections.length === 0) {

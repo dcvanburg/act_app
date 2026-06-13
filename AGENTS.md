@@ -122,4 +122,4 @@ act_app/
 - Do not copy copyrighted ACT workbook text — therapist-owned content only
 - Do not commit `.env`, secrets, or API keys
 - Apple/Google data declarations: Article 9 data must be declared in App Privacy and Data Safety forms before submission
-- **Chatbot (ADR-005):** crisis keyword pre-filter runs before any LLM call (client + server); no message bodies persisted; therapist sign-off on system prompt and ingested content before pilot. See `docs/SECURITY.md` → AI processing.
+- **Chatbot (ADR-005):** crisis keyword pre-filter runs before any LLM call (client + server); chat messages persist in `chat_messages` (user can wipe); therapist sign-off on system prompt and ingested content before pilot. See `docs/SECURITY.md` → AI processing.
