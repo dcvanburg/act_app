@@ -59,14 +59,15 @@ export function stripGreetingPrefix(text: string): string {
 function applyName(template: string, firstName: string | null): string {
   const name = firstName?.trim();
   if (name) return template.replace('{name}', name);
-  return template.replace('{name}', '').replace(/\s{2,}/g, ' ').trim();
+  return template
+    .replace('{name}', '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
 }
 
 /** Reply when the user only greets on the first turn. */
 export function formatGreetingOnlyReply(firstName: string | null): string {
-  const template = firstName?.trim()
-    ? chat.greeting.onlyWithName
-    : chat.greeting.onlyWithoutName;
+  const template = firstName?.trim() ? chat.greeting.onlyWithName : chat.greeting.onlyWithoutName;
   return applyName(template, firstName);
 }
 

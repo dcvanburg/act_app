@@ -179,11 +179,7 @@ export function pickChatOpeningSuggestions(
     );
   }
 
-  if (
-    lastCompletedId &&
-    lastCompletedId !== focusModuleId &&
-    picked.length < limit
-  ) {
+  if (lastCompletedId && lastCompletedId !== focusModuleId && picked.length < limit) {
     addUnique(
       picked,
       seen,
