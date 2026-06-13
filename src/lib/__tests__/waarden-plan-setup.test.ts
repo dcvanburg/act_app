@@ -33,17 +33,14 @@ describe('needsCollectionPlanSetup', () => {
   it('returns true when any termijn or barriers are missing', () => {
     expect(needsCollectionPlanSetup([], [])).toBe(true);
     expect(needsCollectionPlanSetup([actie('kort')], [barriere])).toBe(true);
-    expect(
-      needsCollectionPlanSetup([actie('kort'), actie('middel'), actie('lang')], []),
-    ).toBe(true);
+    expect(needsCollectionPlanSetup([actie('kort'), actie('middel'), actie('lang')], [])).toBe(
+      true,
+    );
   });
 
   it('returns false when all termijnen and at least one barrier exist', () => {
     expect(
-      needsCollectionPlanSetup(
-        [actie('kort'), actie('middel'), actie('lang')],
-        [barriere],
-      ),
+      needsCollectionPlanSetup([actie('kort'), actie('middel'), actie('lang')], [barriere]),
     ).toBe(false);
   });
 });

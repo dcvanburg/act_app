@@ -78,7 +78,9 @@ export default function WaardenScreen() {
                 <Text className="text-sm font-bold text-primary-dark">
                   {waarden.collection.setupBannerTitle}
                 </Text>
-                <Text className="mt-1 text-xs text-primary">{waarden.collection.setupBannerIntro}</Text>
+                <Text className="mt-1 text-xs text-primary">
+                  {waarden.collection.setupBannerIntro}
+                </Text>
                 {planSetupItems.map((item) => (
                   <Text key={item} className="mt-0.5 text-xs text-primary">
                     • {item}
@@ -133,7 +135,9 @@ export default function WaardenScreen() {
               className="rounded-2xl bg-surface p-4 shadow-sm active:bg-primary-soft"
             >
               <Text className="font-semibold text-text">{waarden.collection.openPlan}</Text>
-              <Text className="mt-1 text-sm text-text-subtle">{waarden.collection.openPlanBody}</Text>
+              <Text className="mt-1 text-sm text-text-subtle">
+                {waarden.collection.openPlanBody}
+              </Text>
             </Pressable>
           ) : null}
 
@@ -210,22 +214,22 @@ function WaardeRow({ waarde, grouped = false }: { waarde: Waarde; grouped?: bool
           : 'flex-row items-center gap-4 rounded-2xl bg-surface p-4 shadow-sm active:bg-primary-soft'
       }
     >
-        <View
-          className="h-10 w-10 items-center justify-center rounded-xl"
-          style={{ backgroundColor: `${waarde.kleur}22` }}
-        >
-          <View className="h-3.5 w-3.5 rounded-md" style={{ backgroundColor: waarde.kleur }} />
-        </View>
-        <View className="min-w-0 flex-1">
-          <Text className="font-semibold text-text">{waarde.naam}</Text>
-          {waarde.beschrijving ? (
-            <Text className="mt-0.5 text-sm text-text-subtle" numberOfLines={2}>
-              {waarde.beschrijving}
-            </Text>
-          ) : (
-            <Text className="mt-0.5 text-sm text-text-muted">{waarden.detail.noteIntro}</Text>
-          )}
-        </View>
+      <View
+        className="h-10 w-10 items-center justify-center rounded-xl"
+        style={{ backgroundColor: `${waarde.kleur}22` }}
+      >
+        <View className="h-3.5 w-3.5 rounded-md" style={{ backgroundColor: waarde.kleur }} />
+      </View>
+      <View className="min-w-0 flex-1">
+        <Text className="font-semibold text-text">{waarde.naam}</Text>
+        {waarde.beschrijving ? (
+          <Text className="mt-0.5 text-sm text-text-subtle" numberOfLines={2}>
+            {waarde.beschrijving}
+          </Text>
+        ) : (
+          <Text className="mt-0.5 text-sm text-text-muted">{waarden.detail.noteIntro}</Text>
+        )}
+      </View>
       <Text className="text-text-muted">›</Text>
     </Pressable>
   );

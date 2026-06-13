@@ -100,9 +100,7 @@ function hasTensionSignal(log: MoodLog | null | undefined): boolean {
 
 function recentWaardenCheckins(waarden: WaardenData, today: string): boolean {
   const from = daysAgo(WAARDEN_CHECKIN_LOOKBACK_DAYS - 1, new Date(`${today}T12:00:00`));
-  return waarden.checkins.some(
-    (c) => c.waarde_id === null && c.datum >= from && c.datum <= today,
-  );
+  return waarden.checkins.some((c) => c.waarde_id === null && c.datum >= from && c.datum <= today);
 }
 
 /**

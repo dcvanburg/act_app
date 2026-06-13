@@ -11,18 +11,12 @@ export type PersistedChatMessage = {
   session_id: string;
 };
 
-export type ChatHistoryStats = {
-  totalMessages: number;
-  endedSessions: number;
-};
-
 const ACTIVE_SESSION_KEY = (userId: string | undefined) => ['chat_sessions', 'active', userId];
 const CHAT_MESSAGES_KEY = (userId: string | undefined, sessionId: string | undefined) => [
   'chat_messages',
   userId,
   sessionId,
 ];
-const CHAT_HISTORY_STATS_KEY = (userId: string | undefined) => ['chat_history_stats', userId];
 
 const MAX_LOADED_MESSAGES = 200;
 
@@ -56,38 +50,6 @@ export function useActiveChatSession() {
     queryFn: async (): Promise<string> => {
       if (!user) throw new Error('Not authenticated');
       return getOrCreateActiveSession(user.id);
-    },
-  });
-}
-
-export function useChatHistoryStats() {
-  const { user } = useAuth();
-
-  return useQuery({
-    queryKey: CHAT_HISTORY_STATS_KEY(user?.id),
-    enabled: !!user,
-    queryFn: async (): Promise<ChatHistoryStats> => {
-      if (!user) return { totalMessages: 0, endedSessions: 0 };
-
-      const [messagesRes, sessionsRes] = await Promise.all([
-        supabase
-          .from('chat_messages')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id),
-        supabase
-          .from('chat_sessions')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .not('ended_at', 'is', null),
-      ]);
-
-      if (messagesRes.error) throw messagesRes.error;
-      if (sessionsRes.error) throw sessionsRes.error;
-
-      return {
-        totalMessages: messagesRes.count ?? 0,
-        endedSessions: sessionsRes.count ?? 0,
-      };
     },
   });
 }
@@ -132,7 +94,6 @@ export function useInsertChatMessage(sessionId: string | undefined) {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: CHAT_MESSAGES_KEY(user?.id, sessionId) });
-      void queryClient.invalidateQueries({ queryKey: CHAT_HISTORY_STATS_KEY(user?.id) });
     },
   });
 }
@@ -142,7 +103,6 @@ function invalidateChatQueries(
   userId: string | undefined,
 ) {
   void queryClient.invalidateQueries({ queryKey: ACTIVE_SESSION_KEY(userId) });
-  void queryClient.invalidateQueries({ queryKey: CHAT_HISTORY_STATS_KEY(userId) });
   void queryClient.invalidateQueries({ queryKey: ['chat_messages', userId] });
 }
 
@@ -173,35 +133,6 @@ export function useClearCurrentChat() {
         .from('chat_sessions')
         .insert({ user_id: user.id });
       if (createError) throw createError;
-    },
-    onSuccess: () => {
-      invalidateChatQueries(queryClient, user?.id);
-    },
-  });
-}
-
-/** Delete every stored message and session for this user. */
-export function useClearAllChatHistory() {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async () => {
-      if (!user) throw new Error('Not authenticated');
-
-      const { error: messagesError } = await supabase
-        .from('chat_messages')
-        .delete()
-        .eq('user_id', user.id);
-      if (messagesError) throw messagesError;
-
-      const { error: sessionsError } = await supabase
-        .from('chat_sessions')
-        .delete()
-        .eq('user_id', user.id);
-      if (sessionsError) throw sessionsError;
-
-      await getOrCreateActiveSession(user.id);
     },
     onSuccess: () => {
       invalidateChatQueries(queryClient, user?.id);

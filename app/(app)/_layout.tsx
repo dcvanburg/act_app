@@ -79,43 +79,43 @@ function AppTabs({ insets }: { insets: { bottom: number } }) {
           },
         }}
       >
-      <Tabs.Screen
-        name="home/index"
-        listeners={{
-          tabPress: (e) => {
-            e.preventDefault();
-            handleTabPress(() => router.navigate('/home'));
-          },
-        }}
-        options={{
-          title: common.nav.home,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="modules"
-        listeners={{
-          tabPress: (e) => {
-            e.preventDefault();
-            handleTabPress(() => router.navigate('/modules'));
-          },
-        }}
-        options={{
-          title: common.nav.modules,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="layers-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen name="wizard" options={{ href: null, tabBarStyle: { display: 'none' } }} />
-      <Tabs.Screen name="onboarding/index" options={{ href: null }} />
-      <Tabs.Screen name="account/index" options={{ href: null }} />
-      <Tabs.Screen name="mood/index" options={{ href: null }} />
-      <Tabs.Screen name="mood/history" options={{ href: null }} />
-      <Tabs.Screen name="waarden" options={{ href: null }} />
-      <Tabs.Screen name="chat" options={{ href: null }} />
+        <Tabs.Screen
+          name="home/index"
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              handleTabPress(() => router.navigate('/home'));
+            },
+          }}
+          options={{
+            title: common.nav.home,
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="home-outline" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="modules"
+          listeners={{
+            tabPress: (e) => {
+              e.preventDefault();
+              handleTabPress(() => router.navigate('/modules'));
+            },
+          }}
+          options={{
+            title: common.nav.modules,
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="layers-outline" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen name="wizard" options={{ href: null, tabBarStyle: { display: 'none' } }} />
+        <Tabs.Screen name="onboarding/index" options={{ href: null }} />
+        <Tabs.Screen name="account/index" options={{ href: null }} />
+        <Tabs.Screen name="mood/index" options={{ href: null }} />
+        <Tabs.Screen name="mood/history" options={{ href: null }} />
+        <Tabs.Screen name="waarden" options={{ href: null }} />
+        <Tabs.Screen name="chat" options={{ href: null }} />
       </Tabs>
       <ChatFloatingButton />
     </View>

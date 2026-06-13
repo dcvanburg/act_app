@@ -195,9 +195,7 @@ export function createId(): string {
 
 /** Consecutive days with a collection check-in. */
 export function computeWaardenStreak(checkins: WaardeCheckin[], today: string = isoDate()): number {
-  const days = [...new Set(collectionCheckins(checkins).map((c) => c.datum))]
-    .sort()
-    .reverse();
+  const days = [...new Set(collectionCheckins(checkins).map((c) => c.datum))].sort().reverse();
   let streak = 0;
   let expected = today;
 
@@ -281,9 +279,7 @@ export function buildCollectionPlanSetupItems(
 ): string[] {
   const items: string[] = [];
   for (const termijn of gaps.missingTermijnen) {
-    items.push(
-      templates.action.replace('{termijn}', termijnLabels[termijn].toLowerCase()),
-    );
+    items.push(templates.action.replace('{termijn}', termijnLabels[termijn].toLowerCase()));
   }
   if (gaps.missingBarriers) {
     items.push(templates.barriers);

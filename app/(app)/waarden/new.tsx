@@ -126,8 +126,7 @@ export default function NewWaardeScreen() {
                 >
                   <Text
                     className={
-                      'text-xs font-semibold ' +
-                      (active ? 'text-primary-dark' : 'text-text-subtle')
+                      'text-xs font-semibold ' + (active ? 'text-primary-dark' : 'text-text-subtle')
                     }
                   >
                     {suggestion}

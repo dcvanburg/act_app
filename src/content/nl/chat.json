@@ -5,16 +5,10 @@
   "send": "Versturen",
   "clearMenuLabel": "Geschiedenis",
   "clear": {
-    "menuTitle": "Chatgeschiedenis",
-    "currentOption": "Huidige chat wissen",
-    "allOption": "Volledige geschiedenis wissen",
     "cancel": "Annuleren",
     "currentTitle": "Huidige chat wissen?",
     "currentBody": "De berichten in dit gesprek worden verwijderd. Eerdere gesprekken blijven bewaard voor de gids.",
-    "currentAction": "Huidige chat wissen",
-    "allTitle": "Volledige geschiedenis wissen?",
-    "allBody": "Alle opgeslagen gesprekken worden permanent verwijderd. De gids kan ze daarna niet meer terugvinden.",
-    "allAction": "Alles wissen"
+    "currentAction": "Huidige chat wissen"
   },
   "thinking": "Bezig met meedenken",
   "youLabel": "Jij",

@@ -162,7 +162,10 @@ export default function WaardenCheckinScreen() {
                 key={waarde.id}
                 className="flex-row items-center gap-2 rounded-full border border-border bg-surface-muted px-3 py-1.5"
               >
-                <View className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: waarde.kleur }} />
+                <View
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ backgroundColor: waarde.kleur }}
+                />
                 <Text className="text-sm font-medium text-text">{waarde.naam}</Text>
               </View>
             ))}

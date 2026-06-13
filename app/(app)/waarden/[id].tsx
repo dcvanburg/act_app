@@ -86,9 +86,7 @@ export default function WaardeDetailScreen() {
 
         <Pressable
           accessibilityRole="button"
-          onPress={() =>
-            router.push({ pathname: '/waarden/edit/[id]', params: { id: waarde.id } })
-          }
+          onPress={() => router.push({ pathname: '/waarden/edit/[id]', params: { id: waarde.id } })}
           className="rounded-2xl border border-border bg-surface px-4 py-3.5 active:bg-primary-soft"
         >
           <Text className="text-center text-sm font-semibold text-text">

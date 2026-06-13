@@ -9,7 +9,13 @@ import {
 } from 'react';
 
 import { isoDate } from '@/lib/mood';
-import { createId, defaultKleurForIndex, EMPTY_WAARDEN_DATA, isCollectionScope, normalizeWaardenData } from '@/lib/waarden';
+import {
+  createId,
+  defaultKleurForIndex,
+  EMPTY_WAARDEN_DATA,
+  isCollectionScope,
+  normalizeWaardenData,
+} from '@/lib/waarden';
 import {
   deleteActieRemote,
   deleteBarriereRemote,
@@ -54,18 +60,10 @@ interface WaardenContextValue {
       nieuweActie?: string;
     },
   ) => void;
-  addBarriere: (
-    type: BarriereType,
-    omschrijving: string,
-    eigenLabel?: string,
-  ) => void;
+  addBarriere: (type: BarriereType, omschrijving: string, eigenLabel?: string) => void;
   updateBarriere: (barriere: WaardeBarriere) => void;
   deleteBarriere: (id: string) => void;
-  addCheckin: (input: {
-    datum: string;
-    antwoord: WaardeCheckinAntwoord;
-    notitie: string;
-  }) => void;
+  addCheckin: (input: { datum: string; antwoord: WaardeCheckinAntwoord; notitie: string }) => void;
 }
 
 const WaardenContext = createContext<WaardenContextValue | null>(null);
@@ -210,9 +208,7 @@ export function WaardenProvider({ children }: { children: ReactNode }) {
 
       if (created.length === 0) return [];
 
-      setData((prev) =>
-        normalizeWaardenData({ ...prev, waarden: [...prev.waarden, ...created] }),
-      );
+      setData((prev) => normalizeWaardenData({ ...prev, waarden: [...prev.waarden, ...created] }));
 
       if (user) {
         for (const waarde of created) {
@@ -409,11 +405,7 @@ export function WaardenProvider({ children }: { children: ReactNode }) {
   );
 
   const addCheckin = useCallback(
-    (input: {
-      datum: string;
-      antwoord: WaardeCheckinAntwoord;
-      notitie: string;
-    }) => {
+    (input: { datum: string; antwoord: WaardeCheckinAntwoord; notitie: string }) => {
       const item = {
         id: createId(),
         waarde_id: null,

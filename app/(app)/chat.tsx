@@ -23,9 +23,7 @@ import chat from '@/content/nl/chat.json';
 import { stripClarifyBulletOptions } from '@/lib/chat-greeting';
 import {
   useActiveChatSession,
-  useChatHistoryStats,
   useChatMessages,
-  useClearAllChatHistory,
   useClearCurrentChat,
   useInsertChatMessage,
 } from '@/lib/chat-messages-queries';
@@ -78,11 +76,9 @@ export default function ChatScreen() {
   const router = useRouter();
   const mutation = useChatMutation();
   const { data: sessionId, isLoading: sessionLoading } = useActiveChatSession();
-  const { data: historyStats } = useChatHistoryStats();
   const { data: persistedMessages, isLoading: messagesLoading } = useChatMessages(sessionId);
   const insertMessage = useInsertChatMessage(sessionId);
   const clearCurrentChat = useClearCurrentChat();
-  const clearAllHistory = useClearAllChatHistory();
   const { data: profile } = useProfile();
   const { data: progress } = useUserProgress();
   const { data: moodLogs } = useMoodLogs('7d');
@@ -165,10 +161,7 @@ export default function ChatScreen() {
     setClarifyOptions(null);
     appendUser(question);
 
-    const historyForRequest: ChatHistoryEntry[] = [
-      ...history,
-      { role: 'user', content: question },
-    ];
+    const historyForRequest: ChatHistoryEntry[] = [...history, { role: 'user', content: question }];
 
     try {
       await persistMessage('user', question);
@@ -255,62 +248,10 @@ export default function ChatScreen() {
     ]);
   }
 
-  function confirmClearAll() {
-    Alert.alert(chat.clear.allTitle, chat.clear.allBody, [
-      { text: chat.clear.cancel, style: 'cancel' },
-      {
-        text: chat.clear.allAction,
-        style: 'destructive',
-        onPress: () =>
-          clearAllHistory.mutate(undefined, {
-            onSuccess: afterClear,
-            onError: () => setErrorText(chat.errors.generic),
-          }),
-      },
-    ]);
-  }
-
-  function openClearMenu() {
-    const canClearCurrent =
-      messages.length > 0 || crisisActive || noMatchSuggestions !== null;
-    const canClearAll =
-      (historyStats?.totalMessages ?? 0) > 0 || (historyStats?.endedSessions ?? 0) > 0;
-
-    if (!canClearCurrent && !canClearAll) return;
-
-    const options: Array<{
-      text: string;
-      style?: 'default' | 'cancel' | 'destructive';
-      onPress?: () => void;
-    }> = [{ text: chat.clear.cancel, style: 'cancel' }];
-
-    if (canClearCurrent) {
-      options.unshift({
-        text: chat.clear.currentOption,
-        onPress: confirmClearCurrent,
-      });
-    }
-
-    if (canClearAll) {
-      options.unshift({
-        text: chat.clear.allOption,
-        style: 'destructive',
-        onPress: confirmClearAll,
-      });
-    }
-
-    Alert.alert(chat.clear.menuTitle, undefined, options);
-  }
-
-  const clearing = clearCurrentChat.isPending || clearAllHistory.isPending;
+  const clearing = clearCurrentChat.isPending;
   const composerDisabled = mutation.isPending || crisisActive || clearing || !sessionId;
-  const canOpenClearMenu =
-    messages.length > 0 ||
-    crisisActive ||
-    noMatchSuggestions !== null ||
-    clarifyOptions !== null ||
-    (historyStats?.totalMessages ?? 0) > 0 ||
-    (historyStats?.endedSessions ?? 0) > 0;
+  const canClear =
+    messages.length > 0 || crisisActive || noMatchSuggestions !== null || clarifyOptions !== null;
 
   return (
     <KeyboardAvoidingView
@@ -327,11 +268,11 @@ export default function ChatScreen() {
           <Text className="font-semibold text-text">{chat.title}</Text>
           <Text className="text-xs text-text-subtle">{chat.subtitle}</Text>
         </View>
-        {canOpenClearMenu ? (
+        {canClear ? (
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={chat.clearMenuLabel}
-            onPress={openClearMenu}
+            onPress={confirmClearCurrent}
             disabled={clearing}
             className="min-h-[44px] justify-center rounded-lg px-2 active:opacity-70 disabled:opacity-50"
           >

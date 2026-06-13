@@ -43,7 +43,13 @@ interface Props {
  * navigation). On reaching FINAL_SCREEN_ID and tapping "Afronden" we save with
  * completed=true and return to /home.
  */
-export function ModulePlayer({ content, initialScreenId, complaintTypes, onComplete, initialNotes }: Props) {
+export function ModulePlayer({
+  content,
+  initialScreenId,
+  complaintTypes,
+  onComplete,
+  initialNotes,
+}: Props) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const screens = buildScreens(content);
@@ -68,16 +74,20 @@ export function ModulePlayer({ content, initialScreenId, complaintTypes, onCompl
   const currentScreenRef = useRef(currentScreen);
   currentScreenRef.current = currentScreen;
 
-  useDebouncedSave(notes, (val) => {
-    const screen = currentScreenRef.current;
-    if (!screen) return;
-    saveMutation.mutate({
-      moduleId: content.id,
-      lastStepId: screen.id,
-      completed: false,
-      notes: val.trim() || undefined,
-    });
-  }, { baseline: initialNotes ?? '' });
+  useDebouncedSave(
+    notes,
+    (val) => {
+      const screen = currentScreenRef.current;
+      if (!screen) return;
+      saveMutation.mutate({
+        moduleId: content.id,
+        lastStepId: screen.id,
+        completed: false,
+        notes: val.trim() || undefined,
+      });
+    },
+    { baseline: initialNotes ?? '' },
+  );
 
   const isFirst = currentIndex === 0;
   const isLast = currentIndex === screens.length - 1;

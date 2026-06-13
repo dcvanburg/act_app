@@ -43,8 +43,8 @@ describe('formatChatUserContext', () => {
 
   it('formats waarden, acties, barriers and check-ins', () => {
     const text = formatChatUserContext({
+      ...emptyContext,
       complaintTypes: ['mental'],
-      moodLogs: [],
       waarden: [{ id: 'w1', naam: 'Rust', beschrijving: 'Meer ruimte voor mezelf' }],
       acties: [{ waarde_id: null, termijn: 'kort', actie: 'Elke ochtend wandelen' }],
       barriers: [
