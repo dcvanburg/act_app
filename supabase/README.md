@@ -61,6 +61,7 @@ Migrations apply in lexical order. Use a `NNNN_short_name.sql` filename pattern.
 | `0014_waarden_shared_collection.sql`  | Shared waarden plan/barriers/check-ins (`waarde_id` nullable). |
 | `0015_chat_messages.sql`              | `chat_messages` — persisted chat history for conversation memory (ADR-005 update). |
 | `0016_chat_sessions.sql`              | `session_id` on messages; one active session per user for current vs full history wipe. |
+| `0017_chat_clear_rpc.sql`             | `clear_current_chat_session()` RPC + RLS policy repair for reliable chat wipe. |
 
 ## Row Level Security
 

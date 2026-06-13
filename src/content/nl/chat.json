@@ -61,6 +61,9 @@
   "disclaimer": "Geen medisch advies. Voor persoonlijke vragen: huisarts of GGZ. Bij directe nood: 0800-0113.",
   "errors": {
     "generic": "Er ging iets mis. Probeer het opnieuw of bekijk de modules.",
+    "persistFailed": "Je bericht kon niet worden opgeslagen. Probeer het opnieuw.",
+    "clearFailed": "De chat kon niet worden gewist. Probeer het opnieuw.",
+    "sessionFailed": "De chat kon niet worden gestart. Probeer het opnieuw.",
     "offline": "Je bent niet verbonden. Probeer het opnieuw zodra je weer online bent.",
     "rateLimited": "Even pauze. Probeer het over een minuutje opnieuw.",
     "unauthorized": "Je sessie is verlopen. Log opnieuw in.",

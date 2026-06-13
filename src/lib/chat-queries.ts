@@ -72,9 +72,42 @@ function mapErrorMessage(rawMessage: string | null | undefined): string {
   }
   if (msg.includes('te lang')) return chat.errors.tooLong;
   if (msg.includes('verplicht') || msg.includes('ongeldig')) return chat.errors.empty;
-  if (msg.includes('429') || msg.includes('rate')) return chat.errors.rateLimited;
-  if (msg.includes('network') || msg.includes('fetch')) return chat.errors.offline;
+  if (
+    msg.includes('429') ||
+    msg.includes('rate') ||
+    msg.includes('529') ||
+    msg.includes('overloaded')
+  ) {
+    return chat.errors.rateLimited;
+  }
+  if (
+    msg.includes('network') ||
+    msg.includes('fetch') ||
+    msg.includes('timeout') ||
+    msg.includes('503')
+  ) {
+    return chat.errors.offline;
+  }
   return chat.errors.generic;
+}
+
+async function readInvokeErrorMessage(error: unknown): Promise<string | null> {
+  if (!error || typeof error !== 'object') return null;
+
+  const context = (error as { context?: Response }).context;
+  if (context && typeof context.json === 'function') {
+    try {
+      const body = (await context.json()) as { error?: string };
+      if (typeof body?.error === 'string' && body.error.trim()) {
+        return body.error;
+      }
+    } catch {
+      // Response body unavailable or not JSON.
+    }
+  }
+
+  const message = (error as { message?: string }).message;
+  return typeof message === 'string' ? message : null;
 }
 
 async function callSearchFunction(args: ChatMutationArgs): Promise<ChatResponse> {
@@ -91,7 +124,8 @@ async function callSearchFunction(args: ChatMutationArgs): Promise<ChatResponse>
   );
 
   if (error) {
-    throw new Error(mapErrorMessage(error.message));
+    const raw = (await readInvokeErrorMessage(error)) ?? error.message;
+    throw new Error(mapErrorMessage(raw));
   }
   if (!data || typeof data.answer !== 'string') {
     throw new Error(chat.errors.generic);

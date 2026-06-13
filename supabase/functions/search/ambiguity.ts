@@ -75,6 +75,9 @@ const VAGUE_PATTERNS: readonly RegExp[] = [
   /^\s*ik snap het niet\s*[!?.]*\s*$/i,
   /^\s*snap het niet\s*[!?.]*\s*$/i,
   /^\s*geen idee\s*[!?.]*\s*$/i,
+  /^\s*ik weet het niet\s*[!?.]*\s*$/i,
+  /^\s*ik weet het echt niet\s*[!?.]*\s*$/i,
+  /^\s*weet ik het niet\s*[!?.]*\s*$/i,
   /^\s*hm+\s*[!?.]*\s*$/i,
   /^\s*\?+\s*$/,
 ];
@@ -130,6 +133,87 @@ function isVagueQuestion(
   if (wordCount(q) < 4 && !hasActTopic(q) && !hasProfileTopic(q)) return true;
   if (/^\s*ik voel me\s+\w+\s*[!?.]*\s*$/i.test(q) && !hasActTopic(q)) return true;
   return false;
+}
+
+export function uncertaintyStreak(
+  question: string,
+  history: Array<{ role: string; content: string }>,
+): number {
+  let streak = isVagueQuestion(question, history) ? 1 : 0;
+  for (let i = history.length - 1; i >= 0; i--) {
+    const msg = history[i];
+    if (msg.role !== 'user') continue;
+    if (isVagueQuestion(msg.content, history.slice(0, i))) streak++;
+    else break;
+  }
+  return streak;
+}
+
+export const UNCERTAINTY_LOOP_RESPONSE =
+  'Het is oké als je het nu even niet weet. Kies een onderwerp hieronder, of beschrijf in je eigen woorden waar je mee zit.';
+
+const CLARIFY_FOLLOW_UP_MARKERS = [
+  'Kies hieronder',
+  'Kies een van deze',
+  'Kies het onderwerp',
+  'Kies een onderwerp',
+  'typ je vraag specifieker',
+  'Even checken',
+] as const;
+
+export function isValidClarifyOption(option: string): boolean {
+  const trimmed = option.trim();
+  if (!trimmed) return false;
+  if (isVagueQuestion(trimmed, [])) return false;
+  if (/^\s*(ja|nee|misschien|onbekend)\s*[!?.]*\s*$/i.test(trimmed)) return false;
+  return true;
+}
+
+export function sanitizeClarifyOptions(
+  options: string[],
+  question: string,
+  chunks: RetrievalChunk[],
+  userContext: ChatUserContextData,
+  count = OPTION_COUNT,
+): string[] {
+  const valid: string[] = [];
+  const seen = new Set<string>();
+
+  function add(option: string) {
+    if (valid.length >= count) return;
+    const trimmed = option.trim();
+    if (!isValidClarifyOption(trimmed)) return;
+    const key = normalize(trimmed);
+    if (seen.has(key)) return;
+    seen.add(key);
+    valid.push(trimmed);
+  }
+
+  for (const option of options) add(option);
+
+  if (valid.length < 2 && chunks.length > 0) {
+    for (const option of buildTopRetrievalOptions(chunks, count)) add(option);
+  }
+
+  if (valid.length < 2) {
+    for (const option of buildClarifyOptions(question, chunks, userContext)) add(option);
+  }
+
+  for (const option of PROGRAM_FALLBACK_OPTIONS) add(option);
+
+  return valid.slice(0, count);
+}
+
+export function isClarifyFollowUp(
+  question: string,
+  history: Array<{ role: string; content: string }>,
+): boolean {
+  if (!isVagueQuestion(question, history)) return false;
+  const lastAssistant = [...history].reverse().find((m) => m.role === 'assistant');
+  if (!lastAssistant) return false;
+  const text = lastAssistant.content.trim();
+  if (text === UNCERTAINTY_LOOP_RESPONSE) return true;
+  return CLARIFY_FOLLOW_UP_MARKERS.some((marker) => text.includes(marker));
 }
 
 function isWeakRetrieval(chunks: RetrievalChunk[]): boolean {

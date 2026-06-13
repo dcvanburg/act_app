@@ -29,8 +29,11 @@ import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-
 import {
   assessClarifyNeed,
   buildClarifyOptions,
-  buildTopRetrievalOptions,
   CLARIFY_PROMPTS,
+  isClarifyFollowUp,
+  sanitizeClarifyOptions,
+  uncertaintyStreak,
+  UNCERTAINTY_LOOP_RESPONSE,
   type StructuredReply,
 } from './ambiguity.ts';
 import {
@@ -45,12 +48,14 @@ import {
   fetchFirstName,
   formatChatUserContext,
   isUserContextEmpty,
+  type ChatUserContextData,
 } from './user-context.ts';
 import {
   fetchStoredChatMessages,
   formatConversationMemory,
   recentTurnMessages,
 } from './conversation-context.ts';
+import { ensureQuestionMarks } from './punctuation.ts';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -86,7 +91,7 @@ const SYSTEM_PROMPT_INSTRUCTIONS = `Je bent een rustige, warme begeleider in de 
 Hoe je klinkt:
 • Rustig, warm, in jij-vorm. Je oordeelt niet en je haast niet.
 • Je luistert reflectief: vat eerst kort samen wat je leest voor je iets toevoegt.
-• Eén open vraag per beurt, niet meer. Liever doorvragen dan gokken.
+• Eén open vraag per beurt, niet meer. Liever doorvragen dan gokken. Eindig elke vraag met een vraagteken.
 • Korte zinnen, ruim wit. Maximaal drie alinea's per antwoord. Geen vakjargon, of leg het meteen uit.
 • Geen uitroeptekens. Gebruik een punt, komma of dubbele punt als zinsbreuk, geen streepjes.
 • Opsommingen met • en maximaal vijf punten.
@@ -110,6 +115,7 @@ Wat je doet:
 
 Bij twijfel over de bedoeling van de vraag:
 • Gebruik type "clarify": stel één korte verduidelijkingsvraag in text. Zet de keuzemogelijkheden uitsluitend in options, niet als opsomming in text.
+• Bij type "clarify": options zijn altijd 2-3 concrete programma-onderwerpen of vragen (bijv. "Wat is de vermijdingscirkel?"). Nooit onzekerheidsantwoorden zoals "ik weet het niet", "geen idee" of "weet ik niet".
 • Geef geen antwoord als je niet zeker bent.
 
 Antwoordformaat (verplicht via tool chat_reply):
@@ -146,6 +152,16 @@ const ERROR_UNAUTHORIZED = 'Niet ingelogd.';
 const ERROR_BAD_REQUEST = 'Ongeldig verzoek.';
 const ERROR_QUESTION_REQUIRED = 'Vraag is verplicht.';
 const ERROR_QUESTION_TOO_LONG = 'Vraag is te lang.';
+
+const EMPTY_USER_CONTEXT: ChatUserContextData = {
+  complaintTypes: [],
+  moodLogs: [],
+  waarden: [],
+  acties: [],
+  barriers: [],
+  checkins: [],
+  moduleNotes: [],
+};
 
 // ── Crisis keyword pre-filter ───────────────────────────────────────────────
 // Mirror of chatbot-drafts.md § 2 hard triggers. When this list changes,
@@ -308,11 +324,12 @@ const CHAT_REPLY_TOOL = {
     type: 'object',
     properties: {
       type: { type: 'string', enum: ['answer', 'clarify', 'out_of_scope'] },
-      text: { type: 'string', description: 'Dutch message to the user' },
+      text: { type: 'string', description: 'Dutch message to the user; questions must end with ?' },
       options: {
         type: 'array',
         items: { type: 'string' },
-        description: 'Required for clarify: 2-3 short Dutch options',
+        description:
+          'Required for clarify: 2-3 concrete Dutch program-topic questions. Never uncertainty phrases like "ik weet het niet".',
       },
     },
     required: ['type', 'text'],
@@ -437,11 +454,8 @@ function resolveClarifyOptions(
   chunks: Chunk[],
   userContextData: Awaited<ReturnType<typeof fetchChatUserContext>>,
 ): string[] {
-  const fromLlm = (reply.options ?? []).map((o) => o.trim()).filter(Boolean).slice(0, 3);
-  if (fromLlm.length >= 2) return fromLlm;
-  if (chunks.length > 0) return buildTopRetrievalOptions(chunks);
-  if (fromLlm.length > 0) return fromLlm;
-  return buildClarifyOptions(question, chunks, userContextData);
+  const fromLlm = (reply.options ?? []).map((o) => o.trim()).filter(Boolean);
+  return sanitizeClarifyOptions(fromLlm, question, chunks, userContextData);
 }
 
 function firstTurnAnswer(
@@ -449,8 +463,42 @@ function firstTurnAnswer(
   history: ChatMessage[],
   firstName: string | null,
 ): string {
-  if (history.length > 0) return answer;
-  return prependFirstTurnGreeting(answer, firstName);
+  const normalized = ensureQuestionMarks(answer);
+  if (history.length > 0) return normalized;
+  return prependFirstTurnGreeting(normalized, firstName);
+}
+
+async function safeFetchFirstName(supabase: SupabaseClient, userId: string): Promise<string | null> {
+  try {
+    return await fetchFirstName(supabase, userId);
+  } catch (err) {
+    console.error('search:', err instanceof Error ? err.message : String(err));
+    return null;
+  }
+}
+
+async function safeFetchStoredChatMessages(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<Awaited<ReturnType<typeof fetchStoredChatMessages>>> {
+  try {
+    return await fetchStoredChatMessages(supabase, userId);
+  } catch (err) {
+    console.error('search:', err instanceof Error ? err.message : String(err));
+    return [];
+  }
+}
+
+async function safeFetchChatUserContext(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<ChatUserContextData> {
+  try {
+    return await fetchChatUserContext(supabase, userId);
+  } catch (err) {
+    console.error('search:', err instanceof Error ? err.message : String(err));
+    return EMPTY_USER_CONTEXT;
+  }
 }
 
 // ── Handler ─────────────────────────────────────────────────────────────────
@@ -498,8 +546,8 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const firstName = await fetchFirstName(supabase, user.id);
-    const storedMessages = await fetchStoredChatMessages(supabase, user.id);
+    const firstName = await safeFetchFirstName(supabase, user.id);
+    const storedMessages = await safeFetchStoredChatMessages(supabase, user.id);
     const effectiveHistory =
       storedMessages.length > 0
         ? recentTurnMessages(storedMessages, MAX_HISTORY_MESSAGES)
@@ -522,7 +570,7 @@ Deno.serve(async (req: Request) => {
     const searchQuestion =
       isFirstTurn && !isGreetingOnly(question) ? stripGreetingPrefix(question) : question;
 
-    const userContextData = await fetchChatUserContext(supabase, user.id);
+    const userContextData = await safeFetchChatUserContext(supabase, user.id);
     const userContextText = formatChatUserContext(userContextData);
 
     const embedding = await getEmbedding(searchQuestion);
@@ -548,7 +596,29 @@ Deno.serve(async (req: Request) => {
         answer: firstTurnAnswer(stripClarifyBulletOptions(CLARIFY_PROMPTS[preClarify.reason]), historyForLlm, firstName),
         chunksFound: chunks.length,
         clarify: true,
-        clarifyOptions: preClarify.options,
+        clarifyOptions: sanitizeClarifyOptions(
+          preClarify.options,
+          searchQuestion,
+          chunks,
+          userContextData,
+        ),
+      });
+    }
+
+    if (
+      uncertaintyStreak(searchQuestion, historyForLlm) >= 2 ||
+      isClarifyFollowUp(searchQuestion, historyForLlm)
+    ) {
+      return jsonResponse({
+        answer: firstTurnAnswer(UNCERTAINTY_LOOP_RESPONSE, historyForLlm, firstName),
+        chunksFound: chunks.length,
+        clarify: true,
+        clarifyOptions: sanitizeClarifyOptions(
+          buildClarifyOptions(searchQuestion, chunks, userContextData),
+          searchQuestion,
+          chunks,
+          userContextData,
+        ),
       });
     }
 
