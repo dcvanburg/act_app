@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppLogo } from '@/components/AppLogo';
+import { ChatHomeCard } from '@/components/chat/ChatHomeCard';
 import { FeatureErrorBoundary } from '@/components/FeatureErrorBoundary';
 import { TodoBlock } from '@/components/home/TodoBlock';
 import { AccountIcon } from '@/components/icons/AccountIcon';
@@ -11,6 +12,8 @@ import { ProgramHomeCard } from '@/components/modules/ProgramHomeCard';
 import { WaardenHomeCard } from '@/components/waarden/WaardenHomeCard';
 import common from '@/content/nl/common.json';
 import { useUserProgress } from '@/lib/progress-queries';
+
+const CHATBOT_ENABLED = (process.env.EXPO_PUBLIC_ENABLE_CHATBOT ?? 'true') !== 'false';
 
 /**
  * /home — program overview.
@@ -69,6 +72,11 @@ export default function HomeScreen() {
         ) : (
           <ProgramHomeCard progress={progress} />
         )}
+        {CHATBOT_ENABLED ? (
+          <FeatureErrorBoundary>
+            <ChatHomeCard />
+          </FeatureErrorBoundary>
+        ) : null}
       </View>
     </ScrollView>
   );

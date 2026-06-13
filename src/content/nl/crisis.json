@@ -11,6 +11,11 @@
       "phoneUri": "tel:08000113",
       "description": "24/7 bereikbaar voor directe hulp"
     },
+    "crisisChat": {
+      "name": "Crisischat",
+      "url": "https://113.nl",
+      "description": "Chatten met 113 als bellen niet lukt"
+    },
     "huisarts": {
       "name": "Huisarts",
       "description": "Neem contact op met je huisarts voor verwijzing"

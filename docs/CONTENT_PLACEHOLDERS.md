@@ -8,7 +8,7 @@
 | Module | Dutch title        | Placeholder field | Status    |
 | ------ | ------------------ | ----------------- | --------- |
 | 0      | Welkom & Intake    | Praktische taak   | ✅ Filled |
-| 1      | Herkennen          | Praktische taak   | ✅ Filled |
+| 1      | Herkennen          | Praktische taak   | ✅ Filled — v1.1 expansion 2026-06-13 (5 sections, expanded bodyscan, two-part task) |
 | 2      | Acceptatie         | Praktische taak   | ✅ Filled |
 | 3      | Defusie            | Praktische taak   | ✅ Filled |
 | 4      | Aanwezig zijn      | Praktische taak   | ✅ Filled |
@@ -70,8 +70,9 @@ The chatbot reuses existing module copy, exercises, and psycho-education — no 
 
 | Artefact                                | Description                                                                                                                                                                                                              | Status                                                                                                                       |
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Dutch system prompt                     | The instructions Claude Haiku receives on every chat call. Must align with [crisis.json](../src/content/nl/crisis.json) wording, ACT philosophy, and the "not a clinician" boundary.                                      | ✅ APPROVED 2026-06-12 — see [chatbot-drafts.md § 1](./THERAPEUT_KB/chatbot-drafts.md#1-system-prompt-dutch--for-claude-haiku-45) |
+| Dutch system prompt                     | The instructions Claude Haiku receives on every chat call. Must align with [crisis.json](../src/content/nl/crisis.json) wording, ACT philosophy, and the "not a clinician" boundary.                                      | ✅ APPROVED v1.1 2026-06-13 (warmer ACT-begeleider tone) · Previous: v1.0 2026-06-12 — see [chatbot-drafts.md § 4a](./THERAPEUT_KB/chatbot-drafts.md#4a-system-prompt-v11-approved) |
 | Ingest manifest                         | The list of source documents to ingest (which module sections, exercises, daily-practice prompts). Therapist confirms each is final and approved for retrieval.                                                           | ⚠️ TBD — list assembled in Phase 4                                                                                            |
+| Program-overview content (`program-overview.json`) | Dutch overview ingested with category `overview` so the chatbot can answer "wat is dit programma?", "wat is ACT?", "voor wie?", "wat doet de gids?". Six sections (program-purpose, for-whom, act-in-plain-dutch, six-principles, chatbot-role, crisis-orientation). | ✅ APPROVED v1.1 2026-06-13 — see [chatbot-drafts.md § 4b](./THERAPEUT_KB/chatbot-drafts.md#4b-program-overview-content-v11-approved) |
 | Crisis-signal keyword list              | Dutch terms / phrases that bypass retrieval entirely and route the user to `/noodhulp` (e.g. self-harm, suicidal ideation, severe relapse). Owned by `therapeut` agent; reviewed each time modules or intake change.       | ✅ APPROVED 2026-06-12 — see [chatbot-drafts.md § 2](./THERAPEUT_KB/chatbot-drafts.md#2-crisis-signal-keyword-list-dutch)     |
 | `src/content/nl/chat.json` (UI strings) | Dutch UI copy: placeholder text, suggested questions, disclaimer, empty-state, error messages. Drafted by `therapeut` agent then code-reviewed for tone.                                                                  | ✅ APPROVED 2026-06-12 — see [chatbot-drafts.md § 3](./THERAPEUT_KB/chatbot-drafts.md#3-chat-ui-strings--draft-srccontentnlchatjson) |
 

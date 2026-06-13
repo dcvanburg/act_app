@@ -4,10 +4,12 @@
  * Pipeline per ADR-005:
  *   1. Auth check (Supabase JWT) — anonymous requests rejected.
  *   2. Crisis keyword pre-filter — bypasses embedding + LLM on match.
- *   3. Voyage AI embedding (voyage-3-lite, 512 dims, input_type='query').
+ *   3. Voyage AI embedding (voyage-3, 1024 dims, input_type='query').
  *   4. hybrid_search() RPC — vector + Dutch FTS via RRF, top-5 chunks.
- *   5. Claude Haiku 4.5 call with system prompt + retrieved chunks +
- *      last 3 turns of history (in-memory only on the client).
+ *   5. Claude Haiku 4.5 call with two-block system prompt:
+ *        - stable persona + ACT instructions (prompt-cached, ephemeral)
+ *        - dynamic chunks + user profile (not cached)
+ *      plus last 3 turns of history (in-memory only on the client).
  *
  * Safety (docs/SECURITY.md → AI processing):
  *   - Request body is never logged. Only error messages reach console.
@@ -15,12 +17,27 @@
  *     its own check (Phase 3). Either layer alone is sufficient; both
  *     together survive a bypass of the other.
  *   - System prompt and crisis copy mirror docs/THERAPEUT_KB/chatbot-drafts.md
- *     (APPROVED 2026-06-12). When the drafts revision, mirror here.
+ *     (v1.1-DRAFT — awaiting therapist re-approval; v1.0 stays the
+ *     fallback if the warmer tone is rejected). When the drafts revise,
+ *     mirror here.
  *
  * Deploy: scripts/deploy-rag-functions.sh
  */
 
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.47.0';
+
+import {
+  assessClarifyNeed,
+  buildClarifyOptions,
+  buildTopRetrievalOptions,
+  CLARIFY_PROMPTS,
+  type StructuredReply,
+} from './ambiguity.ts';
+import {
+  fetchChatUserContext,
+  formatChatUserContext,
+  isUserContextEmpty,
+} from './user-context.ts';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -34,21 +51,65 @@ const MATCH_COUNT = 5;
 const MAX_HISTORY_MESSAGES = 6; // 3 turns × 2 roles
 const MAX_QUESTION_LENGTH = 2000;
 const ANTHROPIC_MODEL = 'claude-haiku-4-5';
-const VOYAGE_MODEL = 'voyage-3-lite';
+const VOYAGE_MODEL = 'voyage-3';
+const ANTHROPIC_BETA = 'prompt-caching-2024-07-31';
 
-// ── Dutch copy (mirror of docs/THERAPEUT_KB/chatbot-drafts.md APPROVED v1.0) ─
+// ── Dutch copy (mirror of docs/THERAPEUT_KB/chatbot-drafts.md v1.1-DRAFT) ───
+//
+// v1.1 shifts the persona from "information gateway" to a warmer ACT-grounded
+// begeleider while keeping the original v1.0 guardrails intact:
+//   - scope stays bound to "INFORMATIE UIT HET PROGRAMMA" + user profile,
+//   - structured tool output stays (answer / clarify / out_of_scope),
+//   - crisis deflection wording and 0800-0113 stay verbatim,
+//   - no medical advice, no invented exercises, no medication talk.
+//
+// This block is sent through Anthropic prompt caching (ephemeral) so the
+// stable persona + instructions are billed at the cache-read rate after the
+// first request. The dynamic chunks + user profile are appended as a second,
+// uncached system block in askClaude().
 
-const SYSTEM_PROMPT_INSTRUCTIONS = `Je bent een rustige, warme gids in de app Van Overleven naar Leven. De app is een zelfstandig therapeutisch programma op basis van Acceptance and Commitment Therapy (ACT) en lichaamsgerichte psychosomatische therapie.
+const SYSTEM_PROMPT_INSTRUCTIONS = `Je bent een rustige, warme begeleider in de app Van Overleven naar Leven. De app is een zelfstandig therapeutisch programma op basis van Acceptance and Commitment Therapy (ACT) en lichaamsgerichte psychosomatische therapie. Je bent geen therapeut, je bent een gids in het programma.
 
-Je rol:
-• Je beantwoordt vragen van gebruikers uitsluitend op basis van de informatie uit het programma die hieronder staat onder "INFORMATIE UIT HET PROGRAMMA".
-• Je vat die informatie samen in begrijpelijk Nederlands, kort en helder (maximaal 3 alinea's). Geen vakjargon. Geen opsommingen langer dan 5 punten.
-• Je toon is rustig, warm, niet klinisch. Je oordeelt niet. Je benadrukt dat klachten geen vijand zijn en dat terugval informatie is, geen mislukking.
+Hoe je klinkt:
+• Rustig, warm, in jij-vorm. Je oordeelt niet en je haast niet.
+• Je luistert reflectief: vat eerst kort samen wat je leest voor je iets toevoegt.
+• Eén open vraag per beurt, niet meer. Liever doorvragen dan gokken.
+• Korte zinnen, ruim wit. Maximaal drie alinea's per antwoord. Geen vakjargon, of leg het meteen uit.
+• Geen uitroeptekens. Gebruik een punt, komma of dubbele punt als zinsbreuk, geen streepjes.
+• Opsommingen met • en maximaal vijf punten.
+
+ACT-principes die je toepast wanneer de bronnen dat ondersteunen:
+• Acceptatie: ruimte maken voor wat er is, niet vechten tegen klachten.
+• Defusie: gedachten zien als gedachten, niet als feiten.
+• Aanwezig zijn: terug naar het hier en nu.
+• Waarden: verbinding met wat echt belangrijk is.
+• Toegewijd handelen: kleine, concrete stappen.
+• Zelf als context: jezelf zien als groter dan je gedachten en gevoelens.
+
+Je gebruikt deze taal alleen als de "INFORMATIE UIT HET PROGRAMMA" het ondersteunt. Je verzint geen oefeningen of metaforen die er niet staan.
+
+Wat je doet:
+• Je beantwoordt vragen op basis van "INFORMATIE UIT HET PROGRAMMA" en, als de vraag daarover gaat, "INFORMATIE UIT JE PROFIEL IN DE APP" (stemming, waarden, check-ins, acties, barrières).
+• Bij vragen over het verloop van stemming of waarden: beschrijf alleen wat in het profiel staat. Geen interpretatie, geen diagnose, geen advies om iets te veranderen.
+• Koppel profielinformatie waar nuttig aan programmainformatie, maar blijf binnen wat er staat.
+• Als persoonlijke gegevens ontbreken, zeg dat eerlijk en verwijs naar het betreffende scherm in de app (stemming, waarden).
+• Je benadrukt dat klachten geen vijand zijn en dat terugval informatie is, geen mislukking.
+
+Bij twijfel over de bedoeling van de vraag:
+• Gebruik type "clarify": stel één korte verduidelijkingsvraag. Geef maximaal drie concrete opties in options.
+• Geef geen antwoord als je niet zeker bent.
+
+Antwoordformaat (verplicht via tool chat_reply):
+• type "answer": je bent zeker; antwoord staat in de bronnen of het profiel.
+• type "clarify": bedoeling onduidelijk; geen inhoudelijk antwoord, alleen doorvraag + options.
+• type "out_of_scope": buiten programma en profiel; verwijs naar huisarts en 0800-0113.
 
 Wat je nooit doet:
 • Je geeft nooit medisch advies, geen diagnose, geen behandelplan.
 • Je verzint nooit oefeningen, technieken of citaten die niet in de informatie staan. Als iets er niet staat, zeg je dat eerlijk.
 • Je doet geen uitspraken over medicatie, dosering of het stoppen daarmee.
+• Je doet geen beloften over herstel.
+• Je stelt geen meerdere vragen tegelijk.
 • Je geeft geen advies bij acute crisis. Bij signalen van suïcidaliteit, zelfbeschadiging, ernstige verslaving zonder begeleiding of acute psychische nood verwijs je de gebruiker direct naar professionele hulp.
 
 Als de vraag buiten het programma valt of als je het antwoord niet in de informatie kunt vinden:
@@ -226,19 +287,53 @@ async function hybridSearch(
   return (data ?? []) as Chunk[];
 }
 
-// ── Claude Haiku call ───────────────────────────────────────────────────────
+const CHAT_REPLY_TOOL = {
+  name: 'chat_reply',
+  description:
+    'Structured Dutch reply. Use clarify when intent is unclear. Never invent content not in context.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      type: { type: 'string', enum: ['answer', 'clarify', 'out_of_scope'] },
+      text: { type: 'string', description: 'Dutch message to the user' },
+      options: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'Required for clarify: 2-3 short Dutch options',
+      },
+    },
+    required: ['type', 'text'],
+  },
+};
+
+// ── Claude Haiku call (structured via tool) ─────────────────────────────────
+
+type ClaudeResult = {
+  reply: StructuredReply;
+  inputTokens?: number;
+  cacheReadInputTokens?: number;
+  cacheCreationInputTokens?: number;
+};
 
 async function askClaude(
   question: string,
   chunks: Chunk[],
   history: ChatMessage[],
-): Promise<string> {
+  userContextText: string,
+): Promise<ClaudeResult> {
   const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not configured');
 
-  const context = chunks.map((c, i) => `[Bron ${i + 1}]\n${c.content}`).join('\n\n---\n\n');
+  const programContext =
+    chunks.length > 0
+      ? chunks.map((c, i) => `[Bron ${i + 1}]\n${c.content}`).join('\n\n---\n\n')
+      : '(Geen programmabronnen gevonden voor deze vraag.)';
 
-  const systemPrompt = `${SYSTEM_PROMPT_INSTRUCTIONS}\n\nINFORMATIE UIT HET PROGRAMMA:\n\n${context}`;
+  const profileSection = userContextText
+    ? `INFORMATIE UIT JE PROFIEL IN DE APP:\n\n${userContextText}`
+    : 'INFORMATIE UIT JE PROFIEL IN DE APP:\n\n(Geen persoonlijke gegevens ingevuld in de app.)';
+
+  const dynamicSystemBlock = `INFORMATIE UIT HET PROGRAMMA:\n\n${programContext}\n\n${profileSection}`;
 
   const messages = [...history.slice(-MAX_HISTORY_MESSAGES), { role: 'user', content: question }];
 
@@ -247,13 +342,30 @@ async function askClaude(
     headers: {
       'x-api-key': apiKey,
       'anthropic-version': '2023-06-01',
+      'anthropic-beta': ANTHROPIC_BETA,
       'content-type': 'application/json',
     },
     body: JSON.stringify({
       model: ANTHROPIC_MODEL,
       max_tokens: 1024,
-      system: systemPrompt,
+      temperature: 0,
+      // Two-block system prompt:
+      //   Block 1: stable persona + ACT instructions (prompt-cached, ephemeral).
+      //   Block 2: per-request RAG chunks + user profile (not cached).
+      system: [
+        {
+          type: 'text',
+          text: SYSTEM_PROMPT_INSTRUCTIONS,
+          cache_control: { type: 'ephemeral' },
+        },
+        {
+          type: 'text',
+          text: dynamicSystemBlock,
+        },
+      ],
       messages,
+      tools: [CHAT_REPLY_TOOL],
+      tool_choice: { type: 'tool', name: 'chat_reply' },
     }),
   });
 
@@ -261,10 +373,37 @@ async function askClaude(
     throw new Error(`Anthropic ${res.status}`);
   }
 
-  const data = (await res.json()) as { content: Array<{ type: string; text: string }> };
+  const data = (await res.json()) as {
+    content: Array<{ type: string; text?: string; input?: StructuredReply }>;
+    usage?: {
+      input_tokens?: number;
+      cache_read_input_tokens?: number;
+      cache_creation_input_tokens?: number;
+    };
+  };
+
+  const usage = {
+    inputTokens: data.usage?.input_tokens,
+    cacheReadInputTokens: data.usage?.cache_read_input_tokens,
+    cacheCreationInputTokens: data.usage?.cache_creation_input_tokens,
+  };
+
+  const toolBlock = data.content.find((c) => c.type === 'tool_use');
+  const input = toolBlock?.input;
+  if (
+    input &&
+    (input.type === 'answer' || input.type === 'clarify' || input.type === 'out_of_scope') &&
+    typeof input.text === 'string'
+  ) {
+    return { reply: input, ...usage };
+  }
+
   const text = data.content.find((c) => c.type === 'text')?.text;
-  if (!text) throw new Error('Anthropic: empty completion');
-  return text;
+  if (text) {
+    return { reply: { type: 'answer', text }, ...usage };
+  }
+
+  throw new Error('Anthropic: empty completion');
 }
 
 // ── Response helpers ────────────────────────────────────────────────────────
@@ -321,6 +460,9 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    const userContextData = await fetchChatUserContext(supabase, user.id);
+    const userContextText = formatChatUserContext(userContextData);
+
     const embedding = await getEmbedding(question);
     const chunks = await hybridSearch(
       supabase,
@@ -330,18 +472,62 @@ Deno.serve(async (req: Request) => {
       filterPhase,
     );
 
-    if (chunks.length === 0) {
+    if (chunks.length === 0 && isUserContextEmpty(userContextData)) {
       return jsonResponse({
         answer: OUT_OF_SCOPE_RESPONSE,
         chunksFound: 0,
+        noMatch: true,
       });
     }
 
-    const answer = await askClaude(question, chunks, history);
+    const preClarify = assessClarifyNeed(question, chunks, userContextData, history);
+    if (preClarify) {
+      return jsonResponse({
+        answer: CLARIFY_PROMPTS[preClarify.reason],
+        chunksFound: chunks.length,
+        clarify: true,
+        clarifyOptions: preClarify.options,
+      });
+    }
+
+    const { reply, inputTokens, cacheReadInputTokens, cacheCreationInputTokens } =
+      await askClaude(question, chunks, history, userContextText);
+
+    const usage = {
+      inputTokens,
+      cacheReadInputTokens,
+      cacheCreationInputTokens,
+    };
+
+    if (reply.type === 'clarify') {
+      const options =
+        chunks.length > 0
+          ? buildTopRetrievalOptions(chunks)
+          : reply.options && reply.options.length > 0
+            ? reply.options.slice(0, 3)
+            : buildClarifyOptions(question, chunks, userContextData);
+      return jsonResponse({
+        answer: reply.text,
+        chunksFound: chunks.length,
+        clarify: true,
+        clarifyOptions: options,
+        ...usage,
+      });
+    }
+
+    if (reply.type === 'out_of_scope') {
+      return jsonResponse({
+        answer: reply.text || OUT_OF_SCOPE_RESPONSE,
+        chunksFound: chunks.length,
+        noMatch: true,
+        ...usage,
+      });
+    }
 
     return jsonResponse({
-      answer,
+      answer: reply.text,
       chunksFound: chunks.length,
+      ...usage,
     });
   } catch (err) {
     // Do NOT log request body — only the error message reaches console.

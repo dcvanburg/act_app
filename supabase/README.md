@@ -10,6 +10,24 @@ redirect URLs — see [docs/SUPABASE_AUTH_SETUP.md](../docs/SUPABASE_AUTH_SETUP.
 `VOYAGE_API_KEY` set in Supabase Edge Function secrets. See
 [docs/ADR/005-rag-chatbot.md](../docs/ADR/005-rag-chatbot.md).
 
+**RAG content ingest** (after applying migrations 0009–0013):
+
+```bash
+# Preview chunk counts without API calls
+npm run ingest:rag -- --dry-run
+
+# Requires EXPO_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VOYAGE_API_KEY in .env.local
+npm run ingest:rag
+```
+
+Re-run ingest when module JSON in `src/content/nl/` changes. The ingest
+clears existing chunks and documents, then re-inserts everything including
+the program-overview (category `overview`) added in migration 0013.
+
+Embeddings are produced with Voyage `voyage-3` (1024 d) since migration 0012.
+Earlier ingests used `voyage-3-lite` (512 d); after applying 0012 you **must**
+re-run `npm run ingest:rag` before the chatbot will return results.
+
 ## Applying migrations
 
 ```bash
@@ -36,6 +54,10 @@ Migrations apply in lexical order. Use a `NNNN_short_name.sql` filename pattern.
 | `0003_profiles_subscription_tier.sql` | Adds `subscription_tier` to pre-pivot `profiles` rows                    |
 | `0004_waarden.sql`                    | `waarden`, `waarde_acties`, `waarde_barriers`, `waarde_checkins`         |
 | `0009_rag_chunks.sql`                 | `documents`, `chunks` (pgvector 512 + Dutch FTS), `hybrid_search()` RPC, `chat_sessions` (counter only). RAG chatbot — see ADR-005. |
+| `0010_rag_chunks_repair.sql`          | Drops legacy pre-release RAG tables and recreates ADR-005 schema (`source_path`, `module_number`). |
+| `0011_hybrid_search_overload_fix.sql` | Drops duplicate `hybrid_search` overloads (legacy `rrf_k` variant). |
+| `0012_rag_chunks_voyage3.sql`         | Embedding upgrade: voyage-3-lite (512 d) → voyage-3 (1024 d). Truncates `chunks`, alters column type, recreates HNSW index + `hybrid_search` signature. Triggers full re-ingest. |
+| `0013_documents_overview_category.sql`| Allows `category = 'overview'` on `documents` for `src/content/nl/program-overview.json` (what the program is, ACT in plain Dutch, who the chatbot is). |
 | _(future)_                            | `exercise_logs`, `streaks`, `user_badges`, `weekly_checkins` — Phase 2-γ |
 
 ## Row Level Security

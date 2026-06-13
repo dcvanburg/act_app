@@ -117,6 +117,7 @@ function AppTabs({ insets }: { insets: { bottom: number } }) {
       <Tabs.Screen name="waarden/[id]" options={{ href: null }} />
       <Tabs.Screen name="waarden/edit/[id]" options={{ href: null }} />
       <Tabs.Screen name="waarden/checkin" options={{ href: null }} />
+      <Tabs.Screen name="chat" options={{ href: null }} />
     </Tabs>
   );
 }
