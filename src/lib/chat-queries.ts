@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 
 import chat from '@/content/nl/chat.json';
+import { formatGreetingOnlyReply, isGreetingOnly } from '@/lib/chat-greeting';
 import { containsCrisisSignal } from '@/lib/chat-safety';
 import { supabase } from '@/lib/supabase/client';
 
@@ -18,8 +19,8 @@ import { supabase } from '@/lib/supabase/client';
  *   3. Map Supabase errors to Dutch error keys from chat.json.errors.
  *
  * History is held by the caller in component state and passed in on each
- * call. Nothing is persisted client-side; the in-memory chat dies with
- * the screen (ADR-005 / SECURITY.md → AI processing).
+ * call. Messages persist in `chat_messages` (Supabase, RLS); the Edge
+ * Function loads stored history for LLM memory (ADR-005).
  */
 
 export type ChatRole = 'user' | 'assistant';
@@ -43,6 +44,8 @@ export interface ChatResponse {
 export interface ChatMutationArgs {
   question: string;
   history: ChatHistoryEntry[];
+  /** Profile first name — used for first-turn greetings (client-side fast path). */
+  firstName?: string | null;
 }
 
 const HISTORY_WINDOW = 6;
@@ -52,6 +55,13 @@ function localCrisisResponse(): ChatResponse {
     answer: chat.crisisDeflection.body,
     chunksFound: 0,
     crisis: true,
+  };
+}
+
+function localGreetingResponse(firstName: string | null | undefined): ChatResponse {
+  return {
+    answer: formatGreetingOnlyReply(firstName ?? null),
+    chunksFound: 0,
   };
 }
 
@@ -112,7 +122,15 @@ export function useChatMutation() {
         return localCrisisResponse();
       }
 
-      return callSearchFunction({ question, history: args.history });
+      if (args.history.length === 0 && isGreetingOnly(question)) {
+        return localGreetingResponse(args.firstName);
+      }
+
+      return callSearchFunction({
+        question,
+        history: args.history,
+        firstName: args.firstName,
+      });
     },
   });
 }

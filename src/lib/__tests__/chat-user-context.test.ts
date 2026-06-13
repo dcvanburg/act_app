@@ -14,6 +14,7 @@ const emptyContext: ChatUserContextData = {
   acties: [],
   barriers: [],
   checkins: [],
+  moduleNotes: [],
 };
 
 describe('formatChatUserContext', () => {
@@ -42,13 +43,13 @@ describe('formatChatUserContext', () => {
 
   it('formats waarden, acties, barriers and check-ins', () => {
     const text = formatChatUserContext({
+      ...emptyContext,
       complaintTypes: ['mental'],
-      moodLogs: [],
       waarden: [{ id: 'w1', naam: 'Rust', beschrijving: 'Meer ruimte voor mezelf' }],
-      acties: [{ waarde_id: 'w1', termijn: 'kort', actie: 'Elke ochtend wandelen' }],
+      acties: [{ waarde_id: null, termijn: 'kort', actie: 'Elke ochtend wandelen' }],
       barriers: [
         {
-          waarde_id: 'w1',
+          waarde_id: null,
           type: 'gedachte',
           eigen_label: null,
           omschrijving: 'Ik heb geen tijd',
@@ -56,7 +57,7 @@ describe('formatChatUserContext', () => {
       ],
       checkins: [
         {
-          waarde_id: 'w1',
+          waarde_id: null,
           datum: '2026-06-12',
           antwoord: 'neutraal',
           notitie: 'Het lukte half',
@@ -65,10 +66,28 @@ describe('formatChatUserContext', () => {
     });
     expect(text).toContain('Mentale klachten');
     expect(text).toContain('Rust');
+    expect(text).toContain('Gedeeld waardenplan');
     expect(text).toContain('Elke ochtend wandelen');
     expect(text).toContain('Ik heb geen tijd');
     expect(text).toContain('Neutraal vandaag');
     expect(text).toContain('Het lukte half');
+    expect(text).not.toContain('2026-06-12 — Rust');
+  });
+
+  it('formats module reflection notes', () => {
+    const text = formatChatUserContext({
+      ...emptyContext,
+      moduleNotes: [
+        {
+          moduleId: 'recognition',
+          title: 'Herkennen',
+          notes: 'Ik merk dat ik veel vermijd',
+        },
+      ],
+    });
+    expect(text).toContain('Module-reflecties');
+    expect(text).toContain('Herkennen');
+    expect(text).toContain('Ik merk dat ik veel vermijd');
   });
 });
 

@@ -3,7 +3,13 @@
   "subtitle": "Vragen over het programma, je stemming of je waarden. Geen medisch advies.",
   "placeholder": "Wat wil je weten?",
   "send": "Versturen",
-  "clearConversation": "Gesprek wissen",
+  "clearMenuLabel": "Geschiedenis",
+  "clear": {
+    "cancel": "Annuleren",
+    "currentTitle": "Huidige chat wissen?",
+    "currentBody": "De berichten in dit gesprek worden verwijderd. Eerdere gesprekken blijven bewaard voor de gids.",
+    "currentAction": "Huidige chat wissen"
+  },
   "thinking": "Bezig met meedenken",
   "youLabel": "Jij",
   "assistantLabel": "Gids",
@@ -11,6 +17,9 @@
     "title": "Vraag de gids",
     "body": "Korte vragen over het programma.",
     "action": "Stel een vraag"
+  },
+  "floatingButton": {
+    "label": "Vraag de gids"
   },
   "emptyState": {
     "title": "Stel een vraag over het programma",
@@ -22,14 +31,32 @@
     "Wat doe ik als ik vastloop in een module?",
     "Hoe gaat dit programma om met terugval?"
   ],
+  "openingSuggestions": {
+    "moduleInProgress": "Waar was ik gebleven in {title}?",
+    "moduleStart": "Waar begin ik in {title}?",
+    "moduleStuck": "Wat doe ik als ik vastloop in {title}?",
+    "moodRecent": "Hoe was mijn stemming de afgelopen dagen?",
+    "moodTodayHeavy": "Wat kan het programma me helpen op een zware dag?",
+    "moodTodayTension": "Welke oefening past bij spanning in mijn lichaam?",
+    "waardenOverview": "Wat zijn mijn waarden en acties in de app?",
+    "waardenCheckinRecent": "Hoe ging mijn laatste waarden-check-in?",
+    "waardenPending": "Hoe neem ik {waarde} vandaag mee in mijn dag?",
+    "lastModuleReview": "Wat was de kern van {title}?"
+  },
   "noMatch": {
     "title": "Daar kan ik geen antwoord op vinden",
     "body": "Ik kan alleen informatie geven uit het programma. Bedoelde je misschien een van deze onderwerpen?",
     "prompt": "Probeer een van deze vragen:"
   },
   "clarify": {
-    "prompt": "Tik op een onderwerp om een antwoord te krijgen:",
+    "prompt": "Tik op een optie om meteen verder te gaan:",
     "typeOwn": "Typ zelf je vraag"
+  },
+  "greeting": {
+    "onlyWithName": "Hoi {name}, fijn dat je er bent.",
+    "onlyWithoutName": "Hoi, fijn dat je er bent.",
+    "prefixWithName": "Hoi {name}, ",
+    "prefixWithoutName": "Hoi, "
   },
   "disclaimer": "Geen medisch advies. Voor persoonlijke vragen: huisarts of GGZ. Bij directe nood: 0800-0113.",
   "errors": {

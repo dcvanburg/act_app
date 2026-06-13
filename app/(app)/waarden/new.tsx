@@ -1,36 +1,84 @@
 import { useRouter } from 'expo-router';
-import { useState, type ReactNode } from 'react';
-import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { Alert, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppTextInput } from '@/components/AppTextInput';
-
+import { KeyboardAwareScrollScreen } from '@/components/KeyboardAwareScrollScreen';
 import waarden from '@/content/nl/waarden.json';
 import { defaultKleurForIndex } from '@/lib/waarden';
 import { useWaarden } from '@/providers/WaardenProvider';
-import { WAARDEN_KLEUREN } from '@/types/waarden';
 
 export default function NewWaardeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { data, addWaarde } = useWaarden();
+  const { data, addWaarden } = useWaarden();
 
-  const [naam, setNaam] = useState('');
-  const [beschrijving, setBeschrijving] = useState('');
-  const [kleur, setKleur] = useState(defaultKleurForIndex(data.waarden.length));
+  const existingNames = useMemo(
+    () => new Set(data.waarden.map((w) => w.naam.trim().toLowerCase())),
+    [data.waarden],
+  );
 
-  function save() {
-    if (!naam.trim()) {
-      Alert.alert(waarden.new.nameRequired);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [customName, setCustomName] = useState('');
+  const [notes, setNotes] = useState<Record<string, string>>({});
+
+  const isFirstSetup = data.waarden.length === 0;
+
+  function toggleSuggestion(name: string) {
+    const key = name.trim();
+    if (!key || existingNames.has(key.toLowerCase())) return;
+    setSelected((prev) => {
+      if (prev.includes(key)) {
+        setNotes((current) => {
+          const next = { ...current };
+          delete next[key];
+          return next;
+        });
+        return prev.filter((item) => item !== key);
+      }
+      return [...prev, key];
+    });
+  }
+
+  function addCustom() {
+    const key = customName.trim();
+    if (!key) return;
+    if (existingNames.has(key.toLowerCase()) || selected.includes(key)) {
+      setCustomName('');
       return;
     }
-    const waarde = addWaarde({ naam, beschrijving, kleur });
-    router.replace(`/waarden/${waarde.id}`);
+    setSelected((prev) => [...prev, key]);
+    setCustomName('');
+  }
+
+  function updateNote(name: string, value: string) {
+    setNotes((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function save() {
+    if (selected.length === 0) {
+      Alert.alert(waarden.select.minRequired);
+      return;
+    }
+
+    addWaarden(
+      selected.map((naam, index) => ({
+        naam,
+        beschrijving: notes[naam]?.trim() ?? '',
+        kleur: defaultKleurForIndex(data.waarden.length + index),
+      })),
+    );
+
+    if (isFirstSetup) {
+      router.replace('/waarden/plan');
+      return;
+    }
+    router.replace('/waarden');
   }
 
   return (
-    <ScrollView
-      className="flex-1 bg-background"
+    <KeyboardAwareScrollScreen
       contentContainerStyle={{
         paddingTop: insets.top + 12,
         paddingBottom: insets.bottom + 112,
@@ -45,91 +93,128 @@ export default function NewWaardeScreen() {
         >
           <Text className="text-base text-text-muted">‹ {waarden.detail.back}</Text>
         </Pressable>
-        <Text className="mb-6 font-serif text-2xl font-bold text-text">{waarden.new.title}</Text>
 
-        <FormGroup label={waarden.new.nameLabel}>
-          <AppTextInput
-            value={naam}
-            onChangeText={setNaam}
-            placeholder={waarden.new.namePlaceholder}
-            className="rounded-xl bg-surface-muted px-3.5"
-          />
-          <View className="mt-2.5 flex-row flex-wrap gap-2">
-            {waarden.suggestions.map((suggestion) => (
-              <Pressable
-                key={suggestion}
-                accessibilityRole="button"
-                onPress={() => setNaam(suggestion)}
-                className={
-                  'rounded-full border px-3 py-1.5 ' +
-                  (naam === suggestion
-                    ? 'border-primary bg-primary-soft'
-                    : 'border-border bg-surface-muted')
-                }
-              >
-                <Text
+        <Text className="mb-2 font-serif text-2xl font-bold text-text">
+          {isFirstSetup ? waarden.select.title : waarden.new.title}
+        </Text>
+        <Text className="mb-6 text-sm leading-5 text-text-subtle">
+          {isFirstSetup ? waarden.select.subtitle : waarden.select.addMoreSubtitle}
+        </Text>
+
+        <View className="mb-4 rounded-2xl bg-surface p-4 shadow-sm">
+          <Text className="mb-3 text-xs font-bold uppercase tracking-wide text-text-muted">
+            {waarden.select.suggestionsHeading}
+          </Text>
+          <View className="flex-row flex-wrap gap-2">
+            {waarden.suggestions.map((suggestion) => {
+              const taken = existingNames.has(suggestion.toLowerCase());
+              const active = selected.includes(suggestion);
+              return (
+                <Pressable
+                  key={suggestion}
+                  accessibilityRole="button"
+                  disabled={taken}
+                  onPress={() => toggleSuggestion(suggestion)}
                   className={
-                    'text-xs font-semibold ' +
-                    (naam === suggestion ? 'text-primary-dark' : 'text-text-subtle')
+                    'rounded-full border px-3 py-1.5 ' +
+                    (taken
+                      ? 'border-border bg-surface-muted opacity-50'
+                      : active
+                        ? 'border-primary bg-primary-soft'
+                        : 'border-border bg-surface-muted')
                   }
                 >
-                  {suggestion}
-                </Text>
-              </Pressable>
+                  <Text
+                    className={
+                      'text-xs font-semibold ' + (active ? 'text-primary-dark' : 'text-text-subtle')
+                    }
+                  >
+                    {suggestion}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        <View className="mb-6 rounded-2xl bg-surface p-4 shadow-sm">
+          <Text className="mb-2 text-xs font-bold uppercase tracking-wide text-text-muted">
+            {waarden.select.customHeading}
+          </Text>
+          <View className="flex-row gap-2">
+            <AppTextInput
+              value={customName}
+              onChangeText={setCustomName}
+              placeholder={waarden.new.namePlaceholder}
+              onSubmitEditing={addCustom}
+              returnKeyType="done"
+              className="flex-1 rounded-xl bg-surface-muted px-3.5"
+            />
+            <Pressable
+              accessibilityRole="button"
+              onPress={addCustom}
+              className="items-center justify-center rounded-xl bg-primary px-3.5 active:bg-primary-dark"
+            >
+              <Text className="text-xl text-white">+</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        {selected.length > 0 ? (
+          <View className="mb-4 rounded-2xl border border-primary-border-soft bg-primary-soft p-4">
+            <Text className="mb-2 text-xs font-semibold uppercase tracking-wide text-primary-dark">
+              {waarden.select.selectedHeading}
+            </Text>
+            <View className="flex-row flex-wrap gap-2">
+              {selected.map((name) => (
+                <Pressable
+                  key={name}
+                  accessibilityRole="button"
+                  onPress={() => toggleSuggestion(name)}
+                  className="rounded-full border border-primary bg-surface px-3 py-1.5"
+                >
+                  <Text className="text-xs font-semibold text-primary-dark">{name} ×</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        ) : null}
+
+        {selected.length > 0 ? (
+          <View className="mb-4 gap-3">
+            <View>
+              <Text className="text-xs font-bold uppercase tracking-wide text-text-muted">
+                {waarden.select.notesHeading}
+              </Text>
+              <Text className="mt-1 text-sm text-text-subtle">{waarden.select.notesIntro}</Text>
+            </View>
+            {selected.map((name) => (
+              <View key={name} className="rounded-2xl bg-surface p-4 shadow-sm">
+                <Text className="mb-2 font-semibold text-text">{name}</Text>
+                <AppTextInput
+                  value={notes[name] ?? ''}
+                  onChangeText={(value) => updateNote(name, value)}
+                  placeholder={waarden.detail.notePlaceholder}
+                  multiline
+                  numberOfLines={4}
+                  className="rounded-xl bg-surface-muted px-3.5"
+                  style={{ minHeight: 96, textAlignVertical: 'top' }}
+                />
+              </View>
             ))}
           </View>
-        </FormGroup>
-
-        <FormGroup label={`${waarden.new.descLabel} ${waarden.new.descOptional}`}>
-          <AppTextInput
-            value={beschrijving}
-            onChangeText={setBeschrijving}
-            placeholder={waarden.new.descPlaceholder}
-            multiline
-            numberOfLines={3}
-            className="rounded-xl bg-surface-muted px-3.5"
-            style={{ minHeight: 88 }}
-          />
-        </FormGroup>
-
-        <FormGroup label={waarden.new.colorLabel}>
-          <View className="flex-row flex-wrap gap-2.5">
-            {WAARDEN_KLEUREN.map((option) => (
-              <Pressable
-                key={option}
-                accessibilityRole="button"
-                onPress={() => setKleur(option)}
-                className="h-9 w-9 rounded-xl"
-                style={{
-                  backgroundColor: option,
-                  borderWidth: kleur === option ? 3 : 0,
-                  borderColor: option,
-                  transform: [{ scale: kleur === option ? 1.12 : 1 }],
-                }}
-              />
-            ))}
-          </View>
-        </FormGroup>
+        ) : null}
 
         <Pressable
           accessibilityRole="button"
           onPress={save}
-          className="mt-2 rounded-xl bg-primary py-4 active:bg-primary-dark"
+          className="rounded-xl bg-primary py-4 active:bg-primary-dark"
         >
-          <Text className="text-center font-semibold text-white">{waarden.new.saveAction}</Text>
+          <Text className="text-center font-semibold text-white">
+            {isFirstSetup ? waarden.select.saveAction : waarden.select.addAction}
+          </Text>
         </Pressable>
       </View>
-    </ScrollView>
-  );
-}
-
-function FormGroup({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <View className="mb-4 rounded-2xl bg-surface p-4 shadow-sm">
-      <Text className="mb-2.5 text-xs font-bold uppercase tracking-wide text-text-muted">
-        {label}
-      </Text>
-      {children}
-    </View>
+    </KeyboardAwareScrollScreen>
   );
 }

@@ -29,6 +29,15 @@ type EmotionTag =
 type WaardeTermijn = 'kort' | 'middel' | 'lang';
 type BarriereType = 'vermijding' | 'gedachte' | 'zelfkritiek' | 'eigen';
 type WaardeCheckinAntwoord = 'ja' | 'neutraal' | 'nee';
+type ModuleId =
+  | 'onboarding'
+  | 'recognition'
+  | 'acceptance'
+  | 'defusion'
+  | 'presence'
+  | 'self-as-context'
+  | 'values'
+  | 'committed-action';
 
 export type ChatUserContextData = {
   complaintTypes: ComplaintType[];
@@ -40,23 +49,24 @@ export type ChatUserContextData = {
   }>;
   waarden: Array<{ id: string; naam: string; beschrijving: string }>;
   acties: Array<{
-    waarde_id: string;
+    waarde_id: string | null;
     termijn: WaardeTermijn;
     actie: string;
     beoordeling?: { behaald: boolean; beschrijving: string; beoordeeld_op: string };
   }>;
   barriers: Array<{
-    waarde_id: string;
+    waarde_id: string | null;
     type: BarriereType;
     eigen_label: string | null;
     omschrijving: string;
   }>;
   checkins: Array<{
-    waarde_id: string;
+    waarde_id: string | null;
     datum: string;
     antwoord: WaardeCheckinAntwoord;
     notitie: string;
   }>;
+  moduleNotes: Array<{ moduleId: ModuleId; title: string; notes: string }>;
 };
 
 const MOOD_SCORE_LABELS: Record<MoodScore, string> = {
@@ -111,7 +121,18 @@ const COMPLAINT_LABELS: Record<ComplaintType, string> = {
   combination: 'Combinatie',
 };
 
-const MAX_NOTE_LENGTH = 200;
+const MAX_NOTE_LENGTH = 500;
+
+const MODULE_TITLES: Record<ModuleId, string> = {
+  onboarding: 'Welkom & Intake',
+  recognition: 'Herkennen',
+  acceptance: 'Acceptatie',
+  defusion: 'Defusie',
+  presence: 'Aanwezig zijn',
+  'self-as-context': 'Zelf-als-context',
+  values: 'Waarden',
+  'committed-action': 'Toegewijd handelen',
+};
 
 function isoDateDaysAgo(n: number): string {
   const d = new Date();
@@ -128,7 +149,8 @@ function truncateNote(note: string | null | undefined): string | null {
   return trimmed.length > MAX_NOTE_LENGTH ? `${trimmed.slice(0, MAX_NOTE_LENGTH)}…` : trimmed;
 }
 
-function waardeName(waarden: ChatUserContextData['waarden'], id: string): string {
+function waardeName(waarden: ChatUserContextData['waarden'], id: string | null): string {
+  if (id === null) return 'waardenverzameling';
   return waarden.find((w) => w.id === id)?.naam ?? 'Onbekende waarde';
 }
 
@@ -149,7 +171,8 @@ export function isUserContextEmpty(data: ChatUserContextData): boolean {
     data.waarden.length === 0 &&
     data.acties.length === 0 &&
     data.barriers.length === 0 &&
-    data.checkins.length === 0
+    data.checkins.length === 0 &&
+    data.moduleNotes.length === 0
   );
 }
 
@@ -177,7 +200,7 @@ export function formatChatUserContext(data: ChatUserContextData): string {
 
   if (data.waarden.length > 0) {
     const lines = data.waarden.map((w) => {
-      const desc = w.beschrijving.trim();
+      const desc = truncateNote(w.beschrijving) ?? '';
       return `• ${w.naam}${desc ? `: ${desc}` : ''}`;
     });
     sections.push(`Persoonlijke waarden:\n${lines.join('\n')}`);
@@ -191,28 +214,52 @@ export function formatChatUserContext(data: ChatUserContextData): string {
         : '';
       return `• ${waardeName(data.waarden, a.waarde_id)} — actie (${termijn}): «${a.actie}»${review}`;
     });
-    sections.push(`Acties per waarde:\n${lines.join('\n')}`);
+    sections.push(`Gedeeld waardenplan:\n${lines.join('\n')}`);
   }
 
   if (data.barriers.length > 0) {
     const lines = data.barriers.map((b) => {
       const typeLabel =
         b.type === 'eigen' && b.eigen_label ? b.eigen_label : (BARRIER_LABELS[b.type] ?? b.type);
-      return `• ${waardeName(data.waarden, b.waarde_id)} — barrière (${typeLabel}): «${b.omschrijving}»`;
+      const scope = waardeName(data.waarden, b.waarde_id);
+      return `• ${scope} — barrière (${typeLabel}): «${b.omschrijving}»`;
     });
-    sections.push(`Barrières:\n${lines.join('\n')}`);
+    sections.push(`Barrières in het waardenplan:\n${lines.join('\n')}`);
   }
 
   if (data.checkins.length > 0) {
     const lines = data.checkins.map((c) => {
       const antwoord = CHECKIN_LABELS[c.antwoord] ?? c.antwoord;
       const note = truncateNote(c.notitie);
-      return `• ${c.datum} — ${waardeName(data.waarden, c.waarde_id)}: ${antwoord}${note ? ` — «${note}»` : ''}`;
+      return `• ${c.datum}: ${antwoord}${note ? ` — «${note}»` : ''}`;
     });
     sections.push(`Waarden-check-ins:\n${lines.join('\n')}`);
   }
 
+  if (data.moduleNotes.length > 0) {
+    const lines = data.moduleNotes.map((m) => {
+      const note = truncateNote(m.notes);
+      return note ? `• ${m.title}: «${note}»` : `• ${m.title}`;
+    });
+    sections.push(`Module-reflecties:\n${lines.join('\n')}`);
+  }
+
   return sections.length > 0 ? sections.join('\n\n') : '';
+}
+
+export async function fetchFirstName(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('first_name')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) throw new Error(`profiles: ${error.message}`);
+  const name = data?.first_name;
+  return typeof name === 'string' && name.trim() ? name.trim() : null;
 }
 
 export async function fetchChatUserContext(
@@ -255,12 +302,26 @@ export async function fetchChatUserContext(
   if (progressRes.error) throw new Error(`user_progress: ${progressRes.error.message}`);
 
   const progress = progressRes.data?.progress as
-    | { intake?: { complaintTypes?: ComplaintType[] } }
+    | {
+        intake?: { complaintTypes?: ComplaintType[] };
+        modules?: Array<{ moduleId?: string; notes?: string }>;
+      }
     | undefined;
   const complaintTypes = (progress?.intake?.complaintTypes ?? []).filter(
     (t): t is ComplaintType =>
       t === 'pain' || t === 'mental' || t === 'alcohol' || t === 'combination',
   );
+
+  const moduleNotes = (progress?.modules ?? [])
+    .filter((m): m is { moduleId: ModuleId; notes: string } => {
+      if (!m.moduleId || !m.notes?.trim()) return false;
+      return m.moduleId in MODULE_TITLES;
+    })
+    .map((m) => ({
+      moduleId: m.moduleId,
+      title: MODULE_TITLES[m.moduleId],
+      notes: m.notes.trim(),
+    }));
 
   return {
     complaintTypes,
@@ -276,22 +337,23 @@ export async function fetchChatUserContext(
       beschrijving: (row.beschrijving as string) ?? '',
     })),
     acties: (actiesRes.data ?? []).map((row) => ({
-      waarde_id: row.waarde_id as string,
+      waarde_id: (row.waarde_id as string | null) ?? null,
       termijn: row.termijn as WaardeTermijn,
       actie: row.actie as string,
       beoordeling: row.beoordeling as ChatUserContextData['acties'][number]['beoordeling'],
     })),
     barriers: (barriersRes.data ?? []).map((row) => ({
-      waarde_id: row.waarde_id as string,
+      waarde_id: (row.waarde_id as string | null) ?? null,
       type: row.type as BarriereType,
       eigen_label: (row.eigen_label as string | null) ?? null,
       omschrijving: row.omschrijving as string,
     })),
     checkins: (checkinsRes.data ?? []).map((row) => ({
-      waarde_id: row.waarde_id as string,
+      waarde_id: (row.waarde_id as string | null) ?? null,
       datum: row.datum as string,
       antwoord: row.antwoord as WaardeCheckinAntwoord,
       notitie: (row.notitie as string) ?? '',
     })),
+    moduleNotes,
   };
 }

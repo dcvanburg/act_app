@@ -5,12 +5,12 @@
   },
   "checkin": {
     "bannerTitle": "Dagelijkse check-in",
-    "bannerSub": "{done}/{total} ingecheckt vandaag",
+    "bannerSub": "Nog niet ingecheckt vandaag",
     "bannerAction": "Inchecken",
     "doneTitle": "Vandaag klaar!",
-    "doneBody": "Alle waarden ingecheckt. Goed bezig.",
-    "progress": "Check-in {current} van {total}",
-    "question": "Heb je vandaag gehandeld vanuit deze waarde?",
+    "doneBody": "Je waarden-check-in van vandaag is klaar. Goed bezig.",
+    "progress": "Waarden-check-in",
+    "question": "Heb je vandaag gehandeld vanuit je waarden?",
     "yesLabel": "Ja, zeker!",
     "neutralLabel": "Neutraal",
     "noLabel": "Niet echt",
@@ -20,9 +20,9 @@
     "nextAction": "Volgende",
     "finishAction": "Afronden",
     "completeTitle": "Gedaan!",
-    "completeBody": "Je hebt vandaag alle waarden ingecheckt. Goed bezig.",
+    "completeBody": "Je waarden-check-in van vandaag is opgeslagen. Goed bezig.",
     "completeAction": "Terug naar overzicht",
-    "handledYes": "Gehandeld naar deze waarde",
+    "handledYes": "Gehandeld vanuit je waarden",
     "handledNeutral": "Neutraal vandaag",
     "handledNo": "Niet gehandeld vandaag",
     "summaryTitle": "Jouw plan",
@@ -64,10 +64,38 @@
   },
   "empty": {
     "title": "Begin hier",
-    "body": "Voeg je eerste waarde toe en start met leven vanuit wat echt belangrijk voor je is.",
-    "action": "Eerste waarde toevoegen"
+    "body": "Kies de waarden die nu het belangrijkst voor je zijn. Daarna maak je één plan voor de hele verzameling.",
+    "action": "Waarden kiezen"
   },
   "addAction": "Waarde toevoegen",
+  "collection": {
+    "title": "Mijn waardenplan",
+    "valuesHeading": "Jouw waarden",
+    "openPlan": "Plan en barrières",
+    "openPlanBody": "Eén plan en barrières voor al je gekozen waarden",
+    "setupBannerTitle": "Maak je waardenplan af",
+    "setupBannerIntro": "Voeg nog toe:",
+    "setupMissingAction": "een actie voor {termijn}",
+    "setupMissingBarriers": "minstens één barrière",
+    "setupBannerAction": "Plan invullen"
+  },
+  "overview": {
+    "historyTitle": "Check-in trend",
+    "historySubtitle": "Afgelopen 7 dagen"
+  },
+  "select": {
+    "title": "Kies je waarden",
+    "subtitle": "Selecteer wat nu het belangrijkst voor je is. Je maakt daarna één plan voor deze verzameling.",
+    "addMoreSubtitle": "Voeg extra waarden toe aan je verzameling.",
+    "suggestionsHeading": "Suggesties",
+    "customHeading": "Eigen waarde",
+    "selectedHeading": "Geselecteerd",
+    "notesHeading": "Persoonlijke notities",
+    "notesIntro": "Optioneel: schrijf per waarde wat die voor jou betekent.",
+    "saveAction": "Opslaan en plan maken",
+    "addAction": "Waarden toevoegen",
+    "minRequired": "Kies minstens één waarde."
+  },
   "new": {
     "title": "Nieuwe waarde",
     "nameLabel": "Naam",
@@ -102,7 +130,12 @@
     "deleteConfirmAction": "Verwijderen",
     "deleteCancel": "Annuleren",
     "deleteAction": "Waarde verwijderen",
-    "editAction": "Bewerken",
+    "editAction": "Naam en kleur bewerken",
+    "noteHeading": "Persoonlijke notitie",
+    "noteIntro": "Wat betekent deze waarde voor jou?",
+    "notePlaceholder": "Schrijf hier wat deze waarde voor jou inhoudt...",
+    "noteSaveAction": "Notitie opslaan",
+    "noteAutoSaveHint": "Wordt automatisch opgeslagen",
     "historyRange": "Afgelopen 14 dagen",
     "historyEmpty": "Nog geen check-ins."
   },
@@ -129,10 +162,10 @@
     "title": "Mijn waarden",
     "body": "Reflecteer op wat belangrijk voor je is",
     "bodyWithCount": "{count} waarden · {done}/{total} ingecheckt",
-    "bodyAllDone": "Alle waarden ingecheckt vandaag",
+    "bodyAllDone": "Waarden-check-in gedaan vandaag",
     "openLabel": "Open waarden overzicht",
-    "todayProgress": "{done}/{total} ingecheckt vandaag",
-    "pendingRemaining": "Nog {pending} waarden te inchecken",
+    "todayProgress": "Check-in gedaan vandaag",
+    "pendingRemaining": "Nog niet ingecheckt vandaag",
     "pendingLabel": "Nog niet ingecheckt"
   },
   "suggestions": [

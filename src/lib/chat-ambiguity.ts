@@ -20,7 +20,7 @@ const MIN_RRF_SCORE = 0.012;
 const CLEAR_WINNER_RATIO = 1.12;
 const OPTION_COUNT = 3;
 
-const MODULE_QUESTIONS: Record<string, string> = {
+export const MODULE_QUESTIONS: Record<string, string> = {
   onboarding: 'Wat houdt de intake en het welkom in het programma in?',
   recognition: 'Wat is de vermijdingscirkel?',
   acceptance: 'Wat betekent acceptatie in dit programma?',

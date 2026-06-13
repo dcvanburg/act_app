@@ -1,21 +1,13 @@
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Modal, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EmotionTagPicker } from '@/components/mood/EmotionTagPicker';
 import { MoodSelector } from '@/components/mood/MoodSelector';
 import { BackButton } from '@/components/BackButton';
 import { AppTextInput } from '@/components/AppTextInput';
+import { KeyboardAwareScrollScreen } from '@/components/KeyboardAwareScrollScreen';
 import mood from '@/content/nl/mood.json';
 import { useSaveMoodLog } from '@/lib/mood-queries';
 import { useOnboardingIdleReset } from '@/lib/use-onboarding-idle-reset';
@@ -69,10 +61,7 @@ export default function MoodCheckinScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      className="flex-1 bg-background"
-    >
+    <>
       <Modal
         visible={showIntro}
         transparent
@@ -127,13 +116,12 @@ export default function MoodCheckinScreen() {
           </View>
         </View>
       </Modal>
-      <ScrollView
+      <KeyboardAwareScrollScreen
         contentContainerStyle={{
           paddingTop: insets.top + 12,
           paddingBottom: insets.bottom + 112,
           paddingHorizontal: 16,
         }}
-        keyboardShouldPersistTaps="handled"
       >
         <View className="mx-auto w-full max-w-md">
           <View className="mb-2 flex-row items-center gap-3">
@@ -197,7 +185,7 @@ export default function MoodCheckinScreen() {
             </>
           ) : null}
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAwareScrollScreen>
+    </>
   );
 }

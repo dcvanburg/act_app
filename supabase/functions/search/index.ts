@@ -9,7 +9,7 @@
  *   5. Claude Haiku 4.5 call with two-block system prompt:
  *        - stable persona + ACT instructions (prompt-cached, ephemeral)
  *        - dynamic chunks + user profile (not cached)
- *      plus last 3 turns of history (in-memory only on the client).
+ *      plus last 3 turns of history and older stored messages as memory.
  *
  * Safety (docs/SECURITY.md → AI processing):
  *   - Request body is never logged. Only error messages reach console.
@@ -34,10 +34,23 @@ import {
   type StructuredReply,
 } from './ambiguity.ts';
 import {
+  formatGreetingOnlyReply,
+  isGreetingOnly,
+  prependFirstTurnGreeting,
+  stripClarifyBulletOptions,
+  stripGreetingPrefix,
+} from './greeting.ts';
+import {
   fetchChatUserContext,
+  fetchFirstName,
   formatChatUserContext,
   isUserContextEmpty,
 } from './user-context.ts';
+import {
+  fetchStoredChatMessages,
+  formatConversationMemory,
+  recentTurnMessages,
+} from './conversation-context.ts';
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -89,14 +102,14 @@ ACT-principes die je toepast wanneer de bronnen dat ondersteunen:
 Je gebruikt deze taal alleen als de "INFORMATIE UIT HET PROGRAMMA" het ondersteunt. Je verzint geen oefeningen of metaforen die er niet staan.
 
 Wat je doet:
-• Je beantwoordt vragen op basis van "INFORMATIE UIT HET PROGRAMMA" en, als de vraag daarover gaat, "INFORMATIE UIT JE PROFIEL IN DE APP" (stemming, waarden, check-ins, acties, barrières).
+• Je beantwoordt vragen op basis van "INFORMATIE UIT HET PROGRAMMA" en, als de vraag daarover gaat, "INFORMATIE UIT JE PROFIEL IN DE APP" (stemming, waarden, check-ins, acties, barrières) en "Eerdere gesprekken met de gids" wanneer die aanwezig zijn.
 • Bij vragen over het verloop van stemming of waarden: beschrijf alleen wat in het profiel staat. Geen interpretatie, geen diagnose, geen advies om iets te veranderen.
 • Koppel profielinformatie waar nuttig aan programmainformatie, maar blijf binnen wat er staat.
 • Als persoonlijke gegevens ontbreken, zeg dat eerlijk en verwijs naar het betreffende scherm in de app (stemming, waarden).
 • Je benadrukt dat klachten geen vijand zijn en dat terugval informatie is, geen mislukking.
 
 Bij twijfel over de bedoeling van de vraag:
-• Gebruik type "clarify": stel één korte verduidelijkingsvraag. Geef maximaal drie concrete opties in options.
+• Gebruik type "clarify": stel één korte verduidelijkingsvraag in text. Zet de keuzemogelijkheden uitsluitend in options, niet als opsomming in text.
 • Geef geen antwoord als je niet zeker bent.
 
 Antwoordformaat (verplicht via tool chat_reply):
@@ -320,6 +333,7 @@ async function askClaude(
   chunks: Chunk[],
   history: ChatMessage[],
   userContextText: string,
+  conversationMemory: string,
 ): Promise<ClaudeResult> {
   const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not configured');
@@ -333,7 +347,9 @@ async function askClaude(
     ? `INFORMATIE UIT JE PROFIEL IN DE APP:\n\n${userContextText}`
     : 'INFORMATIE UIT JE PROFIEL IN DE APP:\n\n(Geen persoonlijke gegevens ingevuld in de app.)';
 
-  const dynamicSystemBlock = `INFORMATIE UIT HET PROGRAMMA:\n\n${programContext}\n\n${profileSection}`;
+  const memorySection = conversationMemory ? `${conversationMemory}\n\n` : '';
+
+  const dynamicSystemBlock = `INFORMATIE UIT HET PROGRAMMA:\n\n${programContext}\n\n${memorySection}${profileSection}`;
 
   const messages = [...history.slice(-MAX_HISTORY_MESSAGES), { role: 'user', content: question }];
 
@@ -415,6 +431,28 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
+function resolveClarifyOptions(
+  reply: StructuredReply,
+  question: string,
+  chunks: Chunk[],
+  userContextData: Awaited<ReturnType<typeof fetchChatUserContext>>,
+): string[] {
+  const fromLlm = (reply.options ?? []).map((o) => o.trim()).filter(Boolean).slice(0, 3);
+  if (fromLlm.length >= 2) return fromLlm;
+  if (chunks.length > 0) return buildTopRetrievalOptions(chunks);
+  if (fromLlm.length > 0) return fromLlm;
+  return buildClarifyOptions(question, chunks, userContextData);
+}
+
+function firstTurnAnswer(
+  answer: string,
+  history: ChatMessage[],
+  firstName: string | null,
+): string {
+  if (history.length > 0) return answer;
+  return prependFirstTurnGreeting(answer, firstName);
+}
+
 // ── Handler ─────────────────────────────────────────────────────────────────
 
 Deno.serve(async (req: Request) => {
@@ -460,13 +498,37 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    const firstName = await fetchFirstName(supabase, user.id);
+    const storedMessages = await fetchStoredChatMessages(supabase, user.id);
+    const effectiveHistory =
+      storedMessages.length > 0
+        ? recentTurnMessages(storedMessages, MAX_HISTORY_MESSAGES)
+        : history;
+    const lastStored = effectiveHistory[effectiveHistory.length - 1];
+    const historyForLlm =
+      lastStored?.role === 'user' && lastStored.content === question
+        ? effectiveHistory.slice(0, -1)
+        : effectiveHistory;
+    const conversationMemory = formatConversationMemory(storedMessages, MAX_HISTORY_MESSAGES);
+    const isFirstTurn = historyForLlm.length === 0;
+
+    if (isFirstTurn && isGreetingOnly(question)) {
+      return jsonResponse({
+        answer: formatGreetingOnlyReply(firstName),
+        chunksFound: 0,
+      });
+    }
+
+    const searchQuestion =
+      isFirstTurn && !isGreetingOnly(question) ? stripGreetingPrefix(question) : question;
+
     const userContextData = await fetchChatUserContext(supabase, user.id);
     const userContextText = formatChatUserContext(userContextData);
 
-    const embedding = await getEmbedding(question);
+    const embedding = await getEmbedding(searchQuestion);
     const chunks = await hybridSearch(
       supabase,
-      question,
+      searchQuestion,
       embedding,
       filterCategory,
       filterPhase,
@@ -474,16 +536,16 @@ Deno.serve(async (req: Request) => {
 
     if (chunks.length === 0 && isUserContextEmpty(userContextData)) {
       return jsonResponse({
-        answer: OUT_OF_SCOPE_RESPONSE,
+        answer: firstTurnAnswer(OUT_OF_SCOPE_RESPONSE, historyForLlm, firstName),
         chunksFound: 0,
         noMatch: true,
       });
     }
 
-    const preClarify = assessClarifyNeed(question, chunks, userContextData, history);
+    const preClarify = assessClarifyNeed(searchQuestion, chunks, userContextData, historyForLlm);
     if (preClarify) {
       return jsonResponse({
-        answer: CLARIFY_PROMPTS[preClarify.reason],
+        answer: firstTurnAnswer(stripClarifyBulletOptions(CLARIFY_PROMPTS[preClarify.reason]), historyForLlm, firstName),
         chunksFound: chunks.length,
         clarify: true,
         clarifyOptions: preClarify.options,
@@ -491,7 +553,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const { reply, inputTokens, cacheReadInputTokens, cacheCreationInputTokens } =
-      await askClaude(question, chunks, history, userContextText);
+      await askClaude(searchQuestion, chunks, historyForLlm, userContextText, conversationMemory);
 
     const usage = {
       inputTokens,
@@ -500,14 +562,9 @@ Deno.serve(async (req: Request) => {
     };
 
     if (reply.type === 'clarify') {
-      const options =
-        chunks.length > 0
-          ? buildTopRetrievalOptions(chunks)
-          : reply.options && reply.options.length > 0
-            ? reply.options.slice(0, 3)
-            : buildClarifyOptions(question, chunks, userContextData);
+      const options = resolveClarifyOptions(reply, searchQuestion, chunks, userContextData);
       return jsonResponse({
-        answer: reply.text,
+        answer: firstTurnAnswer(stripClarifyBulletOptions(reply.text), historyForLlm, firstName),
         chunksFound: chunks.length,
         clarify: true,
         clarifyOptions: options,
@@ -517,7 +574,7 @@ Deno.serve(async (req: Request) => {
 
     if (reply.type === 'out_of_scope') {
       return jsonResponse({
-        answer: reply.text || OUT_OF_SCOPE_RESPONSE,
+        answer: firstTurnAnswer(reply.text || OUT_OF_SCOPE_RESPONSE, historyForLlm, firstName),
         chunksFound: chunks.length,
         noMatch: true,
         ...usage,
@@ -525,7 +582,7 @@ Deno.serve(async (req: Request) => {
     }
 
     return jsonResponse({
-      answer: reply.text,
+      answer: firstTurnAnswer(reply.text, historyForLlm, firstName),
       chunksFound: chunks.length,
       ...usage,
     });

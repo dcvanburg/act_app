@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AlarmBellIcon } from '@/components/icons/AlarmBellIcon';
 import common from '@/content/nl/common.json';
+import { BOTTOM_CHROME, fabBottomOffset } from '@/lib/bottom-chrome';
 
 /**
  * Noodknop — emergency overlay, mounted in the root layout.
@@ -29,9 +30,9 @@ export function Noodknop() {
         position: 'absolute',
         left: 0,
         right: 0,
-        bottom: insets.bottom + 16,
-        alignItems: 'flex-end',
-        paddingHorizontal: 16,
+        bottom: fabBottomOffset(insets.bottom, BOTTOM_CHROME.noodknopSize),
+        alignItems: 'flex-start',
+        paddingHorizontal: BOTTOM_CHROME.edgePadding,
       }}
     >
       <Pressable

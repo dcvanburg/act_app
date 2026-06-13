@@ -5,8 +5,9 @@
     "emptyTitle": "Alles gedaan voor vandaag!",
     "emptyBody": "Super gedaan. Kom morgen terug voor je dagelijkse check-in.",
     "moodItem": "Doe je dagelijkse stemming check-in",
-    "waardenCheckinItem": "Hoe ging het vandaag met je waarden?",
     "waardenAanmakenItem": "Stel je persoonlijke waarden in",
+    "waardenPlanItem": "Maak je waardenplan compleet (acties en barrières)",
+    "waardenCheckinItem": "Hoe ging het vandaag met je waarden?",
     "moduleStartItem": "Start met de module: {title}",
     "moduleContinueItem": "Ga verder met de module: {title}"
   }
