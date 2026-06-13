@@ -56,7 +56,6 @@ function resetChatUiState(setters: {
   setHydrated: (value: boolean) => void;
   setCrisisActive: (value: boolean) => void;
   setNoMatchSuggestions: (value: string[] | null) => void;
-  setClarifyPrompt: (value: string | null) => void;
   setClarifyOptions: (value: string[] | null) => void;
   setErrorText: (value: string | null) => void;
 }) {
@@ -64,7 +63,6 @@ function resetChatUiState(setters: {
   setters.setHydrated(true);
   setters.setCrisisActive(false);
   setters.setNoMatchSuggestions(null);
-  setters.setClarifyPrompt(null);
   setters.setClarifyOptions(null);
   setters.setErrorText(null);
 }
@@ -109,7 +107,6 @@ export default function ChatScreen() {
   const [hydrated, setHydrated] = useState(false);
   const [crisisActive, setCrisisActive] = useState(false);
   const [noMatchSuggestions, setNoMatchSuggestions] = useState<string[] | null>(null);
-  const [clarifyPrompt, setClarifyPrompt] = useState<string | null>(null);
   const [clarifyOptions, setClarifyOptions] = useState<string[] | null>(null);
   const [errorText, setErrorText] = useState<string | null>(null);
 
@@ -165,9 +162,13 @@ export default function ChatScreen() {
 
     setErrorText(null);
     setNoMatchSuggestions(null);
-    setClarifyPrompt(null);
     setClarifyOptions(null);
     appendUser(question);
+
+    const historyForRequest: ChatHistoryEntry[] = [
+      ...history,
+      { role: 'user', content: question },
+    ];
 
     try {
       await persistMessage('user', question);
@@ -177,7 +178,7 @@ export default function ChatScreen() {
     }
 
     mutation.mutate(
-      { question, history, firstName: profile?.first_name ?? null },
+      { question, history: historyForRequest, firstName: profile?.first_name ?? null },
       {
         onSuccess: async (data: ChatResponse) => {
           if (data.crisis) {
@@ -189,7 +190,14 @@ export default function ChatScreen() {
             return;
           }
           if (data.clarify) {
-            setClarifyPrompt(stripClarifyBulletOptions(data.answer));
+            const clarifyText = stripClarifyBulletOptions(data.answer);
+            appendAssistant(clarifyText);
+            try {
+              await persistMessage('assistant', clarifyText);
+            } catch {
+              setErrorText(chat.errors.generic);
+              return;
+            }
             setClarifyOptions(data.clarifyOptions ?? pickChatSuggestions(question));
             return;
           }
@@ -226,7 +234,6 @@ export default function ChatScreen() {
       setHydrated,
       setCrisisActive,
       setNoMatchSuggestions,
-      setClarifyPrompt,
       setClarifyOptions,
       setErrorText,
     });
@@ -265,7 +272,7 @@ export default function ChatScreen() {
 
   function openClearMenu() {
     const canClearCurrent =
-      messages.length > 0 || crisisActive || noMatchSuggestions !== null || clarifyPrompt !== null;
+      messages.length > 0 || crisisActive || noMatchSuggestions !== null;
     const canClearAll =
       (historyStats?.totalMessages ?? 0) > 0 || (historyStats?.endedSessions ?? 0) > 0;
 
@@ -301,7 +308,6 @@ export default function ChatScreen() {
     messages.length > 0 ||
     crisisActive ||
     noMatchSuggestions !== null ||
-    clarifyPrompt !== null ||
     clarifyOptions !== null ||
     (historyStats?.totalMessages ?? 0) > 0 ||
     (historyStats?.endedSessions ?? 0) > 0;
@@ -349,9 +355,8 @@ export default function ChatScreen() {
 
         {mutation.isPending ? <TypingIndicator /> : null}
 
-        {clarifyPrompt && clarifyOptions ? (
+        {clarifyOptions ? (
           <ClarifyCard
-            prompt={clarifyPrompt}
             options={clarifyOptions}
             onPick={handleSuggestion}
             onTypeOwn={handleTypeOwnQuestion}
