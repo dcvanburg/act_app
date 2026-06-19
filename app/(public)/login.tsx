@@ -17,10 +17,7 @@ import auth from '@/content/nl/auth.json';
 import common from '@/content/nl/common.json';
 import { AppTextInput } from '@/components/AppTextInput';
 import { getAuthRedirectUrl } from '@/lib/auth-redirect';
-import {
-  formatRateLimitMessage,
-  mapSignInOtpError,
-} from '@/lib/auth-login';
+import { formatRateLimitMessage, mapSignInOtpError } from '@/lib/auth-login';
 import { supabase, SUPABASE_CONFIGURED } from '@/lib/supabase/client';
 import { useAuth } from '@/providers/AuthProvider';
 
@@ -280,7 +277,11 @@ function SentConfirmation(props: {
         >
           <Text className="text-sm text-text-muted">{auth.sent.changeEmail}</Text>
         </Pressable>
-        <Pressable accessibilityRole="button" onPress={props.onResend} disabled={props.loading || props.cooldownActive}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={props.onResend}
+          disabled={props.loading || props.cooldownActive}
+        >
           {props.loading ? (
             <ActivityIndicator color="#3B6D11" size="small" />
           ) : (

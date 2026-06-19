@@ -26,7 +26,9 @@ export function parseRateLimitSeconds(message: string | undefined): number | nul
   return Number.isFinite(seconds) && seconds > 0 ? seconds : null;
 }
 
-export function isAuthRateLimitError(error: Pick<AuthError, 'message' | 'status' | 'code'>): boolean {
+export function isAuthRateLimitError(
+  error: Pick<AuthError, 'message' | 'status' | 'code'>,
+): boolean {
   if (error.status === 429) return true;
   if (error.code && RATE_LIMIT_ERROR_CODES.has(error.code)) return true;
   return parseRateLimitSeconds(error.message) !== null;
@@ -42,8 +44,7 @@ export function mapSignInOtpError(error: AuthError | null | undefined): AuthLogi
     return { kind: 'generic', message: auth.errors.generic };
   }
 
-  const retryAfterSeconds =
-    parseRateLimitSeconds(error.message) ?? DEFAULT_OTP_RATE_LIMIT_SECONDS;
+  const retryAfterSeconds = parseRateLimitSeconds(error.message) ?? DEFAULT_OTP_RATE_LIMIT_SECONDS;
 
   return {
     kind: 'rate_limit',
