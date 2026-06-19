@@ -32,11 +32,11 @@ export function formatConversationMemory(
   if (older.length === 0) return '';
 
   const lines = older.map((m) => {
-    const label = m.role === 'user' ? 'Gebruiker' : 'Gids';
+    const label = m.role === 'user' ? 'Gebruiker' : 'Assistent';
     return `• ${label}: «${truncateEntry(m.content)}»`;
   });
 
-  return `Eerdere gesprekken met de gids:\n${lines.join('\n')}`;
+  return `Eerdere gesprekken met de assistent:\n${lines.join('\n')}`;
 }
 
 /** Recent turns sent as Claude message history. */

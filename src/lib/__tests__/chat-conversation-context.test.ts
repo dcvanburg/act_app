@@ -33,7 +33,7 @@ describe('formatConversationMemory', () => {
       ['assistant', 'Antwoord'],
     ]);
     const text = formatConversationMemory(messages, 4);
-    expect(text).toContain('Eerdere gesprekken met de gids');
+    expect(text).toContain('Eerdere gesprekken met de assistent');
     expect(text).toContain('Ik ben moe');
     expect(text).not.toContain('Nog een vraag');
   });

@@ -1,29 +1,29 @@
 {
-  "title": "Stel een vraag",
-  "subtitle": "Vragen over het programma, je stemming of je waarden. Geen medisch advies.",
+  "title": "Kennisassistent",
+  "subtitle": "Vragen over ACT, lichaamswerk en je voortgang. Geen medisch advies.",
   "placeholder": "Wat wil je weten?",
   "send": "Versturen",
   "clearMenuLabel": "Geschiedenis",
   "clear": {
     "cancel": "Annuleren",
     "currentTitle": "Huidige chat wissen?",
-    "currentBody": "De berichten in dit gesprek worden verwijderd. Eerdere gesprekken blijven bewaard voor de gids.",
+    "currentBody": "De berichten in dit gesprek worden verwijderd. Eerdere gesprekken blijven bewaard voor de assistent.",
     "currentAction": "Huidige chat wissen"
   },
   "thinking": "Bezig met meedenken",
   "youLabel": "Jij",
-  "assistantLabel": "Gids",
+  "assistantLabel": "Assistent",
   "homeCard": {
-    "title": "Vraag de gids",
-    "body": "Korte vragen over het programma.",
+    "title": "Kennisassistent",
+    "body": "Vragen over ACT, lichaamswerk en je voortgang.",
     "action": "Stel een vraag"
   },
   "floatingButton": {
-    "label": "Vraag de gids"
+    "label": "Kennisassistent"
   },
   "emptyState": {
-    "title": "Stel een vraag over het programma",
-    "subtitle": "Ik kan je helpen met informatie uit de modules en oefeningen. Voor persoonlijke zorgen verwijs ik je naar je huisarts."
+    "title": "Stel een vraag aan de kennisassistent",
+    "subtitle": "Ik help je concepten te begrijpen en toe te passen op jouw situatie. Voor persoonlijke zorg verwijs ik je naar je huisarts."
   },
   "suggestedQuestions": [
     "Wat betekent acceptatie in dit programma?",
@@ -44,13 +44,9 @@
     "lastModuleReview": "Wat was de kern van {title}?"
   },
   "noMatch": {
-    "title": "Daar kan ik geen antwoord op vinden",
-    "body": "Ik kan alleen informatie geven uit het programma. Bedoelde je misschien een van deze onderwerpen?",
+    "title": "Buiten mijn bereik",
+    "body": "Dit valt buiten wat ik vanuit zelfhulp kan beantwoorden. Probeer een van deze onderwerpen, of bespreek het met je huisarts.",
     "prompt": "Probeer een van deze vragen:"
-  },
-  "clarify": {
-    "prompt": "Tik op een optie om meteen verder te gaan:",
-    "typeOwn": "Typ zelf je vraag"
   },
   "greeting": {
     "onlyWithName": "Hoi {name}, fijn dat je er bent.",
@@ -58,7 +54,7 @@
     "prefixWithName": "Hoi {name}, ",
     "prefixWithoutName": "Hoi, "
   },
-  "disclaimer": "Geen medisch advies. Voor persoonlijke vragen: huisarts of GGZ. Bij directe nood: 0800-0113.",
+  "disclaimer": "Geen medisch advies. Voor persoonlijke vragen: huisarts of GGZ. Bij directe nood: 113 of 0800-0113.",
   "errors": {
     "generic": "Er ging iets mis. Probeer het opnieuw of bekijk de modules.",
     "persistFailed": "Je bericht kon niet worden opgeslagen. Probeer het opnieuw.",
@@ -72,7 +68,7 @@
   },
   "crisisDeflection": {
     "title": "Even pauze met de app",
-    "body": "Het lijkt erop dat je nu veel meemaakt. Dit is een moment voor menselijke hulp, niet voor een app. Bel je huisarts, of bij directe nood 0800-0113 (24/7 bereikbaar).",
+    "body": "Het lijkt erop dat je nu veel meemaakt. Dit is een moment voor menselijke hulp, niet voor een app. Bel 113 Zelfmoordpreventie: telefoon 113 of gratis 0800-0113. Chat: 113.nl. 24/7 bereikbaar, anoniem en gratis. Neem ook contact op met je huisarts.",
     "actionPrimary": "Bekijk hulpmiddelen",
     "actionSecondary": "Terug naar het programma"
   },

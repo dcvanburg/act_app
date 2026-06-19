@@ -17,7 +17,16 @@ Three changes layer on top of the v1.0 decisions below. v1.0 stays the fallback 
 | Anthropic prompt caching | Two-block `system` array: stable persona + ACT instructions cached ephemeral; per-request chunks + user profile uncached. Adds `anthropic-beta: prompt-caching-2024-07-31` header. Response surfaces `inputTokens` / `cacheReadInputTokens` / `cacheCreationInputTokens` for monitoring. | `supabase/functions/search/index.ts` `askClaude()`. |
 | Program-overview content | New ingestable Dutch content (`src/content/nl/program-overview.json`, category `overview`) so the chatbot can answer "wat is dit programma?", "wat is ACT?", "voor wie is dit?", "wat doet de gids?". | Migration `0013_documents_overview_category.sql`; ingest script. Therapist draft in [chatbot-drafts.md § 4b](../THERAPEUT_KB/chatbot-drafts.md). |
 
-**Unchanged from v1.0 (all non-negotiables intact):** crisis keyword pre-filter (client + server), structured `chat_reply` tool output (`answer` / `clarify` / `out_of_scope`), live LLM history capped at 3 turns with older turns in a memory block, JWT-authed Edge Function, server logging never includes request body.
+**Unchanged from v1.0 (all non-negotiables intact):** crisis keyword pre-filter (client + server), live LLM history capped at 3 turns with older turns in a memory block, JWT-authed Edge Function, server logging never includes request body.
+
+## Update 2026-06-19 — v1.2 in-flight (not yet pilot-approved)
+
+| Change | What | Where |
+|---|---|---|
+| Generic kennisassistent persona | System prompt from `systeemprompt_zelfhulp_bot.md`: principles-based reasoning when KB has no match, 5-step translation workflow, optional inline open question | `supabase/functions/search/index.ts` `SYSTEM_PROMPT_INSTRUCTIONS`; draft in [chatbot-drafts.md § 5](../THERAPEUT_KB/chatbot-drafts.md) |
+| Simplified tool output | `chat_reply` types reduced to `answer` / `out_of_scope`; ClarifyCard and pre-LLM clarify checks removed | `supabase/functions/search/index.ts`, `app/(app)/chat.tsx` |
+| Crisis copy | 113 Zelfmoordpreventie wording (113 / 0800-0113 / 113.nl) in deflection; keyword pre-filter unchanged | `src/content/nl/chat.json`, server `CRISIS_RESPONSE` |
+| UI persona | "Kennisassistent" labels in chat.json | `src/content/nl/chat.json` |
 
 ## Context
 

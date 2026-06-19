@@ -321,3 +321,30 @@ Live source: `src/content/nl/program-overview.json`. Ingested with `category: 'o
 - [x] No copied text from Resiliens, Hayes, or other sources
 
 `Status: ✅ APPROVED 2026-06-13 via /therapeut skill. Real-human review still recommended before pilot launch.`
+
+---
+
+## 5. v1.2 — Generic kennisassistent (systeemprompt_zelfhulp_bot.md)
+
+> **Status:** DRAFT — pending therapist re-sign-off before pilot.
+> **Diff vs v1.1:**
+>
+> - Persona shifts from "rustige, warme begeleider in Van Overleven naar Leven" to generic **kennisassistent** (ACT, lichaamsgericht, psychosomatisch).
+> - Principles-based reasoning when KB has no direct match (no longer strict "say honestly when not in sources").
+> - Structured `chat_reply` simplified to `answer` / `out_of_scope` only; clarify chips removed; optional inline open question per turn.
+> - Crisis copy updated with 113 Zelfmoordpreventie framing (113 / 0800-0113 / 113.nl); keyword pre-filter unchanged.
+> - Hexaflex six principles retained in system prompt; user profile injection unchanged.
+
+### 5a. System prompt v1.2 (DRAFT)
+
+Live source: `supabase/functions/search/index.ts` — constant `SYSTEM_PROMPT_INSTRUCTIONS`. Based on `systeemprompt_zelfhulp_bot.md` with appended hexaflex block and profile usage rules.
+
+See the constant in code for the full approved text once signed off.
+
+### 5b. Review checklist (pending)
+
+- [ ] Generic kennisassistent tone acceptable vs program-specific gids
+- [ ] Principles-based fallback when KB has no match — safe for pilot audience
+- [ ] Crisis deflection includes 113 / 0800-0113 / 113.nl
+- [ ] Profile context rules unchanged (describe only, no diagnosis)
+- [ ] chat.json UI copy matches new persona ("Kennisassistent")

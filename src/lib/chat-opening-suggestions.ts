@@ -4,7 +4,6 @@
  */
 
 import chat from '@/content/nl/chat.json';
-import { MODULE_QUESTIONS } from '@/lib/chat-ambiguity';
 import { MODULE_META } from '@/lib/content';
 import { daysAgo, isoDate } from '@/lib/mood';
 import { getDefaultProgress, getModuleStatus, MODULE_ORDER } from '@/lib/progress';
@@ -15,6 +14,17 @@ import type { WaardenData } from '@/types/waarden';
 const OPENING_LIMIT = 4;
 const MOOD_LOOKBACK_DAYS = 7;
 const WAARDEN_CHECKIN_LOOKBACK_DAYS = 30;
+
+const MODULE_QUESTIONS: Record<string, string> = {
+  onboarding: 'Wat houdt de intake en het welkom in het programma in?',
+  recognition: 'Wat is de vermijdingscirkel?',
+  acceptance: 'Wat betekent acceptatie in dit programma?',
+  defusion: 'Wat is defusie en hoe werkt het in dit programma?',
+  presence: 'Wat betekent aanwezig zijn in dit programma?',
+  'self-as-context': 'Wat is zelf-als-context?',
+  values: 'Hoe werk ik met mijn waarden in dit programma?',
+  'committed-action': 'Wat is toegewijd handelen in ACT?',
+};
 
 const TENSION_TAGS: ReadonlySet<EmotionTag> = new Set(['stress', 'pijn', 'angst']);
 

@@ -17,9 +17,7 @@
  *     its own check (Phase 3). Either layer alone is sufficient; both
  *     together survive a bypass of the other.
  *   - System prompt and crisis copy mirror docs/THERAPEUT_KB/chatbot-drafts.md
- *     (v1.1-DRAFT — awaiting therapist re-approval; v1.0 stays the
- *     fallback if the warmer tone is rejected). When the drafts revise,
- *     mirror here.
+ *     (v1.2 DRAFT — kennisassistent persona; pending therapist re-sign-off).
  *
  * Deploy: scripts/deploy-rag-functions.sh
  */
@@ -27,27 +25,15 @@
 import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.47.0';
 
 import {
-  assessClarifyNeed,
-  buildClarifyOptions,
-  CLARIFY_PROMPTS,
-  isClarifyFollowUp,
-  sanitizeClarifyOptions,
-  uncertaintyStreak,
-  UNCERTAINTY_LOOP_RESPONSE,
-  type StructuredReply,
-} from './ambiguity.ts';
-import {
   formatGreetingOnlyReply,
   isGreetingOnly,
   prependFirstTurnGreeting,
-  stripClarifyBulletOptions,
   stripGreetingPrefix,
 } from './greeting.ts';
 import {
   fetchChatUserContext,
   fetchFirstName,
   formatChatUserContext,
-  isUserContextEmpty,
   type ChatUserContextData,
 } from './user-context.ts';
 import {
@@ -72,31 +58,28 @@ const ANTHROPIC_MODEL = 'claude-haiku-4-5';
 const VOYAGE_MODEL = 'voyage-3';
 const ANTHROPIC_BETA = 'prompt-caching-2024-07-31';
 
-// ── Dutch copy (mirror of docs/THERAPEUT_KB/chatbot-drafts.md v1.1-DRAFT) ───
+// ── Dutch copy (mirror of docs/THERAPEUT_KB/chatbot-drafts.md § 5 v1.2) ─────
 //
-// v1.1 shifts the persona from "information gateway" to a warmer ACT-grounded
-// begeleider while keeping the original v1.0 guardrails intact:
-//   - scope stays bound to "INFORMATIE UIT HET PROGRAMMA" + user profile,
-//   - structured tool output stays (answer / clarify / out_of_scope),
-//   - crisis deflection wording and 0800-0113 stay verbatim,
-//   - no medical advice, no invented exercises, no medication talk.
-//
-// This block is sent through Anthropic prompt caching (ephemeral) so the
-// stable persona + instructions are billed at the cache-read rate after the
-// first request. The dynamic chunks + user profile are appended as a second,
-// uncached system block in askClaude().
+// v1.2: generic kennisassistent persona, principles-based reasoning when KB
+// has no match, inline clarify only, structured tool output (answer /
+// out_of_scope). Cached via Anthropic prompt caching (ephemeral).
 
-const SYSTEM_PROMPT_INSTRUCTIONS = `Je bent een rustige, warme begeleider in de app Van Overleven naar Leven. De app is een zelfstandig therapeutisch programma op basis van Acceptance and Commitment Therapy (ACT) en lichaamsgerichte psychosomatische therapie. Je bent geen therapeut, je bent een gids in het programma.
+const SYSTEM_PROMPT_INSTRUCTIONS = `Je bent een ondersteunende kennisassistent in een zelfhulp-app, gespecialiseerd in Acceptance & Commitment Therapy (ACT), lichaamsgerichte therapie (Somatic Experiencing, polyvagaaltheorie), en psychosomatische therapie.
 
-Hoe je klinkt:
-• Rustig, warm, in jij-vorm. Je oordeelt niet en je haast niet.
-• Je luistert reflectief: vat eerst kort samen wat je leest voor je iets toevoegt.
-• Eén open vraag per beurt, niet meer. Liever doorvragen dan gokken. Eindig elke vraag met een vraagteken.
-• Korte zinnen, ruim wit. Maximaal drie alinea's per antwoord. Geen vakjargon, of leg het meteen uit.
-• Geen uitroeptekens. Gebruik een punt, komma of dubbele punt als zinsbreuk, geen streepjes.
-• Opsommingen met • en maximaal vijf punten.
+Je doel is mensen helpen de concepten en technieken uit de kennisbank te begrijpen én te vertalen naar hun eigen, persoonlijke situatie. Je bent geen therapeut en geen vervanging voor professionele zorg. Je bent een laagdrempelige, kennisrijke eerste stap.
 
-ACT-principes die je toepast wanneer de bronnen dat ondersteunen:
+BELANGRIJKSTE WERKWIJZE: VAN KENNIS NAAR PERSOONLIJKE VERTALING
+
+Bij elke vraag doorloop je dit proces:
+1. Begrijp eerst de situatie. Wat beschrijft de persoon? Welke gevoelens, lichamelijke sensaties, gedachten of gedragspatronen noemen ze?
+2. Koppel aan relevante concepten uit "INFORMATIE UIT HET PROGRAMMA" en, als de vraag daarover gaat, "INFORMATIE UIT JE PROFIEL IN DE APP".
+3. Vertaal, vertel niet alleen op. Verbind concepten expliciet aan wat de persoon beschreef. Gebruik hun woorden waar mogelijk.
+4. Bied een kleine, concrete volgende stap. Eén techniek of oefening die nu kan helpen, niet een hele lijst.
+5. Nodig eventueel uit tot verdere reflectie met maximaal één korte, open vraag (niet bij elk antwoord verplicht).
+
+Als een vraag geen directe match heeft in de kennisbank, beredeneer vanuit onderliggende principes (zenuwstelselregulatie, psychologische flexibiliteit). Verzin geen specifieke citaten of paginaverwijzingen die niet uit de kennisbank komen.
+
+ACT-principes (hexaflex) die je toepast wanneer de bronnen dat ondersteunen:
 • Acceptatie: ruimte maken voor wat er is, niet vechten tegen klachten.
 • Defusie: gedachten zien als gedachten, niet als feiten.
 • Aanwezig zijn: terug naar het hier en nu.
@@ -104,48 +87,45 @@ ACT-principes die je toepast wanneer de bronnen dat ondersteunen:
 • Toegewijd handelen: kleine, concrete stappen.
 • Zelf als context: jezelf zien als groter dan je gedachten en gevoelens.
 
-Je gebruikt deze taal alleen als de "INFORMATIE UIT HET PROGRAMMA" het ondersteunt. Je verzint geen oefeningen of metaforen die er niet staan.
+OMGAAN MET PROFIELGEGEVENS
+• Gebruik "INFORMATIE UIT JE PROFIEL IN DE APP" wanneer de vraag daarover gaat (stemming, waarden, check-ins, acties, barrières, module-reflecties).
+• Beschrijf alleen wat in het profiel staat. Geen interpretatie, geen diagnose, geen advies om iets te veranderen.
+• Als persoonlijke gegevens ontbreken, zeg dat eerlijk en verwijs naar het betreffende scherm in de app.
+• Gebruik "Eerdere gesprekken met de assistent" wanneer die aanwezig zijn.
 
-Wat je doet:
-• Je beantwoordt vragen op basis van "INFORMATIE UIT HET PROGRAMMA" en, als de vraag daarover gaat, "INFORMATIE UIT JE PROFIEL IN DE APP" (stemming, waarden, check-ins, acties, barrières) en "Eerdere gesprekken met de gids" wanneer die aanwezig zijn.
-• Bij vragen over het verloop van stemming of waarden: beschrijf alleen wat in het profiel staat. Geen interpretatie, geen diagnose, geen advies om iets te veranderen.
-• Koppel profielinformatie waar nuttig aan programmainformatie, maar blijf binnen wat er staat.
-• Als persoonlijke gegevens ontbreken, zeg dat eerlijk en verwijs naar het betreffende scherm in de app (stemming, waarden).
-• Je benadrukt dat klachten geen vijand zijn en dat terugval informatie is, geen mislukking.
+TOON EN STIJL
+• Rustig, zorgvuldig en professioneel. Geen overdreven enthousiasme, geen jargon zonder uitleg.
+• Empathisch zonder te overdrijven: erken wat iemand voelt, zonder het groter te maken dan het is.
+• Kort en behapbaar. Dit is een app, geen leerboek. Vermijd lange opsommingen tenzij gevraagd.
+• Spreek de persoon aan met je/jij. Geen diagnostische taal. Beschrijf patronen, stel geen diagnoses.
 
-Bij twijfel over de bedoeling van de vraag:
-• Gebruik type "clarify": stel één korte verduidelijkingsvraag in text. Zet de keuzemogelijkheden uitsluitend in options, niet als opsomming in text.
-• Bij type "clarify": options zijn altijd 2-3 concrete programma-onderwerpen of vragen (bijv. "Wat is de vermijdingscirkel?"). Nooit onzekerheidsantwoorden zoals "ik weet het niet", "geen idee" of "weet ik niet".
-• Geef geen antwoord als je niet zeker bent.
+GRENZEN
+• Geen diagnoses, geen behandelplan, geen medisch advies over medicatie of lichamelijke aandoeningen.
+• Geen reproductie van lange, letterlijke boekteksten. Leg concepten in eigen woorden uit.
+• Bij twijfel of een vraag te zwaar is voor zelfhulp: benoem dit en moedig professionele hulp aan.
+
+OMGAAN MET DE KENNISBANK
+• Gebruik de aangeleverde chunks als basis. Combineer ze vrijelijk tot één samenhangend antwoord.
+• Vermeld geen interne bronnen, chunk-ID's of bestandsnamen aan de gebruiker.
+• Als de kennisbank een boek of auteur noemt, mag je die noemen als dat relevant is.
+
+CRISISPROTOCOL (backup als dit bericht de LLM bereikt)
+1. Stop met het gewone zelfhulp-antwoord.
+2. Reageer kalm en serieus, zonder dramatiseren.
+3. Verwijs direct door naar 113 Zelfmoordpreventie: telefoon 113 of gratis 0800-0113, chat 113.nl, 24/7 bereikbaar, anoniem en gratis.
+4. Bied geen verdere zelfhulp-content aan in dat moment.
 
 Antwoordformaat (verplicht via tool chat_reply):
-• type "answer": je bent zeker; antwoord staat in de bronnen of het profiel.
-• type "clarify": bedoeling onduidelijk; geen inhoudelijk antwoord, alleen doorvraag + options.
-• type "out_of_scope": buiten programma en profiel; verwijs naar huisarts en 0800-0113.
+• type "answer": je geeft een inhoudelijk antwoord.
+• type "out_of_scope": de vraag valt buiten zelfhulp (medisch advies, acute crisis, behandeling buiten je rol). Verwijs naar huisarts en 113/0800-0113.
 
-Wat je nooit doet:
-• Je geeft nooit medisch advies, geen diagnose, geen behandelplan.
-• Je verzint nooit oefeningen, technieken of citaten die niet in de informatie staan. Als iets er niet staat, zeg je dat eerlijk.
-• Je doet geen uitspraken over medicatie, dosering of het stoppen daarmee.
-• Je doet geen beloften over herstel.
-• Je stelt geen meerdere vragen tegelijk.
-• Je geeft geen advies bij acute crisis. Bij signalen van suïcidaliteit, zelfbeschadiging, ernstige verslaving zonder begeleiding of acute psychische nood verwijs je de gebruiker direct naar professionele hulp.
-
-Als de vraag buiten het programma valt of als je het antwoord niet in de informatie kunt vinden:
-
-"Dit valt buiten wat ik vanuit het programma kan vertellen. Bespreek het met je huisarts, of bel bij directe nood 0800-0113."
-
-Bij signalen van crisis, ook al zit het niet expliciet in de vraag:
-
-"Het lijkt erop dat je nu veel meemaakt. Dit is een moment voor menselijke hulp, niet voor een app. Bel je huisarts, of bij directe nood 0800-0113 (24/7 bereikbaar)."
-
-Taal: Nederlands. Schrijfstijl: rustig, in jij-vorm, geen uitroeptekens. Geen streepjes als zinsbreuk; gebruik een punt, komma of dubbele punt.`;
+Taal: Nederlands.`;
 
 const CRISIS_RESPONSE =
-  'Het lijkt erop dat je nu veel meemaakt. Dit is een moment voor menselijke hulp, niet voor een app. Bel je huisarts, of bij directe nood 0800-0113 (24/7 bereikbaar).';
+  'Het lijkt erop dat je nu veel meemaakt. Dit is een moment voor menselijke hulp, niet voor een app. Bel 113 Zelfmoordpreventie: telefoon 113 of gratis 0800-0113. Chat: 113.nl. 24/7 bereikbaar, anoniem en gratis. Neem ook contact op met je huisarts.';
 
 const OUT_OF_SCOPE_RESPONSE =
-  'Dit valt buiten wat ik vanuit het programma kan vertellen. Bespreek het met je huisarts, of bel bij directe nood 0800-0113.';
+  'Dit valt buiten wat ik kan helpen vanuit zelfhulp. Bespreek het met je huisarts, of bel 113/0800-0113 bij directe nood.';
 
 const ERROR_GENERIC = 'Er ging iets mis. Probeer het opnieuw.';
 const ERROR_UNAUTHORIZED = 'Niet ingelogd.';
@@ -318,22 +298,20 @@ async function hybridSearch(
 
 const CHAT_REPLY_TOOL = {
   name: 'chat_reply',
-  description:
-    'Structured Dutch reply. Use clarify when intent is unclear. Never invent content not in context.',
+  description: 'Structured Dutch reply for the self-help knowledge assistant.',
   input_schema: {
     type: 'object',
     properties: {
-      type: { type: 'string', enum: ['answer', 'clarify', 'out_of_scope'] },
-      text: { type: 'string', description: 'Dutch message to the user; questions must end with ?' },
-      options: {
-        type: 'array',
-        items: { type: 'string' },
-        description:
-          'Required for clarify: 2-3 concrete Dutch program-topic questions. Never uncertainty phrases like "ik weet het niet".',
-      },
+      type: { type: 'string', enum: ['answer', 'out_of_scope'] },
+      text: { type: 'string', description: 'Dutch message to the user' },
     },
     required: ['type', 'text'],
   },
+};
+
+type StructuredReply = {
+  type: 'answer' | 'out_of_scope';
+  text: string;
 };
 
 // ── Claude Haiku call (structured via tool) ─────────────────────────────────
@@ -425,7 +403,7 @@ async function askClaude(
   const input = toolBlock?.input;
   if (
     input &&
-    (input.type === 'answer' || input.type === 'clarify' || input.type === 'out_of_scope') &&
+    (input.type === 'answer' || input.type === 'out_of_scope') &&
     typeof input.text === 'string'
   ) {
     return { reply: input, ...usage };
@@ -446,16 +424,6 @@ function jsonResponse(body: unknown, status = 200): Response {
     status,
     headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
   });
-}
-
-function resolveClarifyOptions(
-  reply: StructuredReply,
-  question: string,
-  chunks: Chunk[],
-  userContextData: Awaited<ReturnType<typeof fetchChatUserContext>>,
-): string[] {
-  const fromLlm = (reply.options ?? []).map((o) => o.trim()).filter(Boolean);
-  return sanitizeClarifyOptions(fromLlm, question, chunks, userContextData);
 }
 
 function firstTurnAnswer(
@@ -582,46 +550,6 @@ Deno.serve(async (req: Request) => {
       filterPhase,
     );
 
-    if (chunks.length === 0 && isUserContextEmpty(userContextData)) {
-      return jsonResponse({
-        answer: firstTurnAnswer(OUT_OF_SCOPE_RESPONSE, historyForLlm, firstName),
-        chunksFound: 0,
-        noMatch: true,
-      });
-    }
-
-    const preClarify = assessClarifyNeed(searchQuestion, chunks, userContextData, historyForLlm);
-    if (preClarify) {
-      return jsonResponse({
-        answer: firstTurnAnswer(stripClarifyBulletOptions(CLARIFY_PROMPTS[preClarify.reason]), historyForLlm, firstName),
-        chunksFound: chunks.length,
-        clarify: true,
-        clarifyOptions: sanitizeClarifyOptions(
-          preClarify.options,
-          searchQuestion,
-          chunks,
-          userContextData,
-        ),
-      });
-    }
-
-    if (
-      uncertaintyStreak(searchQuestion, historyForLlm) >= 2 ||
-      isClarifyFollowUp(searchQuestion, historyForLlm)
-    ) {
-      return jsonResponse({
-        answer: firstTurnAnswer(UNCERTAINTY_LOOP_RESPONSE, historyForLlm, firstName),
-        chunksFound: chunks.length,
-        clarify: true,
-        clarifyOptions: sanitizeClarifyOptions(
-          buildClarifyOptions(searchQuestion, chunks, userContextData),
-          searchQuestion,
-          chunks,
-          userContextData,
-        ),
-      });
-    }
-
     const { reply, inputTokens, cacheReadInputTokens, cacheCreationInputTokens } =
       await askClaude(searchQuestion, chunks, historyForLlm, userContextText, conversationMemory);
 
@@ -630,17 +558,6 @@ Deno.serve(async (req: Request) => {
       cacheReadInputTokens,
       cacheCreationInputTokens,
     };
-
-    if (reply.type === 'clarify') {
-      const options = resolveClarifyOptions(reply, searchQuestion, chunks, userContextData);
-      return jsonResponse({
-        answer: firstTurnAnswer(stripClarifyBulletOptions(reply.text), historyForLlm, firstName),
-        chunksFound: chunks.length,
-        clarify: true,
-        clarifyOptions: options,
-        ...usage,
-      });
-    }
 
     if (reply.type === 'out_of_scope') {
       return jsonResponse({

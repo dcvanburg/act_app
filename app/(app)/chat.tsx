@@ -18,11 +18,9 @@ import { BackButton } from '@/components/BackButton';
 import { ChatComposer, type ChatComposerHandle } from '@/components/chat/ChatComposer';
 import { CrisisCard } from '@/components/chat/CrisisCard';
 import { MessageBubble } from '@/components/chat/MessageBubble';
-import { ClarifyCard } from '@/components/chat/ClarifyCard';
 import { NoMatchCard } from '@/components/chat/NoMatchCard';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import chat from '@/content/nl/chat.json';
-import { stripClarifyBulletOptions } from '@/lib/chat-greeting';
 import { ensureQuestionMarks } from '@/lib/chat-punctuation';
 import { defaultTabBarStyle, hiddenTabBarStyle } from '@/lib/tab-bar';
 import {
@@ -33,7 +31,6 @@ import {
   useInsertChatMessage,
 } from '@/lib/chat-messages-queries';
 import { pickChatOpeningSuggestions } from '@/lib/chat-opening-suggestions';
-import { sanitizeClarifyOptions } from '@/lib/chat-ambiguity';
 import { pickChatSuggestions } from '@/lib/chat-suggestions';
 import { useChatMutation, type ChatHistoryEntry, type ChatResponse } from '@/lib/chat-queries';
 import { useMoodLogs, useTodaysMood } from '@/lib/mood-queries';
@@ -61,21 +58,19 @@ function resetChatUiState(setters: {
   setHydrated: (value: boolean) => void;
   setCrisisActive: (value: boolean) => void;
   setNoMatchSuggestions: (value: string[] | null) => void;
-  setClarifyOptions: (value: string[] | null) => void;
   setErrorText: (value: string | null) => void;
 }) {
   setters.setMessages([]);
   setters.setHydrated(true);
   setters.setCrisisActive(false);
   setters.setNoMatchSuggestions(null);
-  setters.setClarifyOptions(null);
   setters.setErrorText(null);
 }
 
 /**
  * /chat — RAG chatbot screen (ADR-005).
  *
- * Messages persist per chat session. The gids recalls all stored sessions
+ * Messages persist per chat session. The assistant recalls all stored sessions
  * server-side; the UI shows only the active session.
  */
 export default function ChatScreen() {
@@ -121,7 +116,6 @@ export default function ChatScreen() {
   const [hydrated, setHydrated] = useState(false);
   const [crisisActive, setCrisisActive] = useState(false);
   const [noMatchSuggestions, setNoMatchSuggestions] = useState<string[] | null>(null);
-  const [clarifyOptions, setClarifyOptions] = useState<string[] | null>(null);
   const [errorText, setErrorText] = useState<string | null>(null);
 
   useFocusEffect(
@@ -201,7 +195,6 @@ export default function ChatScreen() {
 
     setErrorText(null);
     setNoMatchSuggestions(null);
-    setClarifyOptions(null);
     appendUser(question);
 
     const historyForRequest: ChatHistoryEntry[] = [...history, { role: 'user', content: question }];
@@ -227,28 +220,6 @@ export default function ChatScreen() {
             setNoMatchSuggestions(pickChatSuggestions(question));
             return;
           }
-          if (data.clarify) {
-            const clarifyText = ensureQuestionMarks(stripClarifyBulletOptions(data.answer));
-            appendAssistant(clarifyText);
-            void persistMessage('assistant', clarifyText);
-            setClarifyOptions(
-              sanitizeClarifyOptions(
-                data.clarifyOptions ?? pickChatSuggestions(question),
-                question,
-                [],
-                {
-                  complaintTypes: [],
-                  moodLogs: [],
-                  waarden: [],
-                  acties: [],
-                  barriers: [],
-                  checkins: [],
-                  moduleNotes: [],
-                },
-              ),
-            );
-            return;
-          }
           const answerText = ensureQuestionMarks(data.answer);
           appendAssistant(answerText);
           void persistMessage('assistant', answerText);
@@ -265,11 +236,6 @@ export default function ChatScreen() {
     void handleSend(text);
   }
 
-  function handleTypeOwnQuestion() {
-    if (mutation.isPending || crisisActive) return;
-    requestAnimationFrame(() => composerRef.current?.focus());
-  }
-
   function afterClear(newSessionId?: string) {
     mutation.reset();
     loadedSessionRef.current = newSessionId ?? null;
@@ -278,7 +244,6 @@ export default function ChatScreen() {
       setHydrated,
       setCrisisActive,
       setNoMatchSuggestions,
-      setClarifyOptions,
       setErrorText,
     });
   }
@@ -308,8 +273,7 @@ export default function ChatScreen() {
   const clearing = clearCurrentChat.isPending;
   const composerDisabled =
     mutation.isPending || clearing || (!effectiveSessionId && sessionLoading);
-  const canClear =
-    messages.length > 0 || crisisActive || noMatchSuggestions !== null || clarifyOptions !== null;
+  const canClear = messages.length > 0 || crisisActive || noMatchSuggestions !== null;
 
   return (
     <KeyboardAvoidingView
@@ -353,14 +317,6 @@ export default function ChatScreen() {
         ))}
 
         {mutation.isPending ? <TypingIndicator /> : null}
-
-        {clarifyOptions ? (
-          <ClarifyCard
-            options={clarifyOptions}
-            onPick={handleSuggestion}
-            onTypeOwn={handleTypeOwnQuestion}
-          />
-        ) : null}
 
         {noMatchSuggestions ? (
           <NoMatchCard suggestions={noMatchSuggestions} onPick={handleSuggestion} />
