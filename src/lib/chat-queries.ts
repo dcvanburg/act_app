@@ -34,11 +34,8 @@ export interface ChatResponse {
   answer: string;
   chunksFound: number;
   crisis?: boolean;
-  /** True when hybrid_search returned zero chunks — client shows suggestion chips. */
+  /** True when the assistant marks the question out of scope — client shows suggestion chips. */
   noMatch?: boolean;
-  /** True when intent is unclear — client shows clarify chips after assistant bubble. */
-  clarify?: boolean;
-  clarifyOptions?: string[];
 }
 
 export interface ChatMutationArgs {
@@ -139,8 +136,6 @@ async function callSearchFunction(args: ChatMutationArgs): Promise<ChatResponse>
     chunksFound: data.chunksFound ?? 0,
     crisis: data.crisis === true,
     noMatch: data.noMatch === true,
-    clarify: data.clarify === true,
-    clarifyOptions: Array.isArray(data.clarifyOptions) ? data.clarifyOptions : undefined,
   };
 }
 

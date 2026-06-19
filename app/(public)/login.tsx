@@ -1,5 +1,6 @@
+import type { AuthError } from '@supabase/supabase-js';
 import { Redirect, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -16,7 +17,10 @@ import auth from '@/content/nl/auth.json';
 import common from '@/content/nl/common.json';
 import { AppTextInput } from '@/components/AppTextInput';
 import { getAuthRedirectUrl } from '@/lib/auth-redirect';
-import { isValidOtpCode, verifyEmailOtp } from '@/lib/auth-login';
+import {
+  formatRateLimitMessage,
+  mapSignInOtpError,
+} from '@/lib/auth-login';
 import { supabase, SUPABASE_CONFIGURED } from '@/lib/supabase/client';
 import { useAuth } from '@/providers/AuthProvider';
 
@@ -57,11 +61,40 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [step, setStep] = useState<Step>('email');
   const [loading, setLoading] = useState(false);
+  const [retryUntil, setRetryUntil] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(() => {
     if (reasonParam === 'session_expired') return auth.sessionExpired;
-    if (errorParam === 'auth') return 'Inloggen mislukt. Probeer het opnieuw.';
+    if (errorParam === 'auth') return auth.errors.authFailed;
     return null;
   });
+
+  const cooldownActive = retryUntil !== null && Date.now() < retryUntil;
+
+  useEffect(() => {
+    if (retryUntil === null) return;
+
+    const tick = () => {
+      const remainingMs = retryUntil - Date.now();
+      if (remainingMs <= 0) {
+        setRetryUntil(null);
+        setError(null);
+        return;
+      }
+      setError(formatRateLimitMessage(Math.ceil(remainingMs / 1000)));
+    };
+
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [retryUntil]);
+
+  function applyOtpSendError(signInError: AuthError) {
+    const mapped = mapSignInOtpError(signInError);
+    if (mapped.kind === 'rate_limit') {
+      setRetryUntil(Date.now() + mapped.retryAfterSeconds * 1000);
+    }
+    setError(mapped.message);
+  }
 
   if (session) {
     return <Redirect href="/home" />;
@@ -71,11 +104,14 @@ export default function LoginScreen() {
     if (!email.trim()) return;
 
     if (!SUPABASE_CONFIGURED) {
-      setError('App is niet geconfigureerd. Neem contact op met de beheerder.');
+      setError(auth.errors.notConfigured);
       return;
     }
 
+    if (cooldownActive) return;
+
     setError(null);
+    setRetryUntil(null);
     setLoading(true);
 
     const { error: signInError } = await supabase.auth.signInWithOtp({
@@ -88,28 +124,18 @@ export default function LoginScreen() {
     if (signInError) {
       // eslint-disable-next-line no-console
       console.error('[Login] signInWithOtp failed:', signInError.message, signInError.status);
-      setError('Er is iets misgegaan. Controleer het e-mailadres en probeer opnieuw.');
+      applyOtpSendError(signInError);
       return;
     }
 
     setStep('sent');
   }
 
-  async function handleVerifyOtp(code: string) {
-    setError(null);
-    setLoading(true);
-
-    try {
-      await verifyEmailOtp(email, code);
-    } catch {
-      setError(auth.sent.otpInvalid);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   async function handleResend() {
+    if (cooldownActive) return;
+
     setError(null);
+    setRetryUntil(null);
     setLoading(true);
 
     const { error: resendError } = await supabase.auth.signInWithOtp({
@@ -120,7 +146,7 @@ export default function LoginScreen() {
     setLoading(false);
 
     if (resendError) {
-      setError('Verzenden mislukt. Probeer het later opnieuw.');
+      applyOtpSendError(resendError);
     }
   }
 
@@ -157,18 +183,20 @@ export default function LoginScreen() {
             <SentConfirmation
               email={email}
               loading={loading}
+              cooldownActive={cooldownActive}
               error={error}
               onResend={handleResend}
-              onVerifyOtp={handleVerifyOtp}
               onChangeEmail={() => {
                 setStep('email');
                 setError(null);
+                setRetryUntil(null);
               }}
             />
           ) : (
             <EmailForm
               email={email}
               loading={loading}
+              cooldownActive={cooldownActive}
               error={error}
               onChangeEmail={setEmail}
               onSubmit={handleSubmitEmail}
@@ -187,6 +215,7 @@ export default function LoginScreen() {
 function EmailForm(props: {
   email: string;
   loading: boolean;
+  cooldownActive: boolean;
   error: string | null;
   onChangeEmail: (v: string) => void;
   onSubmit: () => void;
@@ -210,7 +239,7 @@ function EmailForm(props: {
       <Pressable
         accessibilityRole="button"
         onPress={props.onSubmit}
-        disabled={props.loading || props.email.trim().length === 0}
+        disabled={props.loading || props.cooldownActive || props.email.trim().length === 0}
         className="rounded-lg bg-primary px-4 py-3 active:bg-primary-dark disabled:opacity-60"
       >
         {props.loading ? (
@@ -228,14 +257,11 @@ function EmailForm(props: {
 function SentConfirmation(props: {
   email: string;
   loading: boolean;
+  cooldownActive: boolean;
   error: string | null;
   onResend: () => void;
-  onVerifyOtp: (code: string) => void;
   onChangeEmail: () => void;
 }) {
-  const [code, setCode] = useState('');
-  const canSubmit = isValidOtpCode(code);
-
   return (
     <View className="rounded-2xl bg-surface p-6 shadow-sm">
       <Text className="mb-2 font-serif text-xl font-semibold text-text">{auth.sent.title}</Text>
@@ -244,36 +270,7 @@ function SentConfirmation(props: {
       </Text>
       <Text className="mb-5 whitespace-pre-line text-sm text-text-subtle">{auth.sent.steps}</Text>
 
-      <Text className="mb-1 text-sm font-medium text-text">{auth.sent.otpOptionalTitle}</Text>
-      <Text className="mb-3 text-xs text-text-muted">{auth.sent.otpOptionalHint}</Text>
-      <Text className="mb-1 text-sm font-medium text-text">{auth.sent.otpLabel}</Text>
-      <AppTextInput
-        value={code}
-        onChangeText={(value) => setCode(value.replace(/\D/g, '').slice(0, 6))}
-        autoComplete="one-time-code"
-        keyboardType="number-pad"
-        textContentType="oneTimeCode"
-        editable={!props.loading}
-        placeholder={auth.sent.otpPlaceholder}
-        className="mb-4"
-      />
-
-      {props.error ? <Text className="mb-3 text-sm text-crisis">{props.error}</Text> : null}
-
-      <Pressable
-        accessibilityRole="button"
-        onPress={() => props.onVerifyOtp(code)}
-        disabled={!canSubmit || props.loading}
-        className="mb-5 rounded-lg bg-primary px-4 py-3 active:bg-primary-dark disabled:opacity-60"
-      >
-        {props.loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text className="text-center text-base font-semibold text-white">
-            {auth.sent.otpSubmit}
-          </Text>
-        )}
-      </Pressable>
+      {props.error ? <Text className="mb-5 text-sm text-crisis">{props.error}</Text> : null}
 
       <View className="flex-row items-center justify-between">
         <Pressable
@@ -283,7 +280,7 @@ function SentConfirmation(props: {
         >
           <Text className="text-sm text-text-muted">{auth.sent.changeEmail}</Text>
         </Pressable>
-        <Pressable accessibilityRole="button" onPress={props.onResend} disabled={props.loading}>
+        <Pressable accessibilityRole="button" onPress={props.onResend} disabled={props.loading || props.cooldownActive}>
           {props.loading ? (
             <ActivityIndicator color="#3B6D11" size="small" />
           ) : (
